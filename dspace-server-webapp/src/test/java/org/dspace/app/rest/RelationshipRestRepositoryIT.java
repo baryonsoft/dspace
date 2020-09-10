@@ -238,7 +238,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .createRelationshipBuilder(context, project1, orgUnit1, isOrgUnitOfProjectRelationshipType).build();
 
         Relationship relationship3 = RelationshipBuilder
-                .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType).build();
+                .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType)
+                .build();
 
         context.restoreAuthSystemState();
 
@@ -726,11 +727,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
             List<MetadataValue> list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
-            // Ensure that the list of dc.contributor.author values now holds two values ("Smith, Donald" and "plain text")
+            // Ensure that the list of dc.contributor.author values now holds two values
+            // ("Smith, Donald" and "plain text")
             assertEquals(2, list.size());
             for (MetadataValue mdv : list) {
-                // Here we want to ensure that the "plain text" metadatavalue has place 1 because it was added later than
-                // the Relationship, so the "Smith, Donald" should have place 0 and "plain text" should have place 1
+                // Here we want to ensure that the "plain text" metadatavalue has place 1 because it was added later
+                // than the Relationship,
+                // so the "Smith, Donald" should have place 0 and "plain text" should have place 1
                 if (StringUtils.equals(mdv.getValue(), "plain text")) {
                     assertEquals(1, mdv.getPlace());
                 }
@@ -1071,7 +1074,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
             // The list should currently look like this: "Donald Smith", "plain text", "Maria Smith", "plain text two"
 
-            // This creates a third relationship for the publication and thus adding a fifth value for author metadatavalues
+            // This creates a third relationship for the publication
+            // and thus adding a fifth value for author metadatavalues
             getClient(adminToken).perform(post("/api/core/relationships")
                     .param("relationshipType",
                             isAuthorOfPublicationRelationshipType.getID()
@@ -1109,7 +1113,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
             // Now we will have a dc.contributor.author metadatavalue list of size 6 in the following order:
             // "Smith, Donald", "plain text", "Smith, Maria", "plain text two", "Maybe, Maybe", "plain text three"
-            List<MetadataValue> authors = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
+            List<MetadataValue> authors = itemService.getMetadata(publication1,
+                    "dc", "contributor", "author", Item.ANY);
             List<MetadataValue> listToRemove = new LinkedList<>();
             for (MetadataValue metadataValue : authors) {
                 if (StringUtils.equals(metadataValue.getValue(), "plain text two")) {
@@ -1284,7 +1289,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
             // The list should currently look like this: "Donald Smith", "plain text", "Maria Smith", "plain text two"
 
-            // This creates a third relationship for the publication and thus adding a fifth value for author metadatavalues
+            // This creates a third relationship for the publication
+            // and thus adding a fifth value for author metadatavalues
             getClient(adminToken).perform(post("/api/core/relationships")
                     .param("relationshipType",
                             isAuthorOfPublicationRelationshipType.getID()
@@ -1395,8 +1401,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         AtomicReference<Integer> idRef1 = new AtomicReference<>();
         AtomicReference<Integer> idRef2 = new AtomicReference<>();
         try {
-            // This post request will add a first relationship to the publication and thus create a first set of metadata
-            // For the author values, namely "Donald Smith"
+            // This post request will add a first relationship to the publication and thus create a
+            // first set of metadata for the author values, namely "Donald Smith"
             getClient(adminToken).perform(post("/api/core/relationships")
                     .param("relationshipType",
                             isAuthorOfPublicationRelationshipType.getID()
@@ -1670,7 +1676,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("rightPlace", is(2)));
 
-            // Here we will delete the secondRelationship and then verify that the others have their place handled properly
+            // Here we will delete the secondRelationship
+            // and then verify that the others have their place handled properly
             getClient(adminToken).perform(delete("/api/core/relationships/" + idRef2))
                     .andExpect(status().isNoContent());
 
@@ -2175,7 +2182,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         // We're creating a Relationship of type isAuthorOfPublication between a publication and an author
         Relationship relationship3 = RelationshipBuilder
-                .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType).build();
+                .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType)
+                .build();
 
         context.restoreAuthSystemState();
         // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
