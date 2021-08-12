@@ -55,9 +55,8 @@ EXPOSE 8080 8009
 ENV JAVA_OPTS=-Xmx2000m
 
 # Run the "server" webapp off the /server path (e.g. http://localhost:8080/server/)
-RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
+#RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
 # If you wish to run "server" webapp off the ROOT path, then comment out the above RUN, and uncomment the below RUN.
 # You also MUST update the URL in dspace/src/main/docker/local.cfg
 # Please note that server webapp should only run on one path at a time.
-#RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
-#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
+RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
