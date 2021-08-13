@@ -62,7 +62,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
     protected void fillFromModel(T obj, R witem, Projection projection) {
         Collection collection = obj.getCollection();
         Item item = obj.getItem();
-        EPerson submitter = null;
+        EPerson submitter;
         submitter = obj.getSubmitter();
 
         witem.setId(obj.getID());

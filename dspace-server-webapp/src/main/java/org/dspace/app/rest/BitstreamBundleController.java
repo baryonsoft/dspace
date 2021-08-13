@@ -101,6 +101,7 @@ public class BitstreamBundleController {
         BundleRest bundleRest = bitstreamRestRepository.performBitstreamMove(context, bitstream,
                 (Bundle) dsoList.get(0));
 
+        assert context != null;
         context.commit();
 
         return bundleRest;

@@ -106,6 +106,7 @@ public class AuthenticationRestController implements InitializingBean {
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
         Projection projection = utils.obtainProjection();
+        assert context != null;
         if (context.getCurrentUser() != null) {
             ePersonRest = converter.toRest(context.getCurrentUser(), projection);
         }
@@ -119,9 +120,8 @@ public class AuthenticationRestController implements InitializingBean {
             response.setHeader("WWW-Authenticate", authenticateHeaderValue);
         }
         authenticationStatusRest.setProjection(projection);
-        AuthenticationStatusResource authenticationStatusResource = converter.toResource(authenticationStatusRest);
 
-        return authenticationStatusResource;
+        return converter.toResource(authenticationStatusRest);
     }
 
     /**
