@@ -8,6 +8,8 @@ updates:
     interval: weekly
     time: '00:00'
   open-pull-requests-limit: 20
+  reviewers:
+    - astrowq
   assignees:
     - astrowq
   commit-message:
