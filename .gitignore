@@ -42,4 +42,4 @@ nb-configuration.xml
 
 ##Ignore JRebel project configuration
 rebel.xml
-!/local-dev/
+local-dev/
