@@ -21,9 +21,7 @@ jobs:
       # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token
       # This is necessary because the "DSpace Backlog" project is an org level project (i.e. not repo specific)
       with:
-        GITHUB_TOKEN: ${{ secrets.ORG_PROJECT_TOKEN }}
         PROJECT: DSpace Backlog
         COLUMN: Triage
-        CHECK_ORG_PROJECT: true
       # Ignore errors.
       continue-on-error: true
