@@ -74,4 +74,4 @@ jobs:
 
       # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.1.0
