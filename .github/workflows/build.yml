@@ -38,7 +38,7 @@ jobs:
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2.3.4
 
       # https://github.com/actions/setup-java
       - name: Install JDK 11
