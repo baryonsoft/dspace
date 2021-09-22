@@ -38,7 +38,7 @@
         <jetty.version>9.4.41.v20210516</jetty.version>
         <log4j.version>2.13.3</log4j.version>
         <pdfbox-version>2.0.24</pdfbox-version>
-        <poi-version>3.17</poi-version>
+        <poi-version>4.1.2</poi-version>
         <slf4j.version>1.7.25</slf4j.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
