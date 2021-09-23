@@ -45,6 +45,7 @@ jobs:
         uses: actions/setup-java@v2.3.0
         with:
           java-version: 11
+          distribution: 'adopt'
 
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
