@@ -1,7 +1,7 @@
 
 # DSpace
 
-[![Build Status](https://github.com/DSpace/DSpace/workflows/Build/badge.svg)](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild)
+[![Build](https://github.com/astrowq/baryonics-dspace/actions/workflows/build.yml/badge.svg)](https://github.com/astrowq/baryonics-dspace/actions/workflows/build.yml)
 
 [DSpace Documentation](https://wiki.lyrasis.org/display/DSDOC/) |
 [DSpace Releases](https://github.com/DSpace/DSpace/releases) |
