@@ -42,9 +42,10 @@ jobs:
 
       # https://github.com/actions/setup-java
       - name: Install JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2.3.0
         with:
           java-version: 11
+          distribution: 'adopt'
 
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
