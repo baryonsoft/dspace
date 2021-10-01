@@ -50,9 +50,13 @@ RUN ant init_installation update_configs update_code update_webapps
 FROM tomcat:8-jdk11
 ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
-EXPOSE 8080 8009
 
-ENV JAVA_OPTS=-Xmx2000m
+#EXPOSE 8009
+#RUN sed -i 's/port="8080"/port="${PORT}"/' ${CATALINA_HOME}/conf/server.xml
+COPY scripts/run.sh $CATALINA_HOME/bin/run.sh
+RUN chmod +x $CATALINA_HOME/bin/run.sh
+
+ENV JAVA_OPTS="-Xmx500m -Xss200m -XX:CICompilerCount=2 -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+UseConcMarkSweepGC"
 
 # Run the "server" webapp off the /server path (e.g. http://localhost:8080/server/)
 #RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
@@ -62,3 +66,4 @@ ENV JAVA_OPTS=-Xmx2000m
 RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
 
 #ENTRYPOINT ["/bin/bash", "-c" , "/dspace/bin/dspace database migrate && catalina.sh run"]
+#ENTRYPOINT ["/bin/bash", "-c" , "catalina.sh run"]
