@@ -60,3 +60,5 @@ ENV JAVA_OPTS=-Xmx2000m
 # You also MUST update the URL in dspace/src/main/docker/local.cfg
 # Please note that server webapp should only run on one path at a time.
 RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
+
+#ENTRYPOINT ["/bin/bash", "-c" , "/dspace/bin/dspace database migrate && catalina.sh run"]
