@@ -4,26 +4,26 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
 
     <bean name="org.dspace.storage.bitstore.BitstreamStorageService" class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl">
-        <property name="incoming" value="0"/>
+        <property name="incoming" value="1"/>
         <property name="stores">
             <map>
                 <entry key="0" value-ref="localStore"/>
-                <!--<entry key="1" value-ref="s3Store"/>-->
+                <entry key="1" value-ref="s3Store"/>
             </map>
         </property>
     </bean>
 
-    <bean name="localStore" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
+    <bean name="localStore" class="org.dspace.storage.bitstore.DSBitStoreService">
         <property name="baseDir" value="${assetstore.dir}"/>
     </bean>
 
-    <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton">
+    <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService">
         <!-- AWS Security credentials, with policies for specified bucket -->
-        <property name="awsAccessKey" value=""/>
-        <property name="awsSecretKey" value=""/>
+        <property name="awsAccessKey" value="${minio.accesskey}"/>
+        <property name="awsSecretKey" value="${minio.secretkey}"/>
 
         <!-- S3 bucket name to store assets in. example: longsight-dspace-auk -->
-        <property name="bucketName" value=""/>
+        <property name="bucketName" value="${minio.bucketname}"/>
 
         <!-- AWS S3 Region to use: {us-east-1, us-west-1, eu-west-1, eu-central-1, ap-southeast-1, ... } -->
         <!-- Optional, sdk default is us-east-1 -->
