@@ -13,8 +13,8 @@ services:
 #    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x}"
     image: baryonics-dspace
     environment:
-      JAVA_OPTS: -Xmx300m -Xss512k -XX:CICompilerCount=2
-      dspace__P__server__P__url: http://localhost:8088
+      JAVA_OPTS: -Xmx500m -Xss512k -XX:CICompilerCount=2
+#      dspace__P__server__P__url: http://localhost:8088
     build:
       context: .
       dockerfile: Dockerfile
@@ -23,8 +23,8 @@ services:
     networks:
       dspacenet:
     ports:
-    - published: 8088
-      target: 8088
+    - published: 8080
+      target: 8080
     - published: 8009
       target: 8009
     stdin_open: true
@@ -42,7 +42,7 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
-      ./bin/run.sh 8088
+      ./bin/run.sh 8080
 #      catalina.sh run
   # DSpace database container
   dspacedb:

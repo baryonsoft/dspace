@@ -2,7 +2,7 @@
   <configuration default="false" name="dspace-server" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.52" ALTERNATIVE_JRE_ENABLED="false">
     <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8090" />
     <option name="COMMON_VM_ARGUMENTS" value="-Ddspace.dir=$PROJECT_DIR$/../dspace-install" />
-    <option name="UPDATING_POLICY" value="redeploy-artifacts" />
+    <option name="UPDATING_POLICY" value="restart-server" />
     <deployment>
       <artifact name="server:war exploded">
         <settings>
@@ -83,6 +83,8 @@
         <option name="PROGRAM_PARAMETERS" value="" />
       </SHUTDOWN>
     </ConfigurationWrapper>
-    <method v="2" />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="database migration" run_configuration_type="ShConfigurationType" />
+    </method>
   </configuration>
 </component>
