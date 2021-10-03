@@ -62,6 +62,7 @@ public class S3BitStoreService implements BitStoreService {
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
+    private String endpoint;
 
     /**
      * container for all the assets
@@ -92,8 +93,9 @@ public class S3BitStoreService implements BitStoreService {
      */
     @Override
     public void init() throws IOException {
-        if (StringUtils.isBlank(getAwsAccessKey()) || StringUtils.isBlank(getAwsSecretKey())) {
-            log.warn("Empty S3 access or secret");
+        if (StringUtils.isBlank(getAwsAccessKey()) ||
+                StringUtils.isBlank(getAwsSecretKey()) || StringUtils.isBlank(getEndpoint())) {
+            log.warn("Empty S3 access, secret or endpoint.");
         }
 
         // init client
@@ -103,8 +105,7 @@ public class S3BitStoreService implements BitStoreService {
         s3Client = AmazonS3ClientBuilder
                 .standard()
                 .withEndpointConfiguration(
-                        new AwsClientBuilder.EndpointConfiguration(
-                                configurationService.getProperty("minio.endpoint"), Regions.US_EAST_1.name()))
+                        new AwsClientBuilder.EndpointConfiguration(getEndpoint(), Regions.US_EAST_1.name()))
                 .withPathStyleAccessEnabled(true)
                 .withClientConfiguration(clientConfiguration)
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
@@ -426,5 +427,13 @@ public class S3BitStoreService implements BitStoreService {
         // should get nothing back now - will throw exception
         store.get(id);
 */
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
     }
 }
