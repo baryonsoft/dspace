@@ -85,16 +85,40 @@ services:
     - solr_data:/var/solr/data
     # Initialize all DSpace Solr cores using the mounted local config sets (see above), then start Solr
     entrypoint:
-    - /bin/bash
-    - '-c'
-    - |
-      init-var-solr
-      precreate-core authority /opt/solr/server/solr/configsets/authority
-      precreate-core oai /opt/solr/server/solr/configsets/oai
-      precreate-core search /opt/solr/server/solr/configsets/search
-      precreate-core statistics /opt/solr/server/solr/configsets/statistics
-      exec solr -f
+      - /bin/bash
+      - '-c'
+      - |
+        init-var-solr
+        precreate-core authority /opt/solr/server/solr/configsets/authority
+        precreate-core oai /opt/solr/server/solr/configsets/oai
+        precreate-core search /opt/solr/server/solr/configsets/search
+        precreate-core statistics /opt/solr/server/solr/configsets/statistics
+        exec solr -f
+
+  minio:
+    image: minio/minio:latest
+    container_name: myminio
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: server /data
+  mc:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host rm local;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://myminio:9000 minio minio123;
+      /usr/bin/mc rb --force local/bucket1/;
+      /usr/bin/mc mb --quiet local/bucket1/;
+      /usr/bin/mc policy set public local/bucket1;
+      "
+
 volumes:
   assetstore:
   pgdata:
   solr_data:
+  minio_data:
