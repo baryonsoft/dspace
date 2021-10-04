@@ -51,12 +51,10 @@ FROM tomcat:8-jdk11
 ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 
-#EXPOSE 8009
-#RUN sed -i 's/port="8080"/port="${PORT}"/' ${CATALINA_HOME}/conf/server.xml
 COPY scripts/run.sh $CATALINA_HOME/bin/run.sh
 RUN chmod +x $CATALINA_HOME/bin/run.sh
 
-ENV JAVA_OPTS="-Xmx300m -Xss50m"
+ENV JAVA_OPTS="-Xmx300m -Xms50m -Xss900k -XX:+UseContainerSupport"
 
 # Run the "server" webapp off the /server path (e.g. http://localhost:8080/server/)
 #RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
@@ -65,5 +63,9 @@ ENV JAVA_OPTS="-Xmx300m -Xss50m"
 # Please note that server webapp should only run on one path at a time.
 RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
 
-#ENTRYPOINT ["/bin/bash", "-c" , "/dspace/bin/dspace database migrate && catalina.sh run"]
-#ENTRYPOINT ["/bin/bash", "-c" , "catalina.sh run"]
+# Add the newrelic.jar and -javaagent parameters
+RUN mkdir -p /usr/local/tomcat/newrelic
+ADD newrelic.yml /usr/local/tomcat/newrelic/
+ENV JAVA_OPTS="$JAVA_OPTS -Dnewrelic.config.file=/usr/local/tomcat/newrelic/newrelic.yml -Dnewrelic.config.log_file_name=STDOUT"
+
+ENTRYPOINT ["/bin/bash", "-c" , "/dspace/bin/dspace database migrate && catalina.sh run"]
