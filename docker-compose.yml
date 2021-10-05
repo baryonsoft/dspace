@@ -9,12 +9,12 @@ networks:
 services:
   # DSpace (backend) webapp container
   dspace:
-    container_name: dspace
+    container_name: baryonics
 #    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x}"
     image: baryonics-dspace
     environment:
       JAVA_OPTS: -Xmx500m -Xss512k -XX:CICompilerCount=2
-#      dspace__P__server__P__url: http://localhost:8088
+    #      dspace__P__server__P__url: http://localhost:8088
     build:
       context: .
       dockerfile: Dockerfile
@@ -96,15 +96,19 @@ services:
         exec solr -f
 
   minio:
-    image: bitnami/minio:latest
-    container_name: myminio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
+    image: minio/minio
+    container_name: minio-local
+    command: server --console-address ":9001" /data1
+    networks:
+      dspacenet:
     environment:
-      MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio123
-      MINIO_DEFAULT_BUCKETS: 'bucket1:public'
+      MINIO_ROOT_USER: minio-user
+      MINIO_ROOT_PASSWORD: minio-password
+    ports:
+      - "9001:9001"
+      - "9000:9000"
+    volumes:
+      - minio_data:/data1
 
 volumes:
   assetstore:
