@@ -1,0 +1,3 @@
+[submodule "deployment"]
+	path = deployment
+	url = https://github.com/astrowq/baryonbib.git

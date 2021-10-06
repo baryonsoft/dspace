@@ -12,7 +12,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,9 +72,9 @@ public class UUIDLookupRestController implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService
             .register(this,
-                    Arrays.asList(
+                    List.of(
                             new Link(
-                                    new UriTemplate("/api/" + CATEGORY + "/" + ACTION,
+                                    UriTemplate.of("/api/" + CATEGORY + "/" + ACTION,
                                             new TemplateVariables(
                                                     new TemplateVariable(PARAM, VariableType.REQUEST_PARAM))),
                                     CATEGORY)));
