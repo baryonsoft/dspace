@@ -54,7 +54,7 @@ COPY --from=ant_build /dspace $DSPACE_INSTALL
 COPY scripts/run.sh $CATALINA_HOME/bin/run.sh
 RUN chmod +x $CATALINA_HOME/bin/run.sh
 
-ENV JAVA_OPTS="-Xmx300m -Xms50m -Xss900k -XX:+UseContainerSupport"
+ENV JAVA_OPTS="-Xmx3000m -Xms500m -Xss900k -XX:+UseContainerSupport"
 
 # Run the "server" webapp off the /server path (e.g. http://localhost:8080/server/)
 #RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server

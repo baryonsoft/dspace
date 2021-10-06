@@ -27,7 +27,7 @@ public class RootConverter {
     public RootRest convert() {
         RootRest rootRest = new RootRest();
         rootRest.setDspaceName(configurationService.getProperty("dspace.name"));
-        rootRest.setBaryonicsVersion("Baryonics " + configurationService.getProperty("baryonics.version"));
+        rootRest.setBaryonicsVersion(configurationService.getProperty("baryonics.version"));
         rootRest.setDspaceVersion("DSpace " + getSourceVersion());
         rootRest.setDspaceServer(configurationService.getProperty("dspace.server.url"));
         rootRest.setDspaceUI(configurationService.getProperty("dspace.ui.url"));
