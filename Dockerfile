@@ -70,4 +70,4 @@ RUN unzip newrelic-java.zip -d /usr/local/tomcat
 ADD newrelic.yml /usr/local/tomcat/newrelic/
 ENV JAVA_OPTS="$JAVA_OPTS -javaagent:/usr/local/tomcat/newrelic/newrelic.jar -Dnewrelic.config.log_file_name=STDOUT"
 
-ENTRYPOINT ["/bin/bash", "-c" , "/dspace/bin/dspace database migrate && catalina.sh run"]
+#ENTRYPOINT ["/bin/bash", "-c" , "/dspace/bin/dspace database migrate && catalina.sh run"]

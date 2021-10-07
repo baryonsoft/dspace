@@ -42,7 +42,7 @@ services:
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
-      ./bin/run.sh 8080
+      $CATALINA_HOME/bin/run.sh 8080
 #      catalina.sh run
   # DSpace database container
   dspacedb:

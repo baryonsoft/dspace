@@ -8,4 +8,4 @@ release:
     - /dspace/bin/dspace database migrate
 
 run:
-  web: ./bin/run.sh $PORT
+  web: $CATALINA_HOME/bin/run.sh $PORT
