@@ -518,6 +518,12 @@
             <groupId>io.sentry</groupId>
             <artifactId>sentry-spring-boot-starter</artifactId>
             <version>5.2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>
