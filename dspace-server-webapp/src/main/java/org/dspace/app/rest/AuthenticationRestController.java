@@ -12,6 +12,7 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.sentry.Sentry;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.link.HalLinkService;
@@ -103,6 +104,13 @@ public class AuthenticationRestController implements InitializingBean {
     @RequestMapping(value = "/status", method = RequestMethod.GET)
     public AuthenticationStatusResource status(HttpServletRequest request, HttpServletResponse response)
             throws SQLException {
+
+        try {
+            throw new Exception("This is a test.");
+        } catch (Exception e) {
+            Sentry.captureException(e);
+        }
+
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
         Projection projection = utils.obtainProjection();
