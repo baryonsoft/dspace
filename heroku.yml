@@ -8,4 +8,4 @@ release:
     - /dspace/bin/dspace database migrate
 
 run:
-  web: JAVA_OPTS="$JAVA_OPTS -javaagent:/usr/local/tomcat/newrelic/newrelic.jar" $CATALINA_HOME/bin/run.sh $PORT
+  web: $CATALINA_HOME/bin/run.sh $PORT
