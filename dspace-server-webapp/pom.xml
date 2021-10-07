@@ -291,12 +291,6 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-rest-hal-browser</artifactId>
             <version>${spring-hal-browser.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.data</groupId>
-                    <artifactId>spring-data-rest-webmvc</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- WebJars dependencies used to update/enhance the default HAL Browser -->
