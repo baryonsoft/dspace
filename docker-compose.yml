@@ -54,7 +54,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
-    - pgdata:/pgdata
+    - pgdata2:/pgdata
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
@@ -75,7 +75,7 @@ services:
     - ./dspace/solr/search:/opt/solr/server/solr/configsets/search
     - ./dspace/solr/statistics:/opt/solr/server/solr/configsets/statistics
     # Keep Solr data directory between reboots
-    - solr_data:/var/solr/data
+    - solr_data2:/var/solr/data
     # Initialize all DSpace Solr cores using the mounted local configsets (see above), then start Solr
     entrypoint:
     - /bin/bash
@@ -89,5 +89,5 @@ services:
       exec solr -f
 volumes:
   assetstore:
-  pgdata:
-  solr_data:
+  pgdata2:
+  solr_data2:
