@@ -72,6 +72,7 @@ jobs:
       - name: Run Maven ${{ matrix.type }}
         env:
           TEST_FLAGS: ${{ matrix.mvnflags }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
 
       # If previous step failed, save results of tests to downloadable artifact for this job
