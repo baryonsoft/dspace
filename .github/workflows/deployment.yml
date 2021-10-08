@@ -8,6 +8,20 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_APP }}
+          tags: |
+            type=semver,pattern={{version}},prefix=
+            type=semver,pattern={{major}}.{{minor}},prefix=
+            type=semver,pattern={{major}},prefix=
+            type=raw,value=production
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -23,7 +37,7 @@ jobs:
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_APP }}:${GITHUB_REF#refs/*/}
+          tags: ${{ steps.meta.outputs.tags }}
 
   sentry-release:
     runs-on: ubuntu-18.04
