@@ -11,7 +11,6 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -35,6 +34,7 @@ import org.dspace.layout.dao.CrisLayoutTabDAO;
 import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutTabAccessService;
+import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -101,8 +101,8 @@ public class CrisLayoutTabServiceImplTest {
                                                                    restrictedBox(item, itemMetadata),
                                                                    restrictedBox(item, itemMetadata));
 
-        forbiddenAccessTab("forbidden-tab",
-                           boxWithContent(item, itemMetadata),
+        forbiddenAccessTab(
+                boxWithContent(item, itemMetadata),
                            boxWithContent(item, itemMetadata),
                            boxWithoutContent(item, itemMetadata));
 
@@ -119,7 +119,7 @@ public class CrisLayoutTabServiceImplTest {
 
         List<CrisLayoutTab> tabs = crisLayoutTabService.findByItem(context, itemUuid);
 
-        assertThat(tabs.stream().map(CrisLayoutTab::getShortName).collect(toList()),
+        MatcherAssert.assertThat(tabs.stream().map(CrisLayoutTab::getShortName).collect(toList()),
                    containsInAnyOrder("tab1", "tab2"));
 
     }
@@ -141,7 +141,7 @@ public class CrisLayoutTabServiceImplTest {
 
         List<CrisLayoutTab> tabs = crisLayoutTabService.findByItem(context, itemUuid);
 
-        assertThat(tabs, is(emptyList()));
+        MatcherAssert.assertThat(tabs, is(emptyList()));
     }
 
     @Test
@@ -161,7 +161,7 @@ public class CrisLayoutTabServiceImplTest {
 
         List<CrisLayoutTab> tabs = crisLayoutTabService.findByItem(context, itemUuid);
 
-        assertThat(tabs, is(emptyList()));
+        MatcherAssert.assertThat(tabs, is(emptyList()));
     }
 
     @Test(expected = NullPointerException.class)
@@ -178,8 +178,8 @@ public class CrisLayoutTabServiceImplTest {
         return tab(shortName, true, boxes);
     }
 
-    private CrisLayoutTab forbiddenAccessTab(String shortName, CrisLayoutBox... boxes) throws SQLException {
-        return tab(shortName, false, boxes);
+    private void forbiddenAccessTab(CrisLayoutBox... boxes) throws SQLException {
+        tab("forbidden-tab", false, boxes);
     }
 
     private CrisLayoutTab tab(String shortName, boolean grantedAccess, CrisLayoutBox...boxes) throws SQLException {
