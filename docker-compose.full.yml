@@ -7,6 +7,38 @@ networks:
         # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' in your local.cfg.
         - subnet: 172.23.0.0/16
 services:
+  # DSpace (backend) webapp container
+  dspace:
+    container_name: dspace
+    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x-test}"
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+    - dspacedb
+    networks:
+      dspacenet:
+    ports:
+    - published: 8080
+      target: 8080
+    - published: 8009
+      target: 8009
+    stdin_open: true
+    tty: true
+    volumes:
+    - assetstore:/dspace/assetstore
+    - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
+    # Ensure that the database is ready BEFORE starting tomcat
+    # 1. While a TCP connection to dspacedb port 5432 is not available, continue to sleep
+    # 2. Then, run database migration to init database tables
+    # 3. Finally, start Tomcat
+    entrypoint:
+    - /bin/bash
+    - '-c'
+    - |
+      while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
+      /dspace/bin/dspace database migrate
+      catalina.sh run
   # DSpace database container
   dspacedb:
     container_name: dspacedb
@@ -38,14 +70,10 @@ services:
     working_dir: /var/solr/data
     volumes:
     # Mount our local Solr core configs so that they are available as Solr configsets on container
-    - ./dspace/solr/audit:/opt/solr/server/solr/configsets/audit
     - ./dspace/solr/authority:/opt/solr/server/solr/configsets/authority
-    - ./dspace/solr/dedup:/opt/solr/server/solr/configsets/dedup
-    - ./dspace/solr/nbevent:/opt/solr/server/solr/configsets/nbevent
     - ./dspace/solr/oai:/opt/solr/server/solr/configsets/oai
     - ./dspace/solr/search:/opt/solr/server/solr/configsets/search
     - ./dspace/solr/statistics:/opt/solr/server/solr/configsets/statistics
-    - ./dspace/solr/suggestion:/opt/solr/server/solr/configsets/suggestion
     # Keep Solr data directory between reboots
     - solr_data3:/var/solr/data
     # Initialize all DSpace Solr cores using the mounted local configsets (see above), then start Solr
@@ -54,14 +82,10 @@ services:
     - '-c'
     - |
       init-var-solr
-      precreate-core audit /opt/solr/server/solr/configsets/audit
       precreate-core authority /opt/solr/server/solr/configsets/authority
-      precreate-core dedup /opt/solr/server/solr/configsets/dedup
-      precreate-core nbevent /opt/solr/server/solr/configsets/nbevent
       precreate-core oai /opt/solr/server/solr/configsets/oai
       precreate-core search /opt/solr/server/solr/configsets/search
       precreate-core statistics /opt/solr/server/solr/configsets/statistics
-      precreate-core suggestion /opt/solr/server/solr/configsets/suggestion
       exec solr -f
 volumes:
   assetstore:
