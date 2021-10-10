@@ -45,10 +45,11 @@ public interface Condition extends LogicalStatement {
      * Get the result of logical evaluation for an item
      * @param context   DSpace context
      * @param item      Item to evaluate
-     * @return boolean
+     * @return result
      * @throws LogicalStatementException
      */
-    Boolean getResult(Context context, Item item) throws LogicalStatementException;
+    @Override
+    boolean getResult(Context context, Item item) throws LogicalStatementException;
 
     public void setItemService(ItemService itemService);
 

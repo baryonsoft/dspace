@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import io.sentry.Sentry;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -148,9 +149,16 @@ public class DiscoveryRestController implements InitializingBean {
                     + ", page: " + Objects.toString(page));
         }
 
+        try {
+            throw new Exception("This is a test, at endpoint /discover/search/objects");
+        } catch (Exception e) {
+            Sentry.captureException(e);
+        }
+
         //Get the Search results in JSON format
         SearchResultsRest searchResultsRest = discoveryRestRepository
-            .getSearchObjects(query, dsoTypes, dsoScope, configuration, searchFilters, page, utils.obtainProjection());
+                .getSearchObjects(query, dsoTypes, dsoScope, configuration,
+                        searchFilters, page, utils.obtainProjection());
 
         //Convert the Search JSON results to paginated HAL resources
         SearchResultsResource searchResultsResource = new SearchResultsResource(searchResultsRest, utils, page);

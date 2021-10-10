@@ -354,7 +354,6 @@ just adding new jar in the classloader</description>
             <artifactId>lucene-analyzers-icu</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>

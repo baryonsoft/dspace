@@ -36,7 +36,7 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
     private ConfigurationService configurationService;
 
     @Before
-    public void init() throws Exception {
+    public void init() {
         //enable OpenSearch by configuration
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         configurationService.setProperty("websvc.opensearch.enable", true);
@@ -207,17 +207,17 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
                    .andExpect(content().contentType("application/opensearchdescription+xml;charset=UTF-8"))
                    // and there need to be some values taken from the test configuration
                    .andExpect(xpath("OpenSearchDescription/ShortName").string("DSpace"))
-                   .andExpect(xpath("OpenSearchDescription/LongName").string("DSpace at My University"))
+                   .andExpect(xpath("OpenSearchDescription/LongName").string("Baryonics Database"))
                    .andExpect(xpath("OpenSearchDescription/Description")
-                       .string("DSpace at My University DSpace repository")
+                       .string("Baryonics Database DSpace repository")
         )
         ;
         /* Expected response for the service document is:
             <?xml version="1.0" encoding="UTF-8"?>
             <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
                 <ShortName>DSpace</ShortName>
-                <LongName>DSpace at My University</LongName>
-                <Description>DSpace at My University DSpace repository</Description>
+                <LongName>Baryonics Database</LongName>
+                <Description>Baryonics Database DSpace repository</Description>
                 <InputEncoding>UTF-8</InputEncoding>
                 <OutputEncoding>UTF-8</OutputEncoding>
                 <Query role="example" searchTerms="photosyntesis" />

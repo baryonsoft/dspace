@@ -354,7 +354,7 @@
             </bean>
         </property>
     </bean>
-    
+
     <!-- dspace.entity.type is exactly Funding -->
     <bean id="relationship-type-equals-funding_condition" class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
         <property name="parameters">
@@ -364,7 +364,7 @@
             </map>
         </property>
     </bean>
-    
+
     <bean id="has-investigators-set_condition" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
         <property name="parameters">
             <map>
@@ -372,7 +372,7 @@
             </map>
         </property>
     </bean>
-    
+
     <bean id="has-co-investigators-set_condition" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
         <property name="parameters">
             <map>
@@ -380,7 +380,7 @@
             </map>
         </property>
     </bean>
-    
+
     <bean id="has-lead-organizations-set_condition" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
         <property name="parameters">
             <map>
@@ -388,7 +388,7 @@
             </map>
         </property>
     </bean>
-    
+
     <bean id="has-lead-co-organizations-set_condition" class="org.dspace.content.logic.condition.RequiredMetadataCondition">
         <property name="parameters">
             <map>

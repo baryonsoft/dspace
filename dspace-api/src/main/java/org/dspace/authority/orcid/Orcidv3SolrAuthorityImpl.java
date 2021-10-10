@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -171,7 +172,8 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
 
-        String searchPath = "search?q=" + URLEncoder.encode(text) + "&start=" + start + "&rows=" + rows;
+        String searchPath = "search?q=" + URLEncoder.encode(text, StandardCharsets.UTF_16) +
+                "&start=" + start + "&rows=" + rows;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
         XMLtoBio converter = new XMLtoBio();

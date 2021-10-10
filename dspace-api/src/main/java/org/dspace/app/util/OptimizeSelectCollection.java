@@ -61,7 +61,7 @@ public class OptimizeSelectCollection {
             }
         } else {
             //default case, run as specific user, or run all...
-            List<EPerson> people = ePersonService.findAll(context, EPerson.EMAIL);
+            List<EPerson> people = ePersonService.findAll(context, EPerson.EMAIL, 20, 0);
             for (EPerson person : people) {
                 checkSelectCollectionForUser(person);
                 peopleChecked++;

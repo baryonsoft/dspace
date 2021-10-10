@@ -7,10 +7,12 @@
  */
 package org.dspace.content.logic.condition;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.logic.LogicalStatementException;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
@@ -25,14 +27,20 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version $Revision$
  */
 public abstract class AbstractCondition implements Condition {
-    private Map<String, Object> parameters = new HashMap<>();
 
-    @Autowired(required = true)
-    protected ItemService itemService;
-    @Autowired(required = true)
-    protected CollectionService collectionService;
+    // Parameters map (injected, required -- see setter annotation)
+    private Map<String, Object> parameters;
+
+    // Declare and instantiate spring services
+    //@Autowired(required = true)
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    //@Autowired(required = true)
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     @Autowired(required = true)
     protected HandleService handleService;
+
+    // Logging
+    Logger log = LogManager.getLogger(AbstractCondition.class);
 
     /**
      * Get parameters set by spring configuration in item-filters.xml
@@ -51,6 +59,7 @@ public abstract class AbstractCondition implements Condition {
      * @param parameters
      * @throws LogicalStatementException
      */
+    @Autowired(required = true)
     @Override
     public void setParameters(Map<String, Object> parameters) throws LogicalStatementException {
         this.parameters = parameters;
@@ -64,15 +73,13 @@ public abstract class AbstractCondition implements Condition {
      * @throws LogicalStatementException
      */
     @Override
-    public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+    public boolean getResult(Context context, Item item) throws LogicalStatementException {
         if (item == null) {
-            throw new LogicalStatementException("Item is null");
+            log.error("Error evaluating item. Passed item is null, returning false");
+            return false;
         }
         if (context == null) {
-            throw new LogicalStatementException("Context is null");
-        }
-        if (this.parameters == null) {
-            throw new LogicalStatementException("Parameters are null");
+            throw new IllegalStateException("Context is null");
         }
         return true;
     }

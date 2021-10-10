@@ -286,8 +286,6 @@
         </property>
         <property name="moreLikeThisConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
-                <!--When altering this list also alter the "xmlui.Discovery.RelatedItems.help" key as it describes
-                the metadata fields below-->
                 <property name="similarityMetadataFields">
                     <list>
                         <value>dc.title</value>
@@ -420,8 +418,6 @@
         </property>
         <property name="moreLikeThisConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
-                <!--When altering this list also alter the "xmlui.Discovery.RelatedItems.help" key as it describes
-                the metadata fields below-->
                 <property name="similarityMetadataFields">
                     <list>
                         <value>dc.title</value>
@@ -1890,7 +1886,7 @@
         <!-- When true a "did you mean" example will be displayed, value can be true or false -->
         <property name="spellCheckEnabled" value="true"/>
     </bean>
-    
+
     <bean id="eperson_claims" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <property name="id" value="eperson_claims"/>
         <property name="indexAlways" value="true"/>

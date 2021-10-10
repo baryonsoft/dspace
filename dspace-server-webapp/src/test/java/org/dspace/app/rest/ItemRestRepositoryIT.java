@@ -37,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +132,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
+        List<Item> items = new ArrayList();
+        // This comparator is used to sort our test Items by java.util.UUID (which sorts them based on the RFC
+        // and not based on String comparison, see also https://stackoverflow.com/a/51031298/3750035 )
+        Comparator<Item> compareByUUID = Comparator.comparing(i -> i.getID());
+
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
@@ -138,6 +144,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .withSubject("ExtraEntry")
                                       .build();
+        items.add(publicItem1);
 
         Item publicItem2 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
@@ -145,6 +152,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                                       .withSubject("TestingForMore").withSubject("ExtraEntry")
                                       .build();
+        items.add(publicItem2);
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 3")
@@ -153,19 +161,19 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+        items.add(publicItem3);
+        // sort items list by UUID (as Items will come back ordered by UUID)
+        items.sort(compareByUUID);
 
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/items"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
-                                        "Public item 1", "2017-10-17"),
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                                        "Public item 2", "2016-02-13"),
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
-                                        "Public item 3", "2016-02-13")
+                   .andExpect(jsonPath("$._embedded.items", Matchers.containsInRelativeOrder(
+                           ItemMatcher.matchItemProperties(items.get(0)),
+                           ItemMatcher.matchItemProperties(items.get(1)),
+                           ItemMatcher.matchItemProperties(items.get(2))
                    )))
                    .andExpect(jsonPath("$._links.self.href",
                            Matchers.containsString("/api/core/items")))
@@ -205,6 +213,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .withTemplateItem()
                                            .build();
 
+        List<Item> items = new ArrayList();
+        // This comparator is used to sort our test Items by java.util.UUID (which sorts them based on the RFC
+        // and not based on String comparison, see also https://stackoverflow.com/a/51031298/3750035 )
+        Comparator<Item> compareByUUID = Comparator.comparing(i -> i.getID());
+
         //2. Three public items that are readable by Anonymous with different subjects
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
@@ -212,6 +225,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .withSubject("ExtraEntry")
                                       .build();
+        items.add(publicItem1);
 
         Item publicItem2 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
@@ -219,6 +233,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                                       .withSubject("TestingForMore").withSubject("ExtraEntry")
                                       .build();
+        items.add(publicItem2);
 
         Item publicItem3 = ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 3")
@@ -227,6 +242,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+        items.add(publicItem3);
+        // sort items list by UUID (as Items will come back ordered by UUID)
+        items.sort(compareByUUID);
 
         // Create a Workspace Item (which in turn creates an Item with "in_archive=false")
         // This is only created to prove that WorkspaceItems are NOT counted/listed in this endpoint
@@ -252,16 +270,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/core/items")
                    .param("size", "2"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.items", Matchers.containsInAnyOrder(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
-                               "Public item 1", "2017-10-17"),
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                               "Public item 2", "2016-02-13")
+                   .andExpect(jsonPath("$._embedded.items", Matchers.containsInRelativeOrder(
+                       ItemMatcher.matchItemProperties(items.get(0)),
+                       ItemMatcher.matchItemProperties(items.get(1))
                    )))
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
                            Matchers.contains(
-                               ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
-                                       "Public item 3", "2016-02-13"),
+                               ItemMatcher.matchItemProperties(items.get(2)),
                                ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkspace,
                                        "In Progress Item", "2018-02-05"),
                                ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkflow,
@@ -291,15 +306,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .param("page", "1"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.items", Matchers.contains(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3,
-                               "Public item 3", "2016-02-13")
+                           ItemMatcher.matchItemProperties(items.get(2))
                    )))
                    .andExpect(jsonPath("$._embedded.items", Matchers.not(
                        Matchers.contains(
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
-                                   "Public item 1", "2017-10-17"),
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                                   "Public item 2", "2016-02-13"),
+                           ItemMatcher.matchItemProperties(items.get(0)),
+                           ItemMatcher.matchItemProperties(items.get(1)),
                            ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkspace,
                                    "In Progress Item", "2018-02-05"),
                            ItemMatcher.matchItemWithTitleAndDateIssued(itemInWorkflow,

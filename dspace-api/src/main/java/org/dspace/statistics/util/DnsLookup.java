@@ -8,6 +8,7 @@
 package org.dspace.statistics.util;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -49,7 +50,8 @@ public class DnsLookup {
 
         // set the timeout, defaults to 200 milliseconds
         int timeout = configurationService.getIntProperty("usage-statistics.resolver.timeout", 200);
-        res.setTimeout(0, timeout);
+        Duration duration = Duration.ofSeconds(0, timeout * 1000L);
+        res.setTimeout(duration);
 
         Name name = ReverseMap.fromAddress(hostIp);
         int type = Type.PTR;
@@ -58,7 +60,7 @@ public class DnsLookup {
         Message query = Message.newQuery(rec);
         Message response = res.send(query);
 
-        Record[] answers = response.getSectionArray(Section.ANSWER);
+        Record[] answers = response.getSection(Section.ANSWER).toArray(new Record[0]);
         if (answers.length == 0) {
             return hostIp;
         } else {

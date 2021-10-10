@@ -20,15 +20,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class RootConverter {
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private ConfigurationService configurationService;
 
     public RootRest convert() {
         RootRest rootRest = new RootRest();
         rootRest.setDspaceName(configurationService.getProperty("dspace.name"));
-        rootRest.setDspaceUI(configurationService.getProperty("dspace.ui.url"));
-        rootRest.setDspaceServer(configurationService.getProperty("dspace.server.url"));
+        rootRest.setBaryonicsVersion(configurationService.getProperty("baryonics.version"));
         rootRest.setDspaceVersion("DSpace " + getSourceVersion());
+        rootRest.setDspaceServer(configurationService.getProperty("dspace.server.url"));
+        rootRest.setDspaceUI(configurationService.getProperty("dspace.ui.url"));
         return rootRest;
     }
 }

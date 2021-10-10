@@ -588,7 +588,7 @@ public class Email {
     /**
      * @author arnaldo
      */
-    public class InputStreamDataSource implements DataSource {
+    public static class InputStreamDataSource implements DataSource {
         private final String name;
         private final String contentType;
         private final ByteArrayOutputStream baos;
@@ -629,7 +629,7 @@ public class Email {
      * Wrap ConfigurationService to prevent templates from modifying
      * the configuration.
      */
-    public class UnmodifiableConfigurationService {
+    public static class UnmodifiableConfigurationService {
         private final ConfigurationService configurationService;
 
         /**

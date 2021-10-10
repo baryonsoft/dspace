@@ -56,6 +56,7 @@ public class HarvestedItem implements ReloadableEntity<Integer> {
     protected HarvestedItem() {
     }
 
+    @Override
     public Integer getID() {
         return id;
     }
@@ -80,6 +81,16 @@ public class HarvestedItem implements ReloadableEntity<Integer> {
     public String getOaiID() {
         return oaiId;
     }
+
+    /**
+     * Set the oai_id associated with this item
+     *
+     * @param itemOaiID item's OAI identifier
+     */
+    public void setOaiID(String itemOaiID) {
+        this.oaiId = itemOaiID;
+    }
+
 
     public void setHarvestDate(Date date) {
         if (date == null) {

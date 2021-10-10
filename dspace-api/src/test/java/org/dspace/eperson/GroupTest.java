@@ -169,7 +169,7 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void findAll() throws SQLException {
-        List<Group> groups = groupService.findAll(context, null);
+        List<Group> groups = groupService.findAll(context, null, -1, -1);
         assertThat("findAll 1", groups, notNullValue());
         assertTrue("findAll 2", 0 < groups.size());
     }
@@ -196,7 +196,7 @@ public class GroupTest extends AbstractUnitTest {
     @Test
     public void findAllNameSort() throws SQLException {
         // Retrieve groups sorted by name
-        List<Group> groups = groupService.findAll(context, null);
+        List<Group> groups = groupService.findAll(context, null, -1, -1);
 
         assertThat("findAllNameSort 1", groups, notNullValue());
 

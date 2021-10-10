@@ -36,6 +36,8 @@ services:
     stdin_open: true
     tty: true
     working_dir: /var/solr/data
+    environment:
+      SOLR_JAVA_MEM: "-Xms100m -Xmx600m"
     volumes:
     # Mount our local Solr core configs so that they are available as Solr configsets on container
     - ./dspace/solr/audit:/opt/solr/server/solr/configsets/audit
@@ -63,7 +65,24 @@ services:
       precreate-core statistics /opt/solr/server/solr/configsets/statistics
       precreate-core suggestion /opt/solr/server/solr/configsets/suggestion
       exec solr -f
+
+  minio:
+    image: minio/minio
+    container_name: minio-local
+    command: server --console-address ":9001" /data1
+    networks:
+      dspacenet:
+    environment:
+      MINIO_ROOT_USER: minio-user
+      MINIO_ROOT_PASSWORD: minio-password
+    ports:
+      - "9001:9001"
+      - "9000:9000"
+    volumes:
+      - minio_data:/data1
+
 volumes:
   assetstore:
   pgdata3:
   solr_data3:
+  minio_data:

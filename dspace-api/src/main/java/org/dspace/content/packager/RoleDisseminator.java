@@ -484,7 +484,7 @@ public class RoleDisseminator implements PackageDisseminator {
         if (object.getType() == Constants.SITE) {
             // TODO FIXME -- if there was a way to ONLY export Groups which are NOT
             // associated with a Community or Collection, we should be doing that instead!
-            return groupService.findAll(context, null);
+            return groupService.findAll(context, null, 20, 0);
         } else if (object.getType() == Constants.COMMUNITY) {
             Community community = (Community) object;
 
@@ -534,7 +534,7 @@ public class RoleDisseminator implements PackageDisseminator {
             }
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COLLECTION_<ID>_"
-            // (Necessary cause XMLUI allows you to generate a 'COLLECTION_<ID>_DEFAULT_READ' group)
+            // (Necessary because the old XMLUI allowed you to generate a 'COLLECTION_<ID>_DEFAULT_READ' group)
             List<Group> matchingGroups = groupService.search(context, "COLLECTION\\_" + collection.getID() + "\\_");
             for (Group g : matchingGroups) {
                 if (!list.contains(g)) {
@@ -567,7 +567,7 @@ public class RoleDisseminator implements PackageDisseminator {
     protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object)
         throws SQLException {
         if (object.getType() == Constants.SITE) {
-            return ePersonService.findAll(context, EPerson.EMAIL);
+            return ePersonService.findAll(context, EPerson.EMAIL, 20, 0);
         }
 
         //by default, return nothing

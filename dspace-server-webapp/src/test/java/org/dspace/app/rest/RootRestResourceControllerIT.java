@@ -37,7 +37,7 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.dspaceUI", Matchers.is("http://localhost:4000")))
-                   .andExpect(jsonPath("$.dspaceName", Matchers.is("DSpace at My University")))
+                   .andExpect(jsonPath("$.dspaceName", Matchers.is("Baryonics Database")))
                    .andExpect(jsonPath("$.dspaceServer", Matchers.is(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$.type", Matchers.is("root")));
     }

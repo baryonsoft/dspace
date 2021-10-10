@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
@@ -30,7 +31,7 @@ import org.dspace.content.template.TemplateItemValueService;
 import org.dspace.content.vo.MetadataValueVO;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
@@ -77,12 +78,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         if (workspaceItem == null) {
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "find_workspace_item",
+                log.debug(LogHelper.getHeader(context, "find_workspace_item",
                                                "not_found,workspace_item_id=" + id));
             }
         } else {
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "find_workspace_item",
+                log.debug(LogHelper.getHeader(context, "find_workspace_item",
                                                "workspace_item_id=" + id));
             }
         }
@@ -91,6 +92,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
     @Override
     public WorkspaceItem create(Context context, Collection collection, boolean template)
+            throws AuthorizeException, SQLException {
+        return create(context, collection, null, template);
+    }
+
+    @Override
+    public WorkspaceItem create(Context context, Collection collection, UUID uuid, boolean template)
         throws AuthorizeException, SQLException {
         // Check the user has permission to ADD to the collection
         authorizeService.authorizeAction(context, collection, Constants.ADD);
@@ -100,7 +107,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
 
         // Create an item
-        Item item = itemService.create(context, workspaceItem);
+        Item item;
+        if (uuid != null) {
+            item = itemService.create(context, workspaceItem, uuid);
+        } else {
+            item = itemService.create(context, workspaceItem);
+        }
         item.setSubmitter(context.getCurrentUser());
 
         // Now create the policies for the submitter to modify item and contents (bitstreams, bundles)
@@ -153,7 +165,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         itemService.update(context, item);
         workspaceItem.setItem(item);
 
-        log.info(LogManager.getHeader(context, "create_workspace_item",
+        log.info(LogHelper.getHeader(context, "create_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID()
                                           + "item_id=" + item.getID() + "collection_id="
                                           + collection.getID()));
@@ -218,7 +230,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public void update(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
         // Authorisation is checked by the item.update() method below
 
-        log.info(LogManager.getHeader(context, "update_workspace_item",
+        log.info(LogHelper.getHeader(context, "update_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID()));
 
         // Update the item
@@ -238,7 +250,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             throw new AuthorizeException("Must be an administrator or the submitter to delete a workspace item");
         }
 
-        log.info(LogManager.getHeader(context, "delete_workspace_item",
+        log.info(LogHelper.getHeader(context, "delete_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
                                           + "collection_id=" + workspaceItem.getCollection().getID()));
 
@@ -275,7 +287,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         Item item = workspaceItem.getItem();
         authorizeService.authorizeAction(context, item, Constants.WRITE);
 
-        log.info(LogManager.getHeader(context, "delete_workspace_item",
+        log.info(LogHelper.getHeader(context, "delete_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
                                           + "collection_id=" + workspaceItem.getCollection().getID()));
 

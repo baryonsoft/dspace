@@ -20,7 +20,18 @@ public class RootRest extends RestAddressableModel {
     private String dspaceUI;
     private String dspaceName;
     private String dspaceServer;
+
+    public void setBaryonicsVersion(String baryonicsVersion) {
+        this.baryonicsVersion = baryonicsVersion;
+    }
+
     private String dspaceVersion;
+
+    public String getBaryonicsVersion() {
+        return baryonicsVersion;
+    }
+
+    private String baryonicsVersion;
 
     public String getCategory() {
         return CATEGORY;
