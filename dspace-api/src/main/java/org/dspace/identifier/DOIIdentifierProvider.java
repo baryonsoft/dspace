@@ -96,7 +96,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * Empty / default constructor for Spring
      */
     protected DOIIdentifierProvider() {
-
     }
 
     /**
@@ -122,8 +121,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             if (null == this.PREFIX) {
                 log.warn("Cannot find DOI prefix in configuration!");
                 throw new RuntimeException("Unable to load DOI prefix from "
-                        + "configuration. Cannot find property " +
-                        CFG_PREFIX + ".");
+                                               + "configuration. Cannot find property " +
+                                               CFG_PREFIX + ".");
             }
         }
         return this.PREFIX;
@@ -238,7 +237,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             // DOI are currently assigned only to Item
             return null;
         }
-
         String doi = mint(context, dso, skipFilter);
         // register tries to reserve doi if it's not already.
         // So we don't have to reserve it here.
@@ -326,22 +324,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
         throws IdentifierException, IllegalArgumentException {
-        reserve(context, dso, identifier, false);
-    }
-
-    /**
-     * Reserve a specified DOI for a given DSpaceObject
-     * @param context    - DSpace context
-     * @param dso        - DSpaceObject identified by this DOI
-     * @param identifier - String containing the DOI to reserve
-     * @param skipFilter - boolean indicating whether to skip any filtering of items before performing reservation
-     * @throws IdentifierException
-     * @throws IllegalArgumentException
-     * @throws SQLException
-     */
-    @Override
-    public void reserve(Context context, DSpaceObject dso, String identifier, Boolean skipFilter)
-        throws IdentifierException, IllegalArgumentException {
         String doi = doiService.formatIdentifier(identifier);
         DOI doiRow = null;
 
@@ -385,7 +367,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context       - DSpace context
      * @param dso           - DSpaceObject identified by this DOI
      * @param identifier    - String containing the DOI to reserve
-     * @param skipFilter    - skip the filters for {@link checkMintable(Context, DSpaceObject)}
      * @throws IdentifierException
      * @throws IllegalArgumentException
      * @throws SQLException
@@ -429,10 +410,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context       - DSpace context
      * @param dso           - DSpaceObject identified by this DOI
      * @param identifier    - String containing the DOI to register
-     * @param skipFilter    - skip filters for {@link checkMintable(Context, DSpaceObject)}
-     * @throws IdentifierException
-     * @throws IllegalArgumentException
-     * @throws SQLException
+     * @param skipFilter    - skip filters for {checkMintable(Context, DSpaceObject)}
      */
     public void registerOnline(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
             throws IdentifierException, IllegalArgumentException, SQLException {

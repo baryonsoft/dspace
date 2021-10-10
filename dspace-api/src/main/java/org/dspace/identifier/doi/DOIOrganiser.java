@@ -244,8 +244,6 @@ public class DOIOrganiser {
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
                 ex.printStackTrace(System.err);
-            } catch (DOIIdentifierNotApplicableException e) {
-                System.err.println("DOI not registered: " + e.getMessage());
             } catch (DOIIdentifierException ex) {
                 System.err.println("Error registering DOI identifier:" + ex.getMessage());
             }

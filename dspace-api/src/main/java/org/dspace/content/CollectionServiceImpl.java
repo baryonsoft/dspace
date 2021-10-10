@@ -344,7 +344,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
          * whitespace.
          */
         if (value == null) {
-            clearMetadata(context, collection, field.schema, field.element, field.qualifier, Item.ANY);
+            clearMetadata(context, collection, field.SCHEMA, field.ELEMENT, field.QUALIFIER, Item.ANY);
             collection.setMetadataModified();
         } else {
             super.setMetadataSingleValue(context, collection, field, null, value);

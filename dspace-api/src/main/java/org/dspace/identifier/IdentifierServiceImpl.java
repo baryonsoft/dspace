@@ -72,13 +72,6 @@ public class IdentifierServiceImpl implements IdentifierService {
                 if (!StringUtils.isEmpty(identifier)) {
                     service.reserve(context, dso, identifier);
                 }
-            } catch (IdentifierNotApplicableException e) {
-                log.warn("Identifier not reserved (inapplicable): " + e.getMessage());
-            try {
-                String identifier = service.mint(context, dso);
-                if (!StringUtils.isEmpty(identifier)) {
-                    service.reserve(context, dso, identifier);
-                }
             } catch (DOIIdentifierNotApplicableException e) {
                 log.warn("DOI Identifier not reserved (inapplicable): " + e.getMessage());
             }
@@ -93,11 +86,6 @@ public class IdentifierServiceImpl implements IdentifierService {
         // Next resolve all other services
         for (IdentifierProvider service : providers) {
             if (service.supports(identifier)) {
-                try {
-                    service.reserve(context, dso, identifier);
-                } catch (IdentifierNotApplicableException e) {
-                    log.warn("Identifier not reserved (inapplicable): " + e.getMessage());
-                }
                 try {
                     service.reserve(context, dso, identifier);
                 } catch (DOIIdentifierNotApplicableException e) {
@@ -117,11 +105,6 @@ public class IdentifierServiceImpl implements IdentifierService {
         for (IdentifierProvider service : providers) {
             try {
                 service.register(context, dso);
-            } catch (IdentifierNotApplicableException e) {
-                log.warn("Identifier not registered (inapplicable): " + e.getMessage());
-            }
-            try {
-                service.register(context, dso);
             } catch (DOIIdentifierNotApplicableException e) {
                 log.warn("DOI Identifier not registered (inapplicable): " + e.getMessage());
             }
@@ -138,12 +121,6 @@ public class IdentifierServiceImpl implements IdentifierService {
         boolean registered = false;
         for (IdentifierProvider service : providers) {
             if (service.supports(identifier)) {
-                try {
-                    service.register(context, object, identifier);
-                    registered = true;
-                } catch (IdentifierNotApplicableException e) {
-                    log.warn("Identifier not registered (inapplicable): " + e.getMessage());
-                }
                 try {
                     service.register(context, object, identifier);
                     registered = true;

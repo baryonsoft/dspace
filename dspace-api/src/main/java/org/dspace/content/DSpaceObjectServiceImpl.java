@@ -639,7 +639,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public String getMetadataFirstValue(T dso, MetadataFieldName field, String language) {
         List<MetadataValue> metadataValues
-                = getMetadata(dso, field.schema, field.element, field.qualifier, language);
+                = getMetadata(dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER, language);
         if (CollectionUtils.isNotEmpty(metadataValues)) {
             return metadataValues.get(0).getValue();
         }
@@ -666,11 +666,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             String language, String value)
             throws SQLException {
         if (value != null) {
-            clearMetadata(context, dso, field.schema, field.element, field.qualifier,
+            clearMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
                     language);
 
-            String newValueLanguage = Item.ANY.equals(language) ? null : language;
-            addMetadata(context, dso, field.schema, field.element, field.qualifier,
+            String newValueLanguage = (Item.ANY.equals(language)) ? null : language;
+            addMetadata(context, dso, field.SCHEMA, field.ELEMENT, field.QUALIFIER,
                     newValueLanguage, value);
             dso.setMetadataModified();
         }

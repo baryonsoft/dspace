@@ -22,7 +22,7 @@ import org.dspace.core.Context;
 public class RequiredMetadataCondition extends AbstractCondition {
 
     @Override
-    public Boolean getResult(Context context, Item item) throws LogicalStatementException {
+    public boolean getResult(Context context, Item item) throws LogicalStatementException {
         String field = (String) getParameters().get("field");
         if (field == null) {
             return false;

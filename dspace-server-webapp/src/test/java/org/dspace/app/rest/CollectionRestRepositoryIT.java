@@ -22,18 +22,18 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
-import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,11 +47,8 @@ import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
@@ -66,6 +63,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -95,7 +93,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     AuthorizeService authorizeService;
 
     @Autowired
-    ResourcePolicyService resoucePolicyService;
+    ResourcePolicyService resourcePolicyService;
 
     @Autowired
     MetadataValueService metadataValueService;
@@ -105,24 +103,22 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     MetadataFieldService metadataFieldService;
     @Autowired
     EntityTypeService entityTypeService;
-    private EntityType publicationType;
-    private EntityType journalType;
-    private EntityType orgUnitType;
+
     @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
 
-        publicationType = entityTypeService.findByEntityType(context, "Publication");
+        EntityType publicationType = entityTypeService.findByEntityType(context, "Publication");
         if (publicationType == null) {
             publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         }
-        journalType = entityTypeService.findByEntityType(context, "Journal");
+        EntityType journalType = entityTypeService.findByEntityType(context, "Journal");
         if (journalType == null) {
             journalType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
         }
-        orgUnitType = entityTypeService.findByEntityType(context, "OrgUnit");
+        EntityType orgUnitType = entityTypeService.findByEntityType(context, "OrgUnit");
         if (orgUnitType == null) {
             orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
         }
@@ -199,7 +195,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .withName("Collection 2")
                 .build();
 
-        resoucePolicyService.removePolicies(context, col2, Constants.READ);
+        resourcePolicyService.removePolicies(context, col2, Constants.READ);
         context.restoreAuthSystemState();
 
         // anonymous can see only public collections
@@ -225,7 +221,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .withName("Collection 2")
                 .build();
 
-        resoucePolicyService.removePolicies(context, col2, Constants.READ);
+        resourcePolicyService.removePolicies(context, col2, Constants.READ);
         context.restoreAuthSystemState();
 
         // eperson logged can see only public collections
@@ -263,8 +259,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .withName("Collection 2")
                 .build();
 
-        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
-        resoucePolicyService.removePolicies(context, col1, Constants.READ);
+        resourcePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resourcePolicyService.removePolicies(context, col1, Constants.READ);
         context.restoreAuthSystemState();
 
         // parent community admin can see all sub collections
@@ -467,7 +463,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .withName("Collection 1")
                 .build();
 
-        resoucePolicyService.removePolicies(context, col1, Constants.READ);
+        resourcePolicyService.removePolicies(context, col1, Constants.READ);
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID()))
@@ -487,7 +483,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .withName("Collection 1")
                 .build();
 
-        resoucePolicyService.removePolicies(context, col1, Constants.READ);
+        resourcePolicyService.removePolicies(context, col1, Constants.READ);
         context.restoreAuthSystemState();
 
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
@@ -527,9 +523,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .withAdminGroup(col2Admin)
                 .build();
 
-        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
-        resoucePolicyService.removePolicies(context, col1, Constants.READ);
-        resoucePolicyService.removePolicies(context, col2, Constants.READ);
+        resourcePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resourcePolicyService.removePolicies(context, col1, Constants.READ);
+        resourcePolicyService.removePolicies(context, col2, Constants.READ);
         context.restoreAuthSystemState();
 
         String tokenParentAdmin = getAuthToken(parentAdmin.getEmail(), "qwerty01");
@@ -2755,7 +2751,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         Community community1 = createCommunity("Community 1");
         Community community2 = createCommunity("Community 2", user);
-        Community community3 = createCommunity("Community 1", community1);
+        Community community3 = createCommunity(community1);
 
         createCollection(community1, "First Community Collection 1");
         Collection collection2_1 = createCollection(community1, "First Community Collection 2", user);
@@ -2802,7 +2798,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         Community community1 = createCommunity("Community 1");
         Community community2 = createCommunity("Community 2", user);
-        Community community3 = createCommunity("Community 1", community1);
+        Community community3 = createCommunity(community1);
 
         Collection collection1_1 = createCollection(community1, "First Community Collection 1");
         Collection collection2_1 = createCollection(community1, "First Community Collection 2", user);
@@ -2974,7 +2970,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         List<Item> items = new ArrayList();
         // This comparator is used to sort our test Items by java.util.UUID (which sorts them based on the RFC
         // and not based on String comparison, see also https://stackoverflow.com/a/51031298/3750035 )
-        Comparator<Item> compareByUUID = Comparator.comparing(i -> i.getID());
+        Comparator<Item> compareByUUID = Comparator.comparing(DSpaceObject::getID);
 
         Item item0 = ItemBuilder.createItem(context, collection).withTitle("Item 0").build();
         items.add(item0);
@@ -3594,9 +3590,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .andExpect(status().isUnauthorized());
     }
 
-    private Community createCommunity(String name, Community parent, EPerson... admins) throws Exception {
+    private Community createCommunity(Community parent, EPerson... admins) throws Exception {
         return CommunityBuilder.createSubCommunity(context, parent)
-            .withName(name)
+            .withName("Community 1")
             .withAdminGroup(admins)
             .build();
     }

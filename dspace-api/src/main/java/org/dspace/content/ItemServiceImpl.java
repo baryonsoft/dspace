@@ -349,7 +349,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             authorizeService.authorizeAction(context, item, Constants.WRITE);
         }
 
-        log.info(LogManager.getHeader(context, "update_item", "item_id="
+        log.info(LogHelper.getHeader(context, "update_item", "item_id="
                 + item.getID()));
 
         super.update(context, item);

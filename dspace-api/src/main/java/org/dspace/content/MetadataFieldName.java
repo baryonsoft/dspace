@@ -17,13 +17,13 @@ import javax.annotation.Nonnull;
  */
 public class MetadataFieldName {
     /** Name of the metadata schema which defines this field.  Never null. */
-    public final String schema;
+    public final String SCHEMA;
 
     /** Element name of this field.  Never null. */
-    public final String element;
+    public final String ELEMENT;
 
     /** Qualifier name of this field.  May be {@code null}. */
-    public final String qualifier;
+    public final String QUALIFIER;
 
     /**
      * Initialize a tuple of (schema, element, qualifier) to name a metadata field.
@@ -40,9 +40,9 @@ public class MetadataFieldName {
             throw new NullPointerException("Element must not be null.");
         }
 
-        this.schema = schema;
-        this.element = element;
-        this.qualifier = qualifier;
+        SCHEMA = schema;
+        ELEMENT = element;
+        QUALIFIER = qualifier;
     }
 
     /**
@@ -59,9 +59,9 @@ public class MetadataFieldName {
             throw new NullPointerException("Element must not be null.");
         }
 
-        this.schema = schema;
-        this.element = element;
-        qualifier = null;
+        SCHEMA = schema;
+        ELEMENT = element;
+        QUALIFIER = null;
     }
 
     /**
@@ -79,9 +79,9 @@ public class MetadataFieldName {
             throw new IllegalArgumentException("Element must not be null.");
         }
 
-        this.schema = schema.getName();
-        this.element = element;
-        this.qualifier = qualifier;
+        SCHEMA = schema.getName();
+        ELEMENT = element;
+        QUALIFIER = qualifier;
     }
 
     /**
@@ -98,9 +98,9 @@ public class MetadataFieldName {
             throw new IllegalArgumentException("Element must not be null.");
         }
 
-        this.schema = schema.getName();
-        this.element = element;
-        qualifier = null;
+        SCHEMA = schema.getName();
+        ELEMENT = element;
+        QUALIFIER = null;
     }
 
     /**
@@ -110,9 +110,9 @@ public class MetadataFieldName {
      */
     public MetadataFieldName(@Nonnull String name) {
         String[] elements = parse(name);
-        schema = elements[0];
-        element = elements[1];
-        qualifier = elements[2];
+        SCHEMA = elements[0];
+        ELEMENT = elements[1];
+        QUALIFIER = elements[2];
     }
 
     /**
@@ -138,17 +138,17 @@ public class MetadataFieldName {
 
     /**
      * Format a dotted-atoms representation of this field name.
-     * @return schema.element.qualifier
+     * @return SCHEMA.ELEMENT.QUALIFIER
      */
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder(32);
-        buffer.append(schema)
+        buffer.append(SCHEMA)
                 .append('.')
-                .append(element);
-        if (null != qualifier) {
+                .append(ELEMENT);
+        if (null != QUALIFIER) {
             buffer.append('.')
-                    .append(qualifier);
+                    .append(QUALIFIER);
         }
         return buffer.toString();
     }
