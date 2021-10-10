@@ -4,16 +4,16 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>cris-2021.01.02-SNAPSHOT</version>
+    <version>baryonics-0.3.5-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
-   	DSpace-CRIS is an open source extension of DSpace (http://www.dspace.org) providing out of box support for the CRIS / RIMS and moder Institution Repository use cases with advanced features and optimized configurations
+    Baryonics is a comprehensive bibliographic database that powers BaryonBib.
     </description>
-    <url>https://github.com/4Science/DSpace</url>
+    <url>https://www.baryonics.org</url>
 
     <organization>
-        <name>4Science</name>
-        <url>https://www.4science.it</url>
+        <name>Baryonsoft</name>
+        <url>https://www.baryonsoft.com</url>
     </organization>
 
     <properties>
@@ -843,14 +843,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>cris-2021.01.02-SNAPSHOT</version>
+                       <version>baryonics-0.3.5-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>cris-2021.01.02-SNAPSHOT</version>
+                       <version>baryonics-0.3.5-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -997,64 +997,64 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>cris-2021.01.02-SNAPSHOT</version>
+                <version>baryonics-0.3.5-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
