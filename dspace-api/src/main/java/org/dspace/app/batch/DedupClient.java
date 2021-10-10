@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.deduplication.service.DedupService;
@@ -47,10 +47,10 @@ public class DedupClient {
      * the whole index
      *
      * @param args the command-line arguments, none used
-     * @throws java.io.IOException
-     * @throws java.sql.SQLException
-     * @throws SolrServerException
-     *
+     * @throws IOException            io exception
+     * @throws SQLException           sql exception
+     * @throws SolrServerException    solr server exception
+     * @throws SearchServiceException search service exception
      */
     public static void main(String[] args)
             throws SQLException, IOException, SearchServiceException, SolrServerException {
@@ -59,34 +59,34 @@ public class DedupClient {
         context.turnOffAuthorisationSystem();
 
         String usage = "./dspace index-deduplication [-chfueo[r <item handle/uuid>]]"
-                + " or nothing to update/clean an existing index.";
+            + " or nothing to update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
 
-        options.addOption(OptionBuilder.withArgName("item handle").hasArg(true)
-                .withDescription("remove an object from your handle/uuid").create("r"));
+        options.addOption(Option.builder("item handle").hasArg(true)
+            .desc("remove an object from your handle/uuid").longOpt("r").build());
 
-        options.addOption(OptionBuilder.isRequired(false)
-                .withDescription("clean existing index removing any documents that no longer exist in the db")
-                .create("c"));
+        options.addOption(Option.builder().required(false)
+            .desc("clean existing index removing any documents that no longer exist in the db")
+            .longOpt("c").build());
 
-        options.addOption(OptionBuilder.isRequired(false)
-                .withDescription("if updating existing index, force each handle to be reindexed even if uptodate")
-                .create("f"));
+        options.addOption(Option.builder().required(false)
+            .desc("if updating existing index, force each handle to be reindexed even if update")
+            .longOpt("f").build());
 
-        options.addOption(OptionBuilder.isRequired(false).hasArg(true)
-                .withDescription("update an entity from index based on its handle or uuid, use with -f to force clean")
-                .create("u"));
+        options.addOption(Option.builder().required(false).hasArg(true)
+            .desc("update an entity from index based on its handle or uuid, use with -f to force clean")
+            .longOpt("u").build());
 
-        options.addOption(OptionBuilder.isRequired(false).withDescription("print this help message").create("h"));
+        options.addOption(Option.builder().required(false).desc("print this help message").longOpt("h").build());
 
-        options.addOption(OptionBuilder.isRequired(false).withDescription("optimize search core").create("o"));
+        options.addOption(Option.builder().required(false).desc("optimize search core").longOpt("o").build());
 
         options.addOption("e", "readfile", true, "Read the identifier from a file");
 
         try {
-            line = new PosixParser().parse(options, args);
+            line = new DefaultParser().parse(options, args);
         } catch (Exception e) {
             // automatically generate the help statement
             formatter.printHelp(usage, e.getMessage(), options, "");
@@ -138,8 +138,8 @@ public class DedupClient {
                 String strLine;
                 // Read File Line By Line
 
-                UUID item_id = null;
-                List<UUID> ids = new ArrayList<UUID>();
+                UUID item_id;
+                List<UUID> ids = new ArrayList<>();
 
                 while ((strLine = br.readLine()) != null) {
                     item_id = UUID.fromString(strLine.trim());
