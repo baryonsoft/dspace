@@ -26,9 +26,9 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authority.service.AuthorityValueService;
@@ -193,7 +193,7 @@ public class ItemImportOA {
         ItemImportOA myLoader = new ItemImportOA();
 
         // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
 
@@ -823,7 +823,6 @@ public class ItemImportOA {
      * @param bitstreamPath
      * @param bundleName
      * @param description
-     * @param license
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
