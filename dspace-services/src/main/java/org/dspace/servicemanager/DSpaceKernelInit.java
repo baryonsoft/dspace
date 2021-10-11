@@ -21,14 +21,14 @@ import org.slf4j.LoggerFactory;
  */
 public class DSpaceKernelInit {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceKernelInit.class);
-
     private static final Object staticLock = new Object();
+    private static final Logger log = LoggerFactory.getLogger(DSpaceKernelInit.class);
 
     /**
      * Default constructor
      */
-    private DSpaceKernelInit() { }
+    private DSpaceKernelInit() {
+    }
 
     /**
      * Creates or retrieves a DSpace Kernel with the given name.
