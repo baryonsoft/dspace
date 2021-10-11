@@ -42,8 +42,8 @@ jobs:
           - "9000:9000"
         env:
           MINIO_ACCESS_KEY: minio
-          MINIO_SECRET_KEY: minio123
-          MINIO_DEFAULT_BUCKETS: 'bucket1:public'
+          MINIO_SECRET_KEY: minio-key
+          MINIO_DEFAULT_BUCKETS: 'bucket-test:public'
 
     # These are the actual CI steps to perform per job
     steps:
