@@ -67,6 +67,7 @@ public class XlsCollectionCrosswalkIT extends AbstractIntegrationTestWithDatabas
 
     }
 
+    @Ignore
     @Test
     public void testDisseminate() throws Exception {
 
