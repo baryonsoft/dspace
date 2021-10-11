@@ -193,6 +193,7 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
+                        <!--suppress UnresolvedMavenProperty -->
                         <argLine>${test.argLine} ${surefireJacoco}</argLine>
                         <!-- tests whose name starts by Abstract will be ignored -->
                         <excludes>
@@ -217,6 +218,7 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
+                        <!--suppress UnresolvedMavenProperty -->
                         <argLine>${test.argLine} ${failsafeJacoco}</argLine>
                         <excludes>
                             <exclude>**/Abstract*</exclude>

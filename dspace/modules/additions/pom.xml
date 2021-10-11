@@ -1,12 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
    <artifactId>additions</artifactId>
    <name>DSpace Kernel :: Additions and Local Customizations</name>
    <description>
-       This project allows you to easily create your own "additions.jar"
-       including custom Java classes. This JAR will be automatically included
-       in all DSpace web applications.
+      This project allows you to easily create your own "additions.jar"
+      including custom Java classes. This JAR will be automatically included
+      in all DSpace web applications.
    </description>
    <packaging>jar</packaging>
 
@@ -17,8 +18,8 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>7.1-SNAPSHOT</version>
-      <relativePath>..</relativePath>
+      <version>baryonics-0.3.5-SNAPSHOT</version>
+      <relativePath>../pom.xml</relativePath>
    </parent>
 
    <properties>
@@ -50,10 +51,39 @@
                   </goals>
                   <configuration>
                      <source>
-                        project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
-                        log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir']);
+                        project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/')
+                        log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir'])
                      </source>
                   </configuration>
+               </execution>
+            </executions>
+         </plugin>
+
+         <!-- Testing Environment setup: This plugin unzips the
+              'testEnvironment.zip' file (created by dspace-parent POM), into
+              the 'target/testing/' folder, to essentially create a test
+              install of DSpace, against which Tests can be run. -->
+         <plugin>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <configuration>
+               <outputDirectory>${project.build.directory}/testing</outputDirectory>
+               <artifactItems>
+                  <artifactItem>
+                     <groupId>org.dspace</groupId>
+                     <artifactId>dspace-parent</artifactId>
+                     <version>${project.version}</version>
+                     <type>zip</type>
+                     <classifier>testEnvironment</classifier>
+                  </artifactItem>
+               </artifactItems>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>setupTestEnvironment</id>
+                  <phase>generate-test-resources</phase>
+                  <goals>
+                     <goal>unpack</goal>
+                  </goals>
                </execution>
             </executions>
          </plugin>
@@ -72,6 +102,7 @@
          <dependencies>
             <dependency>
                <groupId>com.oracle</groupId>
+               <!--suppress MavenModelInspection -->
                <artifactId>ojdbc6</artifactId>
             </dependency>
          </dependencies>
@@ -125,9 +156,11 @@
                      <systemPropertyVariables>
                         <!-- Specify the dspace.dir to use for test environment -->
                         <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
+                        <!--suppress UnresolvedMavenProperty -->
                         <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                         <!-- Turn off any DSpace logging -->
                         <dspace.log.init.disable>true</dspace.log.init.disable>
+                        <!--suppress UnresolvedMavenProperty -->
                         <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
                      </systemPropertyVariables>
                   </configuration>
@@ -193,9 +226,11 @@
                   <configuration>
                      <systemPropertyVariables>
                         <!-- Specify the dspace.dir to use for test environment -->
+                        <!--suppress UnresolvedMavenProperty -->
                         <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                         <!-- Turn off any DSpace logging -->
                         <dspace.log.init.disable>true</dspace.log.init.disable>
+                        <!--suppress UnresolvedMavenProperty -->
                         <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
                      </systemPropertyVariables>
                   </configuration>
