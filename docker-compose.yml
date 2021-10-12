@@ -22,7 +22,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
-    - pgdata:/pgdata
+      - pgdata2:/pgdata
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
@@ -75,6 +75,6 @@ services:
 
 volumes:
   assetstore:
-  pgdata:
+  pgdata2:
   solr_data:
   minio_data:
