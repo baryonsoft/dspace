@@ -19,9 +19,8 @@ jobs:
       # This will ensure those tasks are run in parallel
       matrix:
         include:
-          # NOTE: Unit Tests include deprecated REST API v6 (as it has unit tests)
           - type: "Unit Tests"
-            mvnflags: "-DskipUnitTests=false -Pdspace-rest"
+            mvnflags: "-DskipUnitTests=false"
             resultsdir: "**/target/surefire-reports/**"
           # NOTE: ITs skip all code validation checks, as they are already done by Unit Test job.
           #  - enforcer.skip     => Skip maven-enforcer-plugin rules
