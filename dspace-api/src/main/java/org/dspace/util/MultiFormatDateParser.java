@@ -53,14 +53,11 @@ public class MultiFormatDateParser {
     private static final ThreadLocal<DateFormat> formatter;
 
     static {
-        formatter = new ThreadLocal<DateFormat>() {
-            @Override
-            protected DateFormat initialValue() {
-                DateFormat dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-                dateTimeInstance.setTimeZone(UTC_ZONE);
-                return dateTimeInstance;
-            }
-        };
+        formatter = ThreadLocal.withInitial(() -> {
+            DateFormat dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
+            dateTimeInstance.setTimeZone(UTC_ZONE);
+            return dateTimeInstance;
+        });
     }
 
     @Inject
@@ -107,7 +104,7 @@ public class MultiFormatDateParser {
                     }
                 } catch (ParseException ex) {
                     log.info("Date string '{}' matched pattern '{}' but did not parse:  {}",
-                             new String[] {dateString, candidate.format.toPattern(), ex.getMessage()});
+                        (Object[]) new String[] {dateString, candidate.format.toPattern(), ex.getMessage()});
                     continue;
                 }
                 return result;

@@ -122,10 +122,10 @@ public class EZIDIdentifierProvider
      */
     private EZIDRequestFactory requestFactory;
 
-    @Autowired(required = true)
+    @Autowired()
     protected ContentServiceFactory contentServiceFactory;
 
-    @Autowired(required = true)
+    @Autowired()
     protected ItemService itemService;
 
     @Override
@@ -263,11 +263,11 @@ public class EZIDIdentifierProvider
         // Good response?
         if (HttpURLConnection.HTTP_CREATED != response.getHttpStatusCode()) {
             log.error("EZID server responded:  {} {}: {}",
-                      new String[] {
-                          String.valueOf(response.getHttpStatusCode()),
-                          response.getHttpReasonPhrase(),
-                          response.getEZIDStatusValue()
-                      });
+                (Object[]) new String[] {
+                    String.valueOf(response.getHttpStatusCode()),
+                    response.getHttpReasonPhrase(),
+                    response.getEZIDStatusValue()
+                });
             throw new IdentifierException("DOI not created:  "
                                               + response.getHttpReasonPhrase()
                                               + ":  "
@@ -525,7 +525,7 @@ public class EZIDIdentifierProvider
      * Map selected DSpace metadata to fields recognized by DataCite.
      */
     Map<String, String> crosswalkMetadata(Context context, DSpaceObject dso) {
-        if ((null == dso) || !(dso instanceof Item)) {
+        if (!(dso instanceof Item)) {
             throw new IllegalArgumentException("Must be an Item");
         }
         Item item = (Item) dso; // TODO generalize to DSO when all DSOs have metadata.
@@ -544,12 +544,12 @@ public class EZIDIdentifierProvider
                             mappedValue = xfrm.transform(value.getValue());
                         } catch (Exception ex) {
                             log.error("Unable to transform '{}' from {} to {}:  {}",
-                                      new String[] {
-                                          value.getValue(),
-                                          value.toString(),
-                                          key,
-                                          ex.getMessage()
-                                      });
+                                (Object[]) new String[] {
+                                    value.getValue(),
+                                    value.toString(),
+                                    key,
+                                    ex.getMessage()
+                                });
                             continue;
                         }
                     } else {
@@ -560,7 +560,7 @@ public class EZIDIdentifierProvider
             }
         }
 
-        if (GENERATE_DATACITE_XML == true) {
+        if (GENERATE_DATACITE_XML) {
             DataCiteXMLCreator xmlGen = new DataCiteXMLCreator();
             xmlGen.setDisseminationCrosswalkName(DATACITE_XML_CROSSWALK);
             String xmlString = xmlGen.getXMLString(context, dso);
@@ -605,7 +605,7 @@ public class EZIDIdentifierProvider
      *
      * @param aCrosswalk map of metadata fields to EZID keys
      */
-    @Autowired(required = true)
+    @Autowired()
     public void setCrosswalk(Map<String, String> aCrosswalk) {
         crosswalk = aCrosswalk;
     }
@@ -615,7 +615,7 @@ public class EZIDIdentifierProvider
     }
 
     /**
-     * Provide a map from DSO metadata keys to classes which can transform their
+     * Provide a map from DSO metadata keys to class which can transform their
      * values to something acceptable to EZID.
      *
      * @param transformMap map of metadata fields to EZID transformation classes
@@ -632,7 +632,7 @@ public class EZIDIdentifierProvider
         this.DATACITE_XML_CROSSWALK = DATACITE_XML_CROSSWALK;
     }
 
-    @Autowired(required = true)
+    @Autowired()
     public void setRequestFactory(EZIDRequestFactory aRequestFactory) {
         requestFactory = aRequestFactory;
     }

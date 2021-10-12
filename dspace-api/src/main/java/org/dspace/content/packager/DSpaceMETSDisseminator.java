@@ -19,7 +19,6 @@ import edu.harvard.hul.ois.mets.MetsHdr;
 import edu.harvard.hul.ois.mets.Name;
 import edu.harvard.hul.ois.mets.Role;
 import edu.harvard.hul.ois.mets.Type;
-import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.PCData;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
@@ -40,7 +39,7 @@ import org.dspace.core.Context;
  * beyond the requirements of a SIP (e.g. deposit licenses), anticipating
  * the DIP specification.
  * <p>
- * DSpaceMETSDisseminator was intended to be an useful example of a packager
+ * DSpaceMETSDisseminator was intended to be a useful example of a packager
  * plugin, and a way to create packages acceptable to the METS SIP importer.
  *
  * @author Larry Stone
@@ -49,7 +48,7 @@ public class DSpaceMETSDisseminator
     extends AbstractMETSDisseminator {
     /**
      * Identifier for the package we produce, i.e. DSpace METS SIP
-     * Profile.  Though not strictly true, there is no DIP standard yet
+     * Profile.  Though not strictly true, there is no DIP standard yet,
      * so it's the most meaningful label we can apply.
      */
     protected static final String PROFILE_LABEL = "DSpace METS SIP Profile 1.0";
@@ -112,8 +111,7 @@ public class DSpaceMETSDisseminator
         agent.setROLE(Role.CUSTODIAN);
         agent.setTYPE(Type.ORGANIZATION);
         Name name = new Name();
-        name.getContent()
-            .add(new PCData(configurationService.getProperty("dspace.name")));
+        name.getContent().add(new PCData(configurationService.getProperty("dspace.name")));
         agent.getContent().add(name);
         metsHdr.getContent().add(agent);
         return metsHdr;
@@ -128,17 +126,13 @@ public class DSpaceMETSDisseminator
      * its METS MDTYPE name.
      *
      * @return array of DMD types
-     * @throws IOException        if IO error
-     * @throws SQLException       if database error
-     * @throws AuthorizeException if authorization error
      */
     @Override
-    public String[] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
-        throws SQLException, IOException, AuthorizeException {
+    public String[] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params) {
 
         // XXX FIXME maybe let dmd choices be configured in DSpace config?
 
-        String result[] = null;
+        String[] result = null;
         if (params != null) {
             result = params.getProperties("dmd");
         }
@@ -155,15 +149,11 @@ public class DSpaceMETSDisseminator
      * and the METS MDTYPE.
      *
      * @return array of TechMD types
-     * @throws IOException        if IO error
-     * @throws SQLException       if database error
-     * @throws AuthorizeException if authorization error
      */
     @Override
-    public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
-        throws SQLException, IOException, AuthorizeException {
+    public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params) {
         if (dso.getType() == Constants.BITSTREAM) {
-            String result[] = new String[1];
+            String[] result = new String[1];
             result[0] = "PREMIS";
             return result;
         } else {
@@ -172,14 +162,12 @@ public class DSpaceMETSDisseminator
     }
 
     @Override
-    public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
-        throws SQLException, IOException, AuthorizeException {
+    public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params) {
         return new String[0];
     }
 
     @Override
-    public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
-        throws SQLException, IOException, AuthorizeException {
+    public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params) {
         return new String[0];
     }
 
@@ -210,14 +198,13 @@ public class DSpaceMETSDisseminator
             }
         }
 
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     // This is where we'd elaborate on the default structMap; nothing to add, yet.
     @Override
     public void addStructMap(Context context, DSpaceObject dso,
-                             PackageParameters params, Mets mets)
-        throws SQLException, IOException, AuthorizeException, MetsException {
+                             PackageParameters params, Mets mets) {
     }
 
     // only exclude metadata bundles from package.

@@ -40,7 +40,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     @Id
     @GeneratedValue(generator = "predefined-uuid")
     @GenericGenerator(name = "predefined-uuid", strategy = "org.dspace.content.PredefinedUUIDGenerator")
-    @Column(name = "uuid", unique = true, nullable = false, insertable = true, updatable = false)
+    @Column(name = "uuid", unique = true, nullable = false, updatable = false)
     protected java.util.UUID id;
 
     // accumulate information to add to "detail" element of content Event,

@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
  * This mapping is configured in {@code [DSpace]/config/workflow-curation.xml}.
  * Meant to be used as a singleton injected by a DI container such as Spring.
  *
- * <p>Adapted from {@link org.dspace.curate.WorkflowCuratorServiceImpl}.
+ * <p>Adapted from {@link org.dspace.curate.XmlWorkflowCuratorServiceImpl}.
  *
  * @author mwood
  */
@@ -126,9 +126,8 @@ public class CurationTaskConfig {
                         } else if (thing instanceof NotifyType) {
                             NotifyType notify = (NotifyType) thing;
                             stepTask.addContact(notify.getOn().value(), notify.getValue());
-                        } else {
-                            // SNH this branch is forbidden by the schema.
-                        }
+                        }  // SNH this branch is forbidden by the schema.
+
                     }
                     flowstep.addTask(stepTask);
                 }

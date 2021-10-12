@@ -21,7 +21,6 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -292,45 +291,6 @@ public class S3BitStoreService implements BitStoreService {
         return awsAccessKey;
     }
 
-    @Autowired(required = true)
-    public void setAwsAccessKey(String awsAccessKey) {
-        this.awsAccessKey = awsAccessKey;
-    }
-
-    public String getAwsSecretKey() {
-        return awsSecretKey;
-    }
-
-    @Autowired(required = true)
-    public void setAwsSecretKey(String awsSecretKey) {
-        this.awsSecretKey = awsSecretKey;
-    }
-
-    public String getAwsRegionName() {
-        return awsRegionName;
-    }
-
-    public void setAwsRegionName(String awsRegionName) {
-        this.awsRegionName = awsRegionName;
-    }
-
-    @Autowired(required = true)
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
-
-    public String getSubfolder() {
-        return subfolder;
-    }
-
-    public void setSubfolder(String subfolder) {
-        this.subfolder = subfolder;
-    }
-
     /**
      * Contains a command-line testing tool. Expects arguments:
      * -a accessKey -s secretKey -f assetFileName
@@ -345,6 +305,7 @@ public class S3BitStoreService implements BitStoreService {
         String assetFile = null;
         String accessKey = null;
         String secretKey = null;
+        String endpoint = null;
 
         for (int i = 0; i < args.length; i += 2) {
             if (args[i].startsWith("-a")) {
@@ -353,18 +314,28 @@ public class S3BitStoreService implements BitStoreService {
                 secretKey = args[i + 1];
             } else if (args[i].startsWith("-f")) {
                 assetFile = args[i + 1];
+            } else if (args[i].startsWith("-r")) {
+                endpoint = args[i + 1];
             }
         }
 
-        if (accessKey == null || secretKey == null || assetFile == null) {
+        if (accessKey == null || secretKey == null || assetFile == null || endpoint == null) {
             System.out.println("Missing arguments - exiting");
             return;
         }
         S3BitStoreService store = new S3BitStoreService();
 
-        AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        ClientConfiguration clientConfiguration = new ClientConfiguration();
 
-        store.s3Client = new AmazonS3Client(awsCredentials);
+        store.s3Client = AmazonS3ClientBuilder
+            .standard()
+            .withEndpointConfiguration(
+                new AwsClientBuilder.EndpointConfiguration(endpoint, Regions.US_EAST_1.name()))
+            .withPathStyleAccessEnabled(true)
+            .withClientConfiguration(clientConfiguration)
+            .withCredentials(new AWSStaticCredentialsProvider(credentials))
+            .build();
 
         //Todo configurable region
         Region usEast1 = Region.getRegion(Regions.US_EAST_1);
@@ -375,7 +346,7 @@ public class S3BitStoreService implements BitStoreService {
         //Bucketname should be lowercase
         store.bucketName = "dspace-asset-" + hostname + ".s3test";
         store.s3Client.createBucket(store.bucketName);
-/* Broken in DSpace 6 TODO Refactor
+        /* Broken in DSpace 6 TODO Refactor
         // time everything, todo, swtich to caliper
         long start = System.currentTimeMillis();
         // Case 1: store a file
@@ -427,6 +398,45 @@ public class S3BitStoreService implements BitStoreService {
         // should get nothing back now - will throw exception
         store.get(id);
 */
+    }
+
+    public String getAwsSecretKey() {
+        return awsSecretKey;
+    }
+
+    @Autowired()
+    public void setAwsSecretKey(String awsSecretKey) {
+        this.awsSecretKey = awsSecretKey;
+    }
+
+    @Autowired()
+    public void setAwsAccessKey(String awsAccessKey) {
+        this.awsAccessKey = awsAccessKey;
+    }
+
+    public String getAwsRegionName() {
+        return awsRegionName;
+    }
+
+    public void setAwsRegionName(String awsRegionName) {
+        this.awsRegionName = awsRegionName;
+    }
+
+    public String getSubfolder() {
+        return subfolder;
+    }
+
+    public void setSubfolder(String subfolder) {
+        this.subfolder = subfolder;
+    }
+
+    @Autowired()
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 
     public String getEndpoint() {

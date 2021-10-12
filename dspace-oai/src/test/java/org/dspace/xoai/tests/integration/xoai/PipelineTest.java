@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.parboiled.common.FileUtils;
 
 public class PipelineTest {
-    private static TransformerFactory factory = TransformerFactory.newInstance();
+    private static final TransformerFactory factory = TransformerFactory.newInstance();
 
     @Test
     public void pipelineTest() throws Exception {
@@ -34,8 +34,10 @@ public class PipelineTest {
 
         assertThat(output, oai_dc().withXPath("/oai_dc:dc/dc:title", equalTo("Teste")));
 
+        assert input != null;
         input.close();
         input = null;
+        assert xslt != null;
         xslt.close();
         xslt = null;
         output = null;

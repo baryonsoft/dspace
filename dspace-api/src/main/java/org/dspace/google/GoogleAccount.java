@@ -31,23 +31,21 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class GoogleAccount {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(GoogleAccount.class);
     // Read from config
-    private String applicationName;
-    private String tableId;
-    private String emailAddress;
-    private String certificateLocation;
-
+    private final String applicationName;
+    private final String tableId;
+    private final String emailAddress;
+    private final String certificateLocation;
     // Created from factories
-    private JsonFactory jsonFactory;
-    private HttpTransport httpTransport;
+    private final JsonFactory jsonFactory;
 
     // The Google stuff
     private Credential credential;
-    private Analytics client;
+    private final HttpTransport httpTransport;
 
     private volatile static GoogleAccount uniqueInstance;
-
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(GoogleAccount.class);
+    private final Analytics client;
 
 
     private GoogleAccount() {
@@ -89,7 +87,7 @@ public class GoogleAccount {
     }
 
     private Credential authorize() throws Exception {
-        Set<String> scopes = new HashSet<String>();
+        Set<String> scopes = new HashSet<>();
         scopes.add(AnalyticsScopes.ANALYTICS);
         scopes.add(AnalyticsScopes.ANALYTICS_EDIT);
         scopes.add(AnalyticsScopes.ANALYTICS_MANAGE_USERS);

@@ -8,13 +8,11 @@
 package org.dspace.xoai.tests.unit.services.impl.solr;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.lyncode.xoai.dataprovider.data.Filter;
 import com.lyncode.xoai.dataprovider.filter.Scope;
 import com.lyncode.xoai.dataprovider.filter.ScopedFilter;
 import com.lyncode.xoai.dataprovider.filter.conditions.AndCondition;
@@ -29,6 +27,7 @@ import org.dspace.xoai.filter.DateFromFilter;
 import org.dspace.xoai.filter.DateUntilFilter;
 import org.dspace.xoai.services.impl.solr.DSpaceSolrQueryResolver;
 import org.dspace.xoai.tests.unit.services.impl.AbstractQueryResolverTest;
+import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,115 +51,88 @@ public class DSpaceSolrQueryResolverTest extends AbstractQueryResolverTest {
     }
 
     @Test
-    public void fromFilterQuery() throws Exception {
-        List<ScopedFilter> scopedFilters = new ArrayList<ScopedFilter>();
-        scopedFilters.add(new ScopedFilter(new Condition() {
-            @Override
-            public Filter getFilter() {
-                return new DateFromFilter(DATE);
-            }
-        }, Scope.Query));
+    public void fromFilterQuery() {
+        List<ScopedFilter> scopedFilters = new ArrayList<>();
+        scopedFilters.add(new ScopedFilter(() -> new DateFromFilter(DATE), Scope.Query));
 
         String result = underTest.buildQuery(scopedFilters);
 
-        assertThat(result, is("((item.lastmodified:[" + escapedFromDate(DATE) + " TO *]))"));
+        MatcherAssert.assertThat(result, is("((item.lastmodified:[" + escapedFromDate(DATE) + " TO *]))"));
     }
 
     @Test
-    public void fromAndUntilFilterQuery() throws Exception {
-        List<ScopedFilter> scopedFilters = new ArrayList<ScopedFilter>();
-        Condition fromCondition = new Condition() {
-            @Override
-            public Filter getFilter() {
-                return new DateFromFilter(DATE);
-            }
-        };
-        Condition untilCondition = new Condition() {
-            @Override
-            public Filter getFilter() {
-                return new DateUntilFilter(DATE);
-            }
-        };
+    public void fromAndUntilFilterQuery() {
+        List<ScopedFilter> scopedFilters = new ArrayList<>();
+        Condition fromCondition = () -> new DateFromFilter(DATE);
+        Condition untilCondition = () -> new DateUntilFilter(DATE);
         scopedFilters.add(new ScopedFilter(new AndCondition(getFilterResolver(),
-                                                            fromCondition, untilCondition), Scope.Query));
+            fromCondition, untilCondition), Scope.Query));
 
         String result = underTest.buildQuery(scopedFilters);
 
-        assertThat(result, is("(((item.lastmodified:[" + escapedFromDate(
+        MatcherAssert.assertThat(result, is("(((item.lastmodified:[" + escapedFromDate(
             DATE) + " TO *]) AND (item.lastmodified:[* TO " + escapedUntilDate(DATE) + "])))"));
     }
 
     @Test
-    public void customConditionForMetadataExistsFilterWithOneSingleValue() throws Exception {
-        List<ScopedFilter> scopedFilters = new ArrayList<ScopedFilter>();
+    public void customConditionForMetadataExistsFilterWithOneSingleValue() {
+        List<ScopedFilter> scopedFilters = new ArrayList<>();
         ParameterMap filterConfiguration = new ParameterMap().withValues(new StringValue()
-                                                                             .withValue(FIELD_1)
-                                                                             .withName("fields"));
+            .withValue(FIELD_1)
+            .withName("fields"));
 
         scopedFilters.add(new ScopedFilter(new CustomCondition(getFilterResolver(),
-                                                               DSpaceMetadataExistsFilter.class,
-                                                               filterConfiguration),
-                                           Scope.Query));
+            DSpaceMetadataExistsFilter.class,
+            filterConfiguration),
+            Scope.Query));
 
         String result = underTest.buildQuery(scopedFilters);
 
-        assertThat(result, is("(((metadata." + FIELD_1 + ":[* TO *])))"));
+        MatcherAssert.assertThat(result, is("(((metadata." + FIELD_1 + ":[* TO *])))"));
     }
 
     @Test
-    public void customConditionForMetadataExistsFilterWithMultipleValues() throws Exception {
-        List<ScopedFilter> scopedFilters = new ArrayList<ScopedFilter>();
+    public void customConditionForMetadataExistsFilterWithMultipleValues() {
+        List<ScopedFilter> scopedFilters = new ArrayList<>();
         ParameterMap filterConfiguration = new ParameterMap().withValues(new ParameterList()
-                                                                             .withValues(
-                                                                                 new StringValue().withValue(FIELD_1),
-                                                                                 new StringValue().withValue(FIELD_2)
-                                                                             )
-                                                                             .withName("fields"));
+            .withValues(
+                new StringValue().withValue(FIELD_1),
+                new StringValue().withValue(FIELD_2)
+            )
+            .withName("fields"));
 
         scopedFilters.add(new ScopedFilter(new CustomCondition(getFilterResolver(),
-                                                               DSpaceMetadataExistsFilter.class,
-                                                               filterConfiguration),
-                                           Scope.Query));
+            DSpaceMetadataExistsFilter.class,
+            filterConfiguration),
+            Scope.Query));
 
         String result = underTest.buildQuery(scopedFilters);
 
-        assertThat(result, is("(((metadata." + FIELD_1 + ":[* TO *] OR metadata." + FIELD_2 + ":[* TO *])))"));
+        MatcherAssert.assertThat(result,
+            is("(((metadata." + FIELD_1 + ":[* TO *] OR metadata." + FIELD_2 + ":[* TO *])))"));
     }
 
     @Test
-    public void fromFilterInMetadataFormatScope() throws Exception {
-        List<ScopedFilter> scopedFilters = new ArrayList<ScopedFilter>();
-        scopedFilters.add(new ScopedFilter(new Condition() {
-            @Override
-            public Filter getFilter() {
-                return new DateFromFilter(DATE);
-            }
-        }, Scope.MetadataFormat));
+    public void fromFilterInMetadataFormatScope() {
+        List<ScopedFilter> scopedFilters = new ArrayList<>();
+        scopedFilters.add(new ScopedFilter(() -> new DateFromFilter(DATE), Scope.MetadataFormat));
 
         String result = underTest.buildQuery(scopedFilters);
 
-        assertThat(result, is("((item.deleted:true OR (item.lastmodified:[" + escapedFromDate(DATE) + " TO *])))"));
+        MatcherAssert.assertThat(result,
+            is("((item.deleted:true OR (item.lastmodified:[" + escapedFromDate(DATE) + " TO *])))"));
     }
 
     @Test
-    public void fromAndSetFilterQuery() throws Exception {
-        List<ScopedFilter> scopedFilters = new ArrayList<ScopedFilter>();
-        scopedFilters.add(new ScopedFilter(new Condition() {
-            @Override
-            public Filter getFilter() {
-                return new DateFromFilter(DATE);
-            }
-        }, Scope.Query));
-        scopedFilters.add(new ScopedFilter(new Condition() {
-            @Override
-            public Filter getFilter() {
-                return new DSpaceSetSpecFilter(collectionsService, handleResolver, SET);
-            }
-        }, Scope.Query));
+    public void fromAndSetFilterQuery() {
+        List<ScopedFilter> scopedFilters = new ArrayList<>();
+        scopedFilters.add(new ScopedFilter(() -> new DateFromFilter(DATE), Scope.Query));
+        scopedFilters.add(
+            new ScopedFilter(() -> new DSpaceSetSpecFilter(collectionsService, handleResolver, SET), Scope.Query));
 
         String result = underTest.buildQuery(scopedFilters);
 
-        assertThat(result, is("((item.lastmodified:[" + escapedFromDate(
+        MatcherAssert.assertThat(result, is("((item.lastmodified:[" + escapedFromDate(
             DATE) + " TO *])) AND ((item.collections:" + SET + "))"));
     }
 

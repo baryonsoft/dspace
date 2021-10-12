@@ -65,34 +65,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements GroupService {
     private static final Logger log = LoggerFactory.getLogger(GroupServiceImpl.class);
 
-    @Autowired(required = true)
+    @Autowired()
     protected GroupDAO groupDAO;
 
-    @Autowired(required = true)
+    @Autowired()
     protected Group2GroupCacheDAO group2GroupCacheDAO;
 
-    @Autowired(required = true)
+    @Autowired()
     protected CollectionService collectionService;
 
-    @Autowired(required = true)
+    @Autowired()
     protected CollectionRoleService collectionRoleService;
 
-    @Autowired(required = true)
+    @Autowired()
     protected EPersonService ePersonService;
 
-    @Autowired(required = true)
+    @Autowired()
     protected CommunityService communityService;
 
-    @Autowired(required = true)
+    @Autowired()
     protected AuthorizeService authorizeService;
-    @Autowired(required = true)
+    @Autowired()
     protected ResourcePolicyService resourcePolicyService;
 
-    @Autowired(required = true)
+    @Autowired()
     protected PoolTaskService poolTaskService;
-    @Autowired(required = true)
+    @Autowired()
     protected ClaimedTaskService claimedTaskService;
-    @Autowired(required = true)
+    @Autowired()
     protected XmlWorkflowFactory workflowFactory;
 
     protected GroupServiceImpl() {
@@ -161,10 +161,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      * Removes a member of a group.
      * The removal will be refused if the group is linked to a workflow step which has claimed tasks or pool tasks
      * and no other member is present in the group to handle these.
+     *
      * @param context DSpace context object
      * @param group   DSpace group
      * @param ePerson eperson
-     * @throws SQLException
+     * @throws SQLException SQLException
      */
     @Override
     public void removeMember(Context context, Group group, EPerson ePerson) throws SQLException {
@@ -342,9 +343,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         // of a user who is not logged in.
         if ((context.getCurrentUser() == null) || (context.getCurrentUser().equals(ePerson))) {
             List<Group> specialGroups = context.getSpecialGroups();
-            for (Group special : specialGroups) {
-                groups.add(special);
-            }
+            groups.addAll(specialGroups);
         }
 
         // all the users are members of the anonymous group
@@ -472,7 +471,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public void delete(Context context, Group group) throws SQLException {
         if (group.isPermanent()) {
-            log.error("Attempt to delete permanent Group $", group.getName());
+            log.error(String.format("Attempt to delete permanent Group %s", group.getName()));
             throw new SQLException("Attempt to delete a permanent Group");
         }
 
@@ -529,7 +528,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                     return false;
                 }
             }
-            return !hasMembers;
+            return true;
         }
     }
 
@@ -715,12 +714,12 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                     // admins can eventually manage it
                     List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
                     if (collectionRoles != null && collectionRoles.size() > 0) {
-                        Set<Collection> colls = new HashSet<>();
+                        Set<Collection> collSet = new HashSet<>();
                         for (CollectionRole cr : collectionRoles) {
-                            colls.add(cr.getCollection());
+                            collSet.add(cr.getCollection());
                         }
-                        if (colls.size() == 1) {
-                            collection = colls.iterator().next();
+                        if (collSet.size() == 1) {
+                            collection = collSet.iterator().next();
                             if (AuthorizeConfiguration.canCollectionAdminManageWorkflows()) {
                                 return collection;
                             } else {
