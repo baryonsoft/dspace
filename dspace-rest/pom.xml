@@ -1,17 +1,19 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
-    <version>baryonics-0.3.5-SNAPSHOT</version>
+    <version>baryonics-0.3.5</version>
     <name>DSpace (Deprecated) REST Webapp</name>
     <description>DSpace RESTful Web Services API. NOTE: this REST API is DEPRECATED.
-        Please consider using the REST API in the dspace-server-webapp instead!</description>
+        Please consider using the REST API in the dspace-server-webapp instead!
+    </description>
     <url>http://demo.dspace.org</url>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>baryonics-0.3.5-SNAPSHOT</version>
+        <version>baryonics-0.3.5</version>
         <relativePath>..</relativePath>
     </parent>
 
