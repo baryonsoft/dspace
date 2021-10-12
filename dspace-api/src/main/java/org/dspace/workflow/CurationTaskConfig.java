@@ -69,7 +69,7 @@ public class CurationTaskConfig {
         } else if (collectionTasksetMap.containsKey(DEFAULT_TASKSET_NAME)) {
             return collectionTasksetMap.get(DEFAULT_TASKSET_NAME);
         } else {
-            return new TaskSet("", Collections.EMPTY_LIST);
+            return new TaskSet("", Collections.emptyList());
         }
     }
 

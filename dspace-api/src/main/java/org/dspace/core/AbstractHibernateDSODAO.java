@@ -9,13 +9,13 @@ package org.dspace.core;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
@@ -37,11 +37,12 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * All DSOs now have UUID primary keys, and those should be used when available.
      * Each type derived from DSpaceObject had its own stream of record IDs, so
      * it is also necessary to know the specific type.
-     * @param context current DSpace context.
+     *
+     * @param context  current DSpace context.
      * @param legacyId the old integer record identifier.
-     * @param clazz DSO subtype of record identified by {@link legacyId}.
-     * @return
-     * @throws SQLException
+     * @param clazz    DSO subtype of record identified by legacyId.
+     * @return uniqueResult
+     * @throws SQLException SQL Exception
      */
     public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -63,8 +64,8 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                                        Collection<MetadataField> metadataFields) {
         for (MetadataField metadataField : metadataFields) {
             query.append(" left join ").append(tableIdentifier).append(".metadata ").append(metadataField.toString());
-            query.append(" WITH ").append(metadataField.toString()).append(".metadataField.id").append(" = :")
-                 .append(metadataField.toString());
+            query.append(" WITH ").append(metadataField).append(".metadataField.id").append(" = :")
+                .append(metadataField);
         }
     }
 
@@ -87,7 +88,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                 MetadataField metadataField = metadataFields.get(i);
                 if (StringUtils.isNotBlank(operator)) {
                     query.append(" (");
-                    query.append("lower(STR(" + metadataField.toString()).append(".value)) ").append(operator)
+                    query.append("lower(STR(").append(metadataField.toString()).append(".value)) ").append(operator)
                          .append(" lower(:queryParam)");
                     query.append(")");
                     if (i < metadataFields.size() - 1) {
@@ -115,7 +116,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      */
     protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields,
                                         List<String> columnSortFields) {
-        addMetadataSortQuery(query, metadataSortFields, columnSortFields, ListUtils.EMPTY_LIST);
+        addMetadataSortQuery(query, metadataSortFields, columnSortFields, Collections.emptyList());
     }
 
     /**

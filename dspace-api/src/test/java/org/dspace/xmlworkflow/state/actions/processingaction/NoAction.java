@@ -26,8 +26,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public class NoAction extends ProcessingAction {
     @Override
-    public void activate(Context c, XmlWorkflowItem wf)
-            throws SQLException, IOException, AuthorizeException, WorkflowException {
+    public void activate(Context c, XmlWorkflowItem wf) {
     }
 
     @Override
@@ -40,6 +39,6 @@ public class NoAction extends ProcessingAction {
 
     @Override
     public List<String> getOptions() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 }
