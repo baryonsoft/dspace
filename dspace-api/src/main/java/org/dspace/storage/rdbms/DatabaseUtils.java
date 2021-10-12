@@ -242,7 +242,7 @@ public class DatabaseUtils {
             } else if (argv[0].equalsIgnoreCase("repair")) {
                 // "repair" = Run Flyway repair script
 
-                try (Connection connection = dataSource.getConnection();) {
+                try (Connection connection = dataSource.getConnection()) {
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
                     System.out.println(
                         "Attempting to repair any previously failed migrations (or mismatched checksums) via " +
@@ -258,7 +258,7 @@ public class DatabaseUtils {
             } else if (argv[0].equalsIgnoreCase("validate")) {
                 // "validate" = Run Flyway validation to check for database errors/issues
 
-                try (Connection connection = dataSource.getConnection();) {
+                try (Connection connection = dataSource.getConnection()) {
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
                     System.out
                         .println("Attempting to validate database status (and migration checksums) via FlywayDB...");
@@ -347,7 +347,7 @@ public class DatabaseUtils {
                             "/update-sequences.sql";
                     InputStream sqlstream = DatabaseUtils.class.getClassLoader().getResourceAsStream(sqlfile);
                     if (sqlstream != null) {
-                        String s = IOUtils.toString(sqlstream, "UTF-8");
+                        String s = IOUtils.toString(sqlstream, StandardCharsets.UTF_8);
                         if (!s.isEmpty()) {
                             System.out.println("Running " + sqlfile);
                             connection.createStatement().execute(s);
@@ -373,17 +373,17 @@ public class DatabaseUtils {
                     " - migrate          = Migrate the database to the latest version");
                 System.out.println(
                     " - repair           = Attempt to repair any previously failed database " +
-                    "migrations or checksum mismatches (via Flyway repair)");
+                        "migrations or checksum mismatches (via Flyway repair)");
                 System.out.println(
                     " - validate         = Validate current database's migration status (via Flyway validate), " +
-                    "validating all migration checksums.");
+                        "validating all migration checksums.");
                 System.out.println(
                     " - update-sequences = Update database sequences after running AIP ingest.");
                 System.out.println(
                     " - clean            = DESTROY all data and tables in database " +
-                    "(WARNING there is no going back!). " +
-                    "Requires 'db.cleanDisabled=false' setting in config.");
-                System.out.println("");
+                        "(WARNING there is no going back!). " +
+                        "Requires 'db.cleanDisabled=false' setting in config.");
+                System.out.println();
                 System.exit(0);
             }
 
@@ -566,7 +566,7 @@ public class DatabaseUtils {
 
             // Now tell Flyway which locations to load SQL / Java migrations from
             log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
-            flywayConfiguration.locations(scriptLocations.toArray(new String[scriptLocations.size()]));
+            flywayConfiguration.locations(scriptLocations.toArray(new String[0]));
 
             // Tell Flyway NOT to throw a validation error if it finds older "Ignored" migrations.
             // For DSpace, we sometimes have to insert "old" migrations in after a major release
@@ -578,7 +578,7 @@ public class DatabaseUtils {
             List<Callback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager()
                                                                         .getServicesByType(Callback.class);
 
-            flywayConfiguration.callbacks(flywayCallbacks.toArray(new Callback[flywayCallbacks.size()]));
+            flywayConfiguration.callbacks(flywayCallbacks.toArray(new Callback[0]));
 
             // Tell Flyway to use the "schema_version" table in the database to manage its migration history
             // As of Flyway v5, the default table is named "flyway_schema_history"
@@ -638,8 +638,8 @@ public class DatabaseUtils {
     }
 
     /**
-     * Ensures the current database is up-to-date with regards
-     * to the latest DSpace DB schema. If the scheme is not up-to-date,
+     * Ensures the current database is up-to-date with regard to the latest DSpace DB schema.
+     * If the scheme is not up-to-date,
      * then any necessary database migrations are performed.
      * <P>
      * FlywayDB (http://flywaydb.org/) is used to perform database migrations.
@@ -704,7 +704,7 @@ public class DatabaseUtils {
             flywayConfiguration.outOfOrder(outOfOrder);
 
             // If a target version was specified, tell Flyway to ONLY migrate to that version
-            // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
+            // (i.e. all later migrations are left as "pending"). By default, we always migrate to latest version.
             // This mode is only useful for testing migrations & should NEVER be used in Production.
             if (!StringUtils.isBlank(targetVersion)) {
                 flywayConfiguration.target(targetVersion);
@@ -928,7 +928,7 @@ public class DatabaseUtils {
      * @param connection    Current Database Connection
      * @param tableName     The name of the table
      * @param caseSensitive When "true", the case of the tableName will not be changed.
-     *                      When "false, the name may be uppercased or lowercased based on DB type.
+     *                      When "false", the name may be uppercase or lowercased based on DB type.
      * @return true if table of that name exists, false otherwise
      */
     public static boolean tableExists(Connection connection, String tableName, boolean caseSensitive) {
@@ -1044,7 +1044,7 @@ public class DatabaseUtils {
 
             // Different database types store sequence information in different tables
             String dbtype = getDbType(connection);
-            String sequenceSQL = null;
+            String sequenceSQL;
             switch (dbtype) {
                 case DBMS_POSTGRES:
                     // Default schema in PostgreSQL is "public"
@@ -1063,6 +1063,7 @@ public class DatabaseUtils {
                 case DBMS_ORACLE:
                     // Oracle specific query for a sequence owned by our current DSpace user
                     // NOTE: No need to filter by schema for Oracle, as Schema = User
+                    //noinspection SqlResolve
                     sequenceSQL = "SELECT COUNT(1) FROM user_sequences WHERE sequence_name=?";
                     break;
                 case DBMS_H2:
@@ -1076,20 +1077,18 @@ public class DatabaseUtils {
                     throw new SQLException("DBMS " + dbtype + " is unsupported.");
             }
 
-            // If we have a SQL query to run for the sequence, then run it
-            if (sequenceSQL != null) {
-                // Run the query, passing it our parameters
-                statement = connection.prepareStatement(sequenceSQL);
-                statement.setString(1, sequenceName);
-                if (schemaFilter) {
-                    statement.setString(2, schema);
-                }
-                results = statement.executeQuery();
+            // If we have an SQL query to run for the sequence, then run it
+            // Run the query, passing it our parameters
+            statement = connection.prepareStatement(sequenceSQL);
+            statement.setString(1, sequenceName);
+            if (schemaFilter) {
+                statement.setString(2, schema);
+            }
+            results = statement.executeQuery();
 
-                // If results are non-zero, then this sequence exists!
-                if (results != null && results.next() && results.getInt(1) > 0) {
-                    exists = true;
-                }
+            // If results are non-zero, then this sequence exists!
+            if (results != null && results.next() && results.getInt(1) > 0) {
+                exists = true;
             }
         } catch (SQLException e) {
             log.error("Error attempting to determine if sequence " + sequenceName + " exists", e);
@@ -1208,7 +1207,7 @@ public class DatabaseUtils {
         } else if (meta.storesUpperCaseIdentifiers()) {
             return StringUtils.upperCase(dbIdentifier);
         } else {
-            // Otherwise DB doesn't care about case
+            // Otherwise, DB doesn't care about case
             return dbIdentifier;
         }
     }
@@ -1257,12 +1256,13 @@ public class DatabaseUtils {
     }
 
     /**
-     * Whether or not reindexing is required in Discovery.
-     * <P>
+     * Whether reindexing is required in Discovery.
+     * <p>
      * Because the DB migration may be initialized by commandline or any one of
      * the many DSpace webapps, this checks for the existence of a temporary
      * file, and the discovery.autoReindex setting to know when
      * Discovery/Solr needs reindexing.
+     *
      * @return whether reindexing should happen.
      */
     public static synchronized boolean getReindexDiscovery() {
@@ -1293,6 +1293,84 @@ public class DatabaseUtils {
     }
 
     /**
+     * Return the DSpace version that this Flyway-enabled database reports to be compatible with.
+     * The version is retrieved from Flyway, and parsed into a Double to represent an actual
+     * DSpace version number (e.g. 5.0, 6.0, etc.)
+     *
+     * @param connection current DB Connection
+     * @return reported DSpace version as a Double
+     * @throws SQLException if database error occurs
+     */
+    public static Double getCurrentFlywayDSpaceState(Connection connection) throws SQLException {
+        String flywayState = getCurrentFlywayState(connection);
+        Matcher matcher = Pattern.compile("^([0-9]*\\.[0-9]*)(\\.)?.*").matcher(flywayState);
+        if (matcher.matches()) {
+            return Double.parseDouble(matcher.group(1));
+        }
+        return null;
+    }
+
+    /**
+     * Determine the type of Database, based on the DB connection.
+     *
+     * @param connection current DB Connection
+     * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
+     * @throws SQLException if database error
+     */
+    public static String getDbType(Connection connection)
+        throws SQLException {
+        DatabaseMetaData meta = connection.getMetaData();
+        String prodName = meta.getDatabaseProductName();
+        String dbms_lc = prodName.toLowerCase(Locale.ROOT);
+        if (dbms_lc.contains("postgresql")) {
+            return DBMS_POSTGRES;
+        } else if (dbms_lc.contains("oracle")) {
+            return DBMS_ORACLE;
+        } else if (dbms_lc.contains("h2")) {
+            // Used for unit testing only
+            return DBMS_H2;
+        } else {
+            return dbms_lc;
+        }
+    }
+
+    /**
+     * Get a reference to the configured DataSource (which can be used to
+     * initialize the database using Flyway).
+     * The DataSource is configured via our ServiceManager (i.e. via Spring).
+     * <p>
+     * This is NOT public, as we discourage direct connections to the database
+     * which bypass Hibernate. Only Flyway should be allowed a direct connection.
+     *
+     * @return DataSource
+     */
+    protected static DataSource getDataSource() {
+        DataSource dataSource = DSpaceServicesFactory.getInstance()
+            .getServiceManager()
+            .getServiceByName("dataSource", DataSource.class);
+        if (null == dataSource) {
+            log.error("The service manager could not find the DataSource.");
+        }
+        return dataSource;
+    }
+
+    /**
+     * Returns the current Flyway schema_version being used by the given database.
+     * (i.e. the version of the highest numbered migration that this database has run)
+     *
+     * @param connection current DB Connection
+     * @return version as string
+     * @throws SQLException if database error occurs
+     */
+    public static String getCurrentFlywayState(Connection connection) throws SQLException {
+        PreparedStatement statement = connection
+            .prepareStatement("SELECT \"version\" FROM \"" + FLYWAY_TABLE + "\" ORDER BY \"version\" desc");
+        ResultSet resultSet = statement.executeQuery();
+        resultSet.next();
+        return resultSet.getString("version");
+    }
+
+    /**
      * Internal class to actually perform re-indexing in a separate thread.
      * (See checkReindexDiscovery() method).
      */
@@ -1302,7 +1380,7 @@ public class DatabaseUtils {
         /**
          * Constructor. Pass it an existing IndexingService
          *
-         * @param is
+         * @param is indexing service
          */
         ReindexerThread(IndexingService is) {
             this.indexer = is;
@@ -1342,7 +1420,7 @@ public class DatabaseUtils {
                     } catch (SQLException | IOException e) {
                         log.error("Error attempting to reindex all contents for search/browse", e);
                     } finally {
-                        // Reset our indexing flag. Indexing is done or it threw an error,
+                        // Reset our indexing flag. Indexing is done, or it threw an error,
                         // Either way, we shouldn't try again.
                         DatabaseUtils.setReindexDiscovery(false);
 
@@ -1354,83 +1432,5 @@ public class DatabaseUtils {
                 }
             }
         }
-    }
-
-    /**
-     * Determine the type of Database, based on the DB connection.
-     *
-     * @param connection current DB Connection
-     * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
-     * @throws SQLException if database error
-     */
-    public static String getDbType(Connection connection)
-        throws SQLException {
-        DatabaseMetaData meta = connection.getMetaData();
-        String prodName = meta.getDatabaseProductName();
-        String dbms_lc = prodName.toLowerCase(Locale.ROOT);
-        if (dbms_lc.contains("postgresql")) {
-            return DBMS_POSTGRES;
-        } else if (dbms_lc.contains("oracle")) {
-            return DBMS_ORACLE;
-        } else if (dbms_lc.contains("h2")) {
-            // Used for unit testing only
-            return DBMS_H2;
-        } else {
-            return dbms_lc;
-        }
-    }
-
-    /**
-     * Get a reference to the configured DataSource (which can be used to
-     * initialize the database using Flyway).
-     * The DataSource is configured via our ServiceManager (i.e. via Spring).
-     * <P>
-     * This is NOT public, as we discourage direct connections to the database
-     * which bypass Hibernate. Only Flyway should be allowed a direct connection.
-     *
-     * @return DataSource
-     */
-    protected static DataSource getDataSource() {
-        DataSource dataSource = DSpaceServicesFactory.getInstance()
-                                                     .getServiceManager()
-                                                     .getServiceByName("dataSource", DataSource.class);
-        if (null == dataSource) {
-            log.error("The service manager could not find the DataSource.");
-        }
-        return dataSource;
-    }
-
-    /**
-     * Returns the current Flyway schema_version being used by the given database.
-     * (i.e. the version of the highest numbered migration that this database has run)
-     *
-     * @param connection current DB Connection
-     * @return version as string
-     * @throws SQLException if database error occurs
-     */
-    public static String getCurrentFlywayState(Connection connection) throws SQLException {
-        PreparedStatement statement = connection
-            .prepareStatement("SELECT \"version\" FROM \"" + FLYWAY_TABLE + "\" ORDER BY \"version\" desc");
-        ResultSet resultSet = statement.executeQuery();
-        resultSet.next();
-        return resultSet.getString("version");
-    }
-
-    /**
-     * Return the DSpace version that this Flyway-enabled database reports to be compatible with.
-     * The version is retrieved from Flyway, and parsed into a Double to represent an actual
-     * DSpace version number (e.g. 5.0, 6.0, etc)
-     *
-     * @param connection current DB Connection
-     * @return reported DSpace version as a Double
-     * @throws SQLException if database error occurs
-     */
-    public static Double getCurrentFlywayDSpaceState(Connection connection) throws SQLException {
-        String flywayState = getCurrentFlywayState(connection);
-        Matcher matcher = Pattern.compile("^([0-9]*\\.[0-9]*)(\\.)?.*").matcher(flywayState);
-        if (matcher.matches()) {
-            return Double.parseDouble(matcher.group(1));
-        }
-        return null;
     }
 }
