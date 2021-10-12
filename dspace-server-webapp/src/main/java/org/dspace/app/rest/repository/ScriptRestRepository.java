@@ -158,14 +158,10 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
             restDSpaceRunnableHandler.schedule(dSpaceRunnable);
         } catch (ParseException e) {
             dSpaceRunnable.printHelp();
-            try {
-                restDSpaceRunnableHandler.handleException(
-                    "Failed to parse the arguments given to the script with name: "
-                        + scriptToExecute.getName() + " and args: " + args, e
-                );
-            } catch (Exception re) {
-                // ignore re-thrown exception
-            }
+            restDSpaceRunnableHandler
+                .handleException(
+                    "Failed to parse the arguments given to the script with name: " + scriptToExecute.getName()
+                        + " and args: " + args, e);
         }
     }
 

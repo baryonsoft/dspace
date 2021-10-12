@@ -17,9 +17,9 @@ import org.dspace.content.DSpaceObject;
  * @version $Revision$
  */
 public class AuthorizeException extends Exception {
-    private int myaction; // action attempted, or -1
+    private final int myaction; // action attempted, or -1
 
-    private DSpaceObject myobject; // object action attempted on or null
+    private final DSpaceObject myobject; // object action attempted on or null
 
     /**
      * Create an empty authorize exception

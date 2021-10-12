@@ -9,7 +9,6 @@ package org.dspace.authorize;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +61,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AuthorizeServiceImpl implements AuthorizeService {
 
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger(AuthorizeServiceImpl.class);
 
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
@@ -100,6 +99,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             }
         }
 
+        assert ex != null;
         throw ex;
     }
 
@@ -278,7 +278,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             }
         }
         if (o instanceof Bundle) {
-            ignoreCustomPolicies = !isAnyItemInstalled(c, Arrays.asList(((Bundle) o)));
+            ignoreCustomPolicies = !isAnyItemInstalled(c, List.of(((Bundle) o)));
         }
         if (o instanceof Item) {
             if (workspaceItemService.findByItem(c, (Item) o) != null ||
@@ -658,7 +658,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                           String reason, DSpaceObject dso, Collection owningCollection)
         throws SQLException, AuthorizeException {
 
-        if (embargoDate != null || (embargoDate == null && dso instanceof Bitstream)) {
+        if (embargoDate != null || dso instanceof Bitstream) {
 
             List<Group> authorizedGroups = getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_ITEM_READ);
 
@@ -869,11 +869,10 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (context.getCurrentUser() == null) {
             return collections;
         }
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append(formatCustomQuery(query));
-        queryBuilder.append("search.resourcetype:").append(IndexableCollection.TYPE);
-        DiscoverResult discoverResult = getDiscoverResult(context, queryBuilder.toString(),
-                offset, limit);
+        String queryBuilder = formatCustomQuery(query) +
+            "search.resourcetype:" + IndexableCollection.TYPE;
+        DiscoverResult discoverResult = getDiscoverResult(context, queryBuilder,
+            offset, limit);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(collection);
@@ -921,11 +920,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             throws SearchServiceException, SQLException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         if (!this.isAdmin(context)) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("(" + "admin:e").append(context.getCurrentUser().getID()).
-                    append(getGroupToQuery(groupService.allMemberGroupsSet(context,
-                            context.getCurrentUser()))).append(")");
-            discoverQuery.addFilterQueries(stringBuilder.toString());
+            String stringBuilder = "(" + "admin:e" + context.getCurrentUser().getID() +
+                getGroupToQuery(groupService.allMemberGroupsSet(context,
+                    context.getCurrentUser())) +
+                ")";
+            discoverQuery.addFilterQueries(stringBuilder);
         }
         discoverQuery.setQuery(query);
         if (offset != null) {

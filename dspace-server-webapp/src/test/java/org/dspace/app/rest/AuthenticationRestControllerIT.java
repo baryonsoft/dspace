@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Objects;
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -968,11 +969,11 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Simulate that a shibboleth authentication has happened
-        token = getClient().perform(post("/api/authn/login")
+        token = Objects.requireNonNull(getClient().perform(post("/api/authn/login")
                 .requestAttr("SHIB-MAIL", eperson.getEmail())
                 .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
             .andExpect(status().isOk())
-            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace("Bearer ", "");
+            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER)).replace("Bearer ", "");
 
         //Check if we have a valid token
         getClient(token).perform(get("/api/authn/status"))
@@ -1374,7 +1375,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
             .build();
 
         String bitstreamContent = "ThisIsSomeDummyText";
-        Bitstream bitstream = null;
+        Bitstream bitstream;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder.
                 createBitstream(context, bundle1, is)

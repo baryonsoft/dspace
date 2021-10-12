@@ -479,6 +479,7 @@
                             <excludes>
                                 <exclude>**/target/**</exclude>
                                 <exclude>**/.idea/**</exclude>
+                                <exclude>**/grobid-0.5.5/**</exclude>
                             </excludes>
                         </validationSet>
                     </validationSets>

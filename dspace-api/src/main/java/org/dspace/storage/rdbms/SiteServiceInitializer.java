@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SiteServiceInitializer implements Callback {
 
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(SiteServiceInitializer.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(SiteServiceInitializer.class);
 
     @Autowired(required = true)
     protected SiteService siteService;
@@ -39,7 +39,7 @@ public class SiteServiceInitializer implements Callback {
     private GroupService groupService;
 
     public void initializeSiteObject() {
-        // After every migrate, ensure default Site is setup correctly.
+        // After every migrate, ensure default Site is set up correctly.
         Context context = null;
         try {
             context = new Context();
@@ -50,7 +50,7 @@ public class SiteServiceInitializer implements Callback {
                 site = siteService.createSite(context);
             }
             context.restoreAuthSystemState();
-            // Give Anonymous users READ permissions on the Site Object (if doesn't exist)
+            // Give Anonymous users READ permissions on the Site Object (if it doesn't exist)
             if (!authorizeService.authorizeActionBoolean(context, site, Constants.READ)) {
                 context.turnOffAuthorisationSystem();
                 Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);

@@ -8,13 +8,13 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueList;
@@ -62,7 +62,7 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
         // Populate MetadataRest's map of key -> List while respecting SortedSet's order
         Map<String, List<MetadataValueRest>> mapOfLists = metadataRest.getMap();
         for (Map.Entry<String, SortedSet<MetadataValueRest>> entry : mapOfSortedSets.entrySet()) {
-            mapOfLists.put(entry.getKey(), entry.getValue().stream().collect(Collectors.toList()));
+            mapOfLists.put(entry.getKey(), new ArrayList<>(entry.getValue()));
         }
 
         return metadataRest;

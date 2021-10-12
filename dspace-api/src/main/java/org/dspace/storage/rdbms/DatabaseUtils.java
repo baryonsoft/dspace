@@ -196,7 +196,7 @@ public class DatabaseUtils {
                             System.out.println(
                                     "Migrating database to latest version ignoring \"Missing\" " +
                                         "migrations... (Check logs for details)");
-                            // Update the database to latest version, but set "outOfOrder=true"
+                            // Update the database to the latest version, but set "outOfOrder=true"
                             // This will ensure any old migrations in the "ignored" state are now run
                             updateDatabase(dataSource, connection, null, false, true);
                         } else {
@@ -246,7 +246,7 @@ public class DatabaseUtils {
             } else if (argv[0].equalsIgnoreCase("repair")) {
                 // "repair" = Run Flyway repair script
 
-                try (Connection connection = dataSource.getConnection();) {
+                try (Connection connection = dataSource.getConnection()) {
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
                     System.out.println(
                         "Attempting to repair any previously failed migrations (or mismatched checksums) via " +
@@ -262,7 +262,7 @@ public class DatabaseUtils {
             } else if (argv[0].equalsIgnoreCase("validate")) {
                 // "validate" = Run Flyway validation to check for database errors/issues
 
-                try (Connection connection = dataSource.getConnection();) {
+                try (Connection connection = dataSource.getConnection()) {
                     System.out.println("\nDatabase URL: " + connection.getMetaData().getURL());
                     System.out
                         .println("Attempting to validate database status (and migration checksums) via FlywayDB...");
@@ -351,7 +351,7 @@ public class DatabaseUtils {
                             "/update-sequences.sql";
                     InputStream sqlstream = DatabaseUtils.class.getClassLoader().getResourceAsStream(sqlfile);
                     if (sqlstream != null) {
-                        String s = IOUtils.toString(sqlstream, "UTF-8");
+                        String s = IOUtils.toString(sqlstream, StandardCharsets.UTF_8);
                         if (!s.isEmpty()) {
                             System.out.println("Running " + sqlfile);
                             connection.createStatement().execute(s);
@@ -385,9 +385,9 @@ public class DatabaseUtils {
                     " - update-sequences = Update database sequences after running AIP ingest.");
                 System.out.println(
                     " - clean            = DESTROY all data and tables in database " +
-                    "(WARNING there is no going back!). " +
-                    "Requires 'db.cleanDisabled=false' setting in config.");
-                System.out.println("");
+                        "(WARNING there is no going back!). " +
+                        "Requires 'db.cleanDisabled=false' setting in config.");
+                System.out.println();
                 System.exit(0);
             }
 
@@ -563,14 +563,14 @@ public class DatabaseUtils {
             scriptLocations.add("classpath:org/dspace/storage/rdbms/migration");
 
             //Add all potential workflow migration paths
-            List<String> workflowFlywayMigrationLocations = WorkflowServiceFactory.getInstance()
-                                                                                  .getWorkflowService()
-                                                                                  .getFlywayMigrationLocations();
+            List workflowFlywayMigrationLocations = WorkflowServiceFactory.getInstance()
+                .getWorkflowService()
+                .getFlywayMigrationLocations();
             scriptLocations.addAll(workflowFlywayMigrationLocations);
 
             // Now tell Flyway which locations to load SQL / Java migrations from
             log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
-            flywayConfiguration.locations(scriptLocations.toArray(new String[scriptLocations.size()]));
+            flywayConfiguration.locations(scriptLocations.toArray(new String[0]));
 
             // Tell Flyway NOT to throw a validation error if it finds older "Ignored" migrations.
             // For DSpace, we sometimes have to insert "old" migrations in after a major release
@@ -582,7 +582,7 @@ public class DatabaseUtils {
             List<Callback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager()
                                                                         .getServicesByType(Callback.class);
 
-            flywayConfiguration.callbacks(flywayCallbacks.toArray(new Callback[flywayCallbacks.size()]));
+            flywayConfiguration.callbacks(flywayCallbacks.toArray(new Callback[0]));
 
             // Tell Flyway to use the "schema_version" table in the database to manage its migration history
             // As of Flyway v5, the default table is named "flyway_schema_history"
@@ -596,10 +596,10 @@ public class DatabaseUtils {
     }
 
     /**
-     * Ensures the current database is up-to-date with regards
-     * to the latest DSpace DB schema. If the scheme is not up-to-date,
+     * Ensures the current database is up-to-date with regard to the latest DSpace DB schema.
+     * If the scheme is not up-to-date,
      * then any necessary database migrations are performed.
-     * <P>
+     * <p>
      * FlywayDB (http://flywaydb.org/) is used to perform database migrations.
      * If a Flyway DB migration fails it will be rolled back to the last
      * successful migration, and any errors will be logged.
@@ -622,8 +622,8 @@ public class DatabaseUtils {
     }
 
     /**
-     * Ensures the current database is up-to-date with regards
-     * to the latest DSpace DB schema. If the scheme is not up-to-date,
+     * Ensures the current database is up-to-date with regard to the latest DSpace DB schema.
+     * If the scheme is not up-to-date,
      * then any necessary database migrations are performed.
      * <P>
      * FlywayDB (http://flywaydb.org/) is used to perform database migrations.
@@ -741,7 +741,7 @@ public class DatabaseUtils {
                         .getState());
                 }
 
-                // Run all pending Flyway migrations to ensure the DSpace Database is up to date
+                // Run all pending Flyway migrations to ensure the DSpace Database is up-to-date
                 flyway.migrate();
 
                 // Flag that Discovery will need reindexing, since database was updated
@@ -922,7 +922,7 @@ public class DatabaseUtils {
             // Get information about our database.
             DatabaseMetaData meta = connection.getMetaData();
 
-            // If this is not a case sensitive search
+            // If this is not a case-sensitive search
             if (!caseSensitive) {
                 // Canonicalize everything to the proper case based on DB type
                 schema = canonicalize(connection, schema);
@@ -1023,7 +1023,7 @@ public class DatabaseUtils {
 
             // Different database types store sequence information in different tables
             String dbtype = getDbType(connection);
-            String sequenceSQL = null;
+            String sequenceSQL;
             switch (dbtype) {
                 case DBMS_POSTGRES:
                     // Default schema in PostgreSQL is "public"

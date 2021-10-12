@@ -98,7 +98,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
 
-        this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream().filter(
+        this.mappingJackson2HttpMessageConverter = Arrays.stream(converters).filter(
             hmc -> hmc instanceof MappingJackson2HttpMessageConverter).findAny().get();
 
         Assert.assertNotNull("the JSON message converter must not be null",
@@ -133,7 +133,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
             .alwaysDo(MockMvcResultHandlers.print())
             //Add all filter implementations
             .addFilters(new ErrorPageFilter())
-            .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]))
+            .addFilters(requestFilters.toArray(new Filter[0]))
             // Enable/Integrate Spring Security with MockMVC
             .apply(springSecurity());
 
