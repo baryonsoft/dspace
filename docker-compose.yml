@@ -7,43 +7,6 @@ networks:
         # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' in your local.cfg.
         - subnet: 172.23.0.0/16
 services:
-  # DSpace (backend) webapp container
-  dspace:
-    container_name: baryonics
-#    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x}"
-    image: baryonics-dspace
-    environment:
-      JAVA_OPTS: -Xmx500m -Xss512k -XX:CICompilerCount=2
-    #      dspace__P__server__P__url: http://localhost:8088
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-    - dspacedb
-    networks:
-      dspacenet:
-    ports:
-    - published: 8080
-      target: 8080
-    - published: 8009
-      target: 8009
-    stdin_open: true
-    tty: true
-    volumes:
-    - assetstore:/dspace/assetstore
-    - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
-    # Ensure that the database is ready BEFORE starting tomcat
-    # 1. While a TCP connection to dspacedb port 5432 is not available, continue to sleep
-    # 2. Then, run database migration to init database tables
-    # 3. Finally, start Tomcat
-    entrypoint:
-    - /bin/bash
-    - '-c'
-    - |
-      while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
-      /dspace/bin/dspace database migrate
-      $CATALINA_HOME/bin/run.sh 8080
-#      catalina.sh run
   # DSpace database container
   dspacedb:
     container_name: dspacedb
@@ -74,7 +37,7 @@ services:
     tty: true
     working_dir: /var/solr/data
     environment:
-      SOLR_JAVA_MEM: "-Xms100m -Xmx400m"
+      SOLR_JAVA_MEM: "-Xms100m -Xmx600m"
     volumes:
     # Mount our local Solr core configs so that they are available as Solr config sets on container
     - ./dspace/solr/authority:/opt/solr/server/solr/configsets/authority
@@ -102,8 +65,8 @@ services:
     networks:
       dspacenet:
     environment:
-      MINIO_ROOT_USER: minio-user
-      MINIO_ROOT_PASSWORD: minio-password
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio-key
     ports:
       - "9001:9001"
       - "9000:9000"

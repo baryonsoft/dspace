@@ -8,8 +8,8 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <version>baryonics-0.3.5-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -47,6 +47,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.oracle</groupId>
+                    <!--suppress MavenModelInspection -->
                     <artifactId>ojdbc6</artifactId>
                 </dependency>
             </dependencies>
