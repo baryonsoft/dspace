@@ -1004,7 +1004,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
+            <version>13.0</version>
             <scope>compile</scope>
         </dependency>
 
