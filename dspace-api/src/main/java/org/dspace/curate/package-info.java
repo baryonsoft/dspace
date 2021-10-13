@@ -1,11 +1,10 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
  * http://www.dspace.org/license/
  */
-
 /**
  * In DSpace, "curation" refers to the application of one or more "tasks" to one
  * or more model objects.  There are two fundamental classes to consider:

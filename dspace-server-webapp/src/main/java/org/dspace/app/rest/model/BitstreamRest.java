@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -16,18 +16,18 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = BitstreamRest.BUNDLE,
-                method = "getBundle"
-        ),
-        @LinkRest(
-                name = BitstreamRest.FORMAT,
-                method = "getFormat"
-        ),
-        @LinkRest(
-                name = BitstreamRest.THUMBNAIL,
-                method = "getThumbnail"
-        )
+    @LinkRest(
+        name = BitstreamRest.BUNDLE,
+        method = "getBundle"
+    ),
+    @LinkRest(
+        name = BitstreamRest.FORMAT,
+        method = "getFormat"
+    ),
+    @LinkRest(
+        name = BitstreamRest.THUMBNAIL,
+        method = "getThumbnail"
+    )
 })
 public class BitstreamRest extends DSpaceObjectRest {
     public static final String PLURAL_NAME = "bitstreams";

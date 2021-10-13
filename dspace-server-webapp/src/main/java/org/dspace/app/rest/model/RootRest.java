@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -20,7 +20,18 @@ public class RootRest extends RestAddressableModel {
     private String dspaceUI;
     private String dspaceName;
     private String dspaceServer;
+
+    public void setBaryonicsVersion(String baryonicsVersion) {
+        this.baryonicsVersion = baryonicsVersion;
+    }
+
     private String dspaceVersion;
+
+    public String getBaryonicsVersion() {
+        return baryonicsVersion;
+    }
+
+    private String baryonicsVersion;
 
     public String getCategory() {
         return CATEGORY;

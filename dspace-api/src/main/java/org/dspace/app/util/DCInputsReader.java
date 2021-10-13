@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -115,8 +115,8 @@ public class DCInputsReader {
 
     private void buildInputs(String fileName)
         throws DCInputsReaderException {
-        formDefns = new HashMap<String, List<List<Map<String, String>>>>();
-        valuePairs = new HashMap<String, List<String>>();
+        formDefns = new HashMap<>();
+        valuePairs = new HashMap<>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -152,7 +152,7 @@ public class DCInputsReader {
      * @param collectionHandle collection's unique Handle
      * @return DC input set
      * @throws DCInputsReaderException if no default set defined
-     * @throws ServletException
+     * @throws ServletException        Servlet Exception
      */
     public List<DCInputSet> getInputsByCollectionHandle(String collectionHandle)
         throws DCInputsReaderException {
@@ -163,7 +163,7 @@ public class DCInputsReader {
             if (formName == null) {
                 throw new DCInputsReaderException("No form designated as default");
             }
-            List<DCInputSet> results = new ArrayList<DCInputSet>();
+            List<DCInputSet> results = new ArrayList<>();
             for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
                 SubmissionStepConfig step = config.getStep(idx);
                 if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
@@ -185,7 +185,7 @@ public class DCInputsReader {
             if (formName == null) {
                 throw new DCInputsReaderException("No form designated as default");
             }
-            List<DCInputSet> results = new ArrayList<DCInputSet>();
+            List<DCInputSet> results = new ArrayList<>();
             for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
                 SubmissionStepConfig step = config.getStep(idx);
                 if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
@@ -235,12 +235,12 @@ public class DCInputsReader {
      * @param limit  max number of Input Forms to return
      * @param offset number of Input form to skip in the return
      * @return the list of input forms
-     * @throws DCInputsReaderException
+     * @throws DCInputsReaderException DC Inputs ReaderException
      */
     public List<DCInputSet> getAllInputs(Integer limit, Integer offset) throws DCInputsReaderException {
         int idx = 0;
         int count = 0;
-        List<DCInputSet> subConfigs = new LinkedList<DCInputSet>();
+        List<DCInputSet> subConfigs = new LinkedList<>();
         for (String key : formDefns.keySet()) {
             if (offset == null || idx >= offset) {
                 count++;
@@ -268,6 +268,7 @@ public class DCInputsReader {
             return;
         }
         Node e = getElement(n);
+        assert e != null;
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
         boolean foundDefs = false;
@@ -311,7 +312,7 @@ public class DCInputsReader {
                 if (formName == null) {
                     throw new SAXException("form element has no name attribute");
                 }
-                List<List<Map<String, String>>> rows = new ArrayList<List<Map<String, String>>>(); // the form
+                List<List<Map<String, String>>> rows = new ArrayList<>(); // the form
                 // contains rows of fields
                 formDefns.put(formName, rows);
                 NodeList pl = nd.getChildNodes();
@@ -319,7 +320,7 @@ public class DCInputsReader {
                 for (int j = 0; j < lenpg; j++) {
                     Node npg = pl.item(j);
                     if (npg.getNodeName().equals("row")) {
-                        List<Map<String, String>> fields = new ArrayList<Map<String, String>>(); // the fields in the
+                        List<Map<String, String>> fields = new ArrayList<>(); // the fields in the
                         // row
                         // process each row definition
                         processRow(formName, j, npg, fields);
@@ -350,7 +351,7 @@ public class DCInputsReader {
 
             if (npg.getNodeName().equals("field")) {
                 // process each field definition
-                Map<String, String> field = new HashMap<String, String>();
+                Map<String, String> field = new HashMap<>();
                 processField(formName, npg, field);
                 fields.add(field);
                 String key = field.get(PAIR_TYPE_NAME);
@@ -400,18 +401,19 @@ public class DCInputsReader {
                 String value = getValue(nd);
                 field.put(tagName, value);
                 if (tagName.equals("input-type")) {
+                    assert value != null;
                     handleInputTypeTagName(formName, field, nd, value);
                 } else if (tagName.equals("vocabulary")) {
                     String closedVocabularyString = getAttribute(nd, "closed");
                     field.put("closedVocabulary", closedVocabularyString);
                 } else if (tagName.equals("language")) {
-                    if (Boolean.valueOf(value)) {
+                    if (Boolean.parseBoolean(value)) {
                         String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
                         if (pairTypeName == null) {
                             throw new SAXException("Form " + formName + ", field " +
-                                                       field.get("dc-element") +
-                                                       "." + field.get("dc-qualifier") +
-                                                       " has no language attribute");
+                                field.get("dc-element") +
+                                "." + field.get("dc-qualifier") +
+                                " has no language attribute");
                         } else {
                             field.put(PAIR_TYPE_NAME, pairTypeName);
                         }
@@ -423,6 +425,7 @@ public class DCInputsReader {
                         String nestedValue = getValue(nestedNode);
                         field.put(nestedTagName, nestedValue);
                         if (nestedTagName.equals("input-type")) {
+                            assert nestedValue != null;
                             handleInputTypeTagName(formName, field, nestedNode, nestedValue);
                         }
                     }
@@ -452,7 +455,7 @@ public class DCInputsReader {
             if ((rpt == null) ||
                 ((!rpt.equalsIgnoreCase("yes")) &&
                     (!rpt.equalsIgnoreCase("true")))) {
-                String msg = "The field \'" + field.get("label") + "\' must be repeatable";
+                String msg = "The field '" + field.get("label") + "' must be repeatable";
                 throw new SAXException(msg);
             }
         }
@@ -490,10 +493,8 @@ public class DCInputsReader {
         }
         String schemaTest;
 
-        for (int i = 0; i < pages.size(); i++) {
-            List<Map<String, String>> pg = pages.get(i);
-            for (int j = 0; j < pg.size(); j++) {
-                Map<String, String> fld = pg.get(j);
+        for (List<Map<String, String>> pg : pages) {
+            for (Map<String, String> fld : pg) {
                 if ((fld.get("dc-schema") == null) ||
                     ((fld.get("dc-schema")).equals(""))) {
                     schemaTest = MetadataSchemaEnum.DC.getName();
@@ -553,7 +554,7 @@ public class DCInputsReader {
                         "Missing name attribute for value-pairs for DC term " + dcTerm;
                     throw new SAXException(errString);
                 }
-                List<String> pairs = new ArrayList<String>();
+                List<String> pairs = new ArrayList<>();
                 valuePairs.put(pairsName, pairs);
                 NodeList cl = nd.getChildNodes();
                 int lench = cl.getLength();
@@ -596,14 +597,10 @@ public class DCInputsReader {
     private void checkValues()
         throws DCInputsReaderException {
         // Step through every field of every page of every form
-        Iterator<String> ki = formDefns.keySet().iterator();
-        while (ki.hasNext()) {
-            String idName = ki.next();
+        for (String idName : formDefns.keySet()) {
             List<List<Map<String, String>>> rows = formDefns.get(idName);
-            for (int j = 0; j < rows.size(); j++) {
-                List<Map<String, String>> fields = rows.get(j);
-                for (int i = 0; i < fields.size(); i++) {
-                    Map<String, String> fld = fields.get(i);
+            for (List<Map<String, String>> fields : rows) {
+                for (Map<String, String> fld : fields) {
                     // verify reference in certain input types
                     String type = fld.get("input-type");
                     if (StringUtils.isNotBlank(type) && (type.equals("dropdown")

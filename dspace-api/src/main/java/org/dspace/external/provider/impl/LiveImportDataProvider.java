@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -23,9 +23,8 @@ import org.dspace.importer.external.service.components.QuerySource;
 
 /**
  * This class allows to configure a Live Import Provider as an External Data Provider
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class LiveImportDataProvider implements ExternalDataProvider {
     /**
@@ -49,7 +48,8 @@ public class LiveImportDataProvider implements ExternalDataProvider {
 
     /**
      * This method set the SourceIdentifier for the ExternalDataProvider
-     * @param sourceIdentifier   The UNIQUE sourceIdentifier to be set on any LiveImport data provider
+     *
+     * @param sourceIdentifier The UNIQUE sourceIdentifier to be set on any LiveImport data provider
      */
     public void setSourceIdentifier(String sourceIdentifier) {
         this.sourceIdentifier = sourceIdentifier;
@@ -57,7 +57,8 @@ public class LiveImportDataProvider implements ExternalDataProvider {
 
     /**
      * This method set the MetadataSource for the ExternalDataProvider
-     * @param metadataSource {@link org.dspace.importer.external.service.components.MetadataSource} implementation used to process the input data
+     *
+     * @param querySource {@link org.dspace.importer.external.service.components.MetadataSource} implementation used to process the input data
      */
     public void setMetadataSource(QuerySource querySource) {
         this.querySource = querySource;
@@ -65,6 +66,7 @@ public class LiveImportDataProvider implements ExternalDataProvider {
 
     /**
      * This method set dublin core identifier to use as metadata id
+     *
      * @param recordIdMetadata dublin core identifier to use as metadata id
      */
     public void setRecordIdMetadata(String recordIdMetadata) {
@@ -73,6 +75,7 @@ public class LiveImportDataProvider implements ExternalDataProvider {
 
     /**
      * This method set the dublin core identifier to display the title
+     *
      * @param displayMetadata metadata to use as title
      */
     public void setDisplayMetadata(String displayMetadata) {
@@ -86,7 +89,7 @@ public class LiveImportDataProvider implements ExternalDataProvider {
             return Optional.of(externalDataObject);
         } catch (MetadataSourceException e) {
             throw new RuntimeException(
-                    "The live import provider " + querySource.getImportSource() + " throws an exception", e);
+                "The live import provider " + querySource.getImportSource() + " throws an exception", e);
         }
     }
 
@@ -98,7 +101,7 @@ public class LiveImportDataProvider implements ExternalDataProvider {
             return records.stream().map(r -> getExternalDataObject(r)).collect(Collectors.toList());
         } catch (MetadataSourceException e) {
             throw new RuntimeException(
-                    "The live import provider " + querySource.getImportSource() + " throws an exception", e);
+                "The live import provider " + querySource.getImportSource() + " throws an exception", e);
         }
     }
 
@@ -113,18 +116,15 @@ public class LiveImportDataProvider implements ExternalDataProvider {
             return querySource.getRecordsCount(query);
         } catch (MetadataSourceException e) {
             throw new RuntimeException(
-                    "The live import provider " + querySource.getImportSource() + " throws an exception", e);
+                "The live import provider " + querySource.getImportSource() + " throws an exception", e);
         }
     }
 
     /**
      * Internal method to convert an ImportRecord to an ExternalDataObject
-     * 
+     *
      * FIXME it would be useful to remove ImportRecord at all in favor of the
      * ExternalDataObject
-     * 
-     * @param record
-     * @return
      */
     private ExternalDataObject getExternalDataObject(ImportRecord record) {
         //return 400 if no record were found

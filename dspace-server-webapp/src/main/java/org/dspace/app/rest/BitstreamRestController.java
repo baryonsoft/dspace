@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -160,6 +160,7 @@ public class BitstreamRestController {
 
             //We have all the data we need, close the connection to the database so that it doesn't stay open during
             //download/streaming
+            assert context != null;
             context.complete();
 
             //Send the data
@@ -250,6 +251,7 @@ public class BitstreamRestController {
 
         bitstream.setFormat(context, bitstreamFormat);
 
+        assert context != null;
         context.commit();
 
         BitstreamRest bitstreamRest = converter.toRest(context.reloadEntity(bitstream), utils.obtainProjection());

@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -17,7 +17,8 @@ import org.hamcrest.Matcher;
 
 public class RegistrationMatcher {
 
-    private RegistrationMatcher(){}
+    private RegistrationMatcher() {
+    }
 
     public static Matcher<? super Object> matchRegistration(String email, UUID epersonUuid) {
         return allOf(

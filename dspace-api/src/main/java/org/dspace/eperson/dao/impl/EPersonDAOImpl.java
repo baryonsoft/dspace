@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -21,7 +21,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataField;
 import org.dspace.core.AbstractHibernateDSODAO;
@@ -73,7 +72,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         if (query != null) {
             query = "%" + query.toLowerCase() + "%";
         }
-        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, sortFields, null);
+        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, sortFields);
 
         if (0 <= offset) {
             hibernateQuery.setFirstResult(offset);
@@ -87,7 +86,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     @Override
     public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException {
         String queryString = "SELECT count(*) FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
-        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, Collections.EMPTY_LIST, null);
+        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, Collections.emptyList());
 
         return count(hibernateQuery);
     }
@@ -96,17 +95,18 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     public List<EPerson> findAll(Context context, MetadataField metadataSortField, String sortField, int pageSize,
                                  int offset) throws SQLException {
         String queryString = "SELECT " + EPerson.class.getSimpleName()
-                                                      .toLowerCase() + " FROM EPerson as " + EPerson.class
+            .toLowerCase() + " FROM EPerson as " + EPerson.class
             .getSimpleName().toLowerCase();
 
-        List<MetadataField> sortFields = Collections.EMPTY_LIST;
+        List<MetadataField> sortFields = Collections.emptyList();
 
         if (metadataSortField != null) {
             sortFields = Collections.singletonList(metadataSortField);
         }
 
-        Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, sortFields, sortField, pageSize,
-                                     offset);
+        Query query =
+            getSearchQuery(context, queryString, null, Collections.emptyList(), sortFields, sortField, pageSize,
+                offset);
         return list(query);
 
     }
@@ -152,9 +152,9 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     protected Query getSearchQuery(Context context, String queryString, String queryParam,
-                                   List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField)
+                                   List<MetadataField> queryFields, List<MetadataField> sortFields)
         throws SQLException {
-        return getSearchQuery(context, queryString, queryParam, queryFields, sortFields, sortField, -1, -1);
+        return getSearchQuery(context, queryString, queryParam, queryFields, sortFields, null, -1, -1);
     }
 
     protected Query getSearchQuery(Context context, String queryString, String queryParam,

@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -484,7 +484,7 @@ public class RoleDisseminator implements PackageDisseminator {
         if (object.getType() == Constants.SITE) {
             // TODO FIXME -- if there was a way to ONLY export Groups which are NOT
             // associated with a Community or Collection, we should be doing that instead!
-            return groupService.findAll(context, null);
+            return groupService.findAll(context, null, 20, 0);
         } else if (object.getType() == Constants.COMMUNITY) {
             Community community = (Community) object;
 
@@ -567,7 +567,7 @@ public class RoleDisseminator implements PackageDisseminator {
     protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object)
         throws SQLException {
         if (object.getType() == Constants.SITE) {
-            return ePersonService.findAll(context, EPerson.EMAIL);
+            return ePersonService.findAll(context, EPerson.EMAIL, 20, 0);
         }
 
         //by default, return nothing

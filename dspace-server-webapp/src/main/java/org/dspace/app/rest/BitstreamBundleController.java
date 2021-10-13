@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -101,6 +101,7 @@ public class BitstreamBundleController {
         BundleRest bundleRest = bitstreamRestRepository.performBitstreamMove(context, bitstream,
                 (Bundle) dsoList.get(0));
 
+        assert context != null;
         context.commit();
 
         return bundleRest;

@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -6,6 +6,8 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.curate;
+
+import static org.apache.commons.io.output.NullOutputStream.NULL_OUTPUT_STREAM;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,13 +20,10 @@ import java.io.PrintStream;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.output.NullOutputStream;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
@@ -106,18 +105,12 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
             }
         } else if (commandLine.hasOption('T')) {
             // load taskFile
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new FileReader(this.taskFile));
+            try (BufferedReader reader = new BufferedReader(new FileReader(this.taskFile))) {
                 while ((taskName = reader.readLine()) != null) {
                     if (verbose) {
                         super.handler.logInfo("Adding task: " + taskName);
                     }
                     curator.addTask(taskName);
-                }
-            } finally {
-                if (reader != null) {
-                    reader.close();
                 }
             }
         }
@@ -142,12 +135,10 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
      * @param curator The curator
      * @return Time when queue started
      */
-    private long runQueue(TaskQueue queue, Curator curator) throws SQLException, AuthorizeException, IOException {
+    private long runQueue(TaskQueue queue, Curator curator) throws IOException {
         // use current time as our reader 'ticket'
         long ticket = System.currentTimeMillis();
-        Iterator<TaskQueueEntry> entryIter = queue.dequeue(this.queue, ticket).iterator();
-        while (entryIter.hasNext()) {
-            TaskQueueEntry entry = entryIter.next();
+        for (TaskQueueEntry entry : queue.dequeue(this.queue, ticket)) {
             if (verbose) {
                 super.handler.logInfo("Curating id: " + entry.getObjectId());
             }
@@ -192,7 +183,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         Curator curator = new Curator();
         OutputStream reporterStream;
         if (null == this.reporter) {
-            reporterStream = new NullOutputStream();
+            reporterStream = NULL_OUTPUT_STREAM;
         } else if ("-".equals(this.reporter)) {
             reporterStream = System.out;
         } else {
@@ -292,20 +283,13 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         }
 
         // verbose
-        verbose = false;
-        if (commandLine.hasOption('v')) {
-            verbose = true;
-        }
+        verbose = commandLine.hasOption('v');
 
         // scope
         if (this.commandLine.getOptionValue('s') != null) {
             this.scope = this.commandLine.getOptionValue('s');
-            if (this.scope != null && Curator.TxScope.valueOf(this.scope.toUpperCase()) == null) {
-                this.handler.logError("Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
-                                      "'open' recognized");
-                throw new IllegalArgumentException(
-                    "Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
-                    "'open' recognized");
+            if (this.scope != null) {
+                Curator.TxScope.valueOf(this.scope.toUpperCase());
             }
         }
     }
