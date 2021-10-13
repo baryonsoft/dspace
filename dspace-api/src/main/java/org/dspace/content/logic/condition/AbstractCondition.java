@@ -28,25 +28,23 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class AbstractCondition implements Condition {
 
-    // Parameters map (injected, required -- see setter annotation)
-    private Map<String, Object> parameters;
-
     // Declare and instantiate spring services
     //@Autowired(required = true)
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     //@Autowired(required = true)
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    @Autowired(required = true)
+    @Autowired()
     protected HandleService handleService;
-
     // Logging
     Logger log = LogManager.getLogger(AbstractCondition.class);
+    // Parameters map (injected, required -- see setter annotation)
+    private Map<String, Object> parameters;
 
     /**
      * Get parameters set by spring configuration in item-filters.xml
      * These could be any kind of map that the extending condition class needs for evaluation
+     *
      * @return map of parameters
-     * @throws LogicalStatementException
      */
     @Override
     public Map<String, Object> getParameters() throws LogicalStatementException {
@@ -56,10 +54,8 @@ public abstract class AbstractCondition implements Condition {
     /**
      * Set parameters - used by Spring when creating beans from item-filters.xml
      * These could be any kind of map that the extending condition class needs for evaluation
-     * @param parameters
-     * @throws LogicalStatementException
      */
-    @Autowired(required = true)
+    @Autowired()
     @Override
     public void setParameters(Map<String, Object> parameters) throws LogicalStatementException {
         this.parameters = parameters;
@@ -67,10 +63,11 @@ public abstract class AbstractCondition implements Condition {
 
     /**
      * Get the result of logical evaluation for an item
-     * @param context   DSpace context
-     * @param item      Item to evaluate
+     *
+     * @param context DSpace context
+     * @param item    Item to evaluate
+     *
      * @return boolean
-     * @throws LogicalStatementException
      */
     @Override
     public boolean getResult(Context context, Item item) throws LogicalStatementException {

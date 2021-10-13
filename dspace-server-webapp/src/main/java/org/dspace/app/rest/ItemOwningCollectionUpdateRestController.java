@@ -68,10 +68,12 @@ public class ItemOwningCollectionUpdateRestController {
      * This method will update the owning collection of the item that correspond to the provided item uuid, effectively
      * moving the item to the new collection.
      *
-     * @param uuid The UUID of the item that will be moved
+     * @param uuid     The UUID of the item that will be moved
      * @param response The response object
      * @param request  The request object
+     *
      * @return The wrapped resource containing the new owning collection or null when the item was not moved
+     *
      * @throws SQLException       If something goes wrong
      * @throws IOException        If something goes wrong
      * @throws AuthorizeException If the user is not authorized to perform the move action
@@ -81,14 +83,14 @@ public class ItemOwningCollectionUpdateRestController {
     @PostAuthorize("returnObject != null")
     public CollectionRest move(@PathVariable UUID uuid, HttpServletResponse response,
                                HttpServletRequest request)
-            throws SQLException, IOException, AuthorizeException {
+        throws SQLException, IOException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
 
         List<DSpaceObject> dsoList = utils.constructDSpaceObjectList(context, utils.getStringListFromRequest(request));
 
         if (dsoList.size() != 1 || dsoList.get(0).getType() != COLLECTION) {
             throw new UnprocessableEntityException("The collection doesn't exist " +
-                                                           "or the data cannot be resolved to a collection.");
+                "or the data cannot be resolved to a collection.");
         }
 
         Collection targetCollection = performItemMove(context, uuid, (Collection) dsoList.get(0));
@@ -107,14 +109,16 @@ public class ItemOwningCollectionUpdateRestController {
      * @param item              The item to be moved
      * @param currentCollection The current owning collection of the item
      * @param targetCollection  The target collection of the item
+     *
      * @return The target collection
+     *
      * @throws SQLException       If something goes wrong
      * @throws IOException        If something goes wrong
      * @throws AuthorizeException If the user is not authorized to perform the move action
      */
     private Collection moveItem(final Context context, final Item item, final Collection currentCollection,
                                 final Collection targetCollection)
-            throws SQLException, IOException, AuthorizeException {
+        throws SQLException, IOException, AuthorizeException {
         itemService.move(context, item, currentCollection, targetCollection);
         //Necessary because Controller does not pass through general RestResourceController, and as such does not do its
         //  commit in DSpaceRestRepository.createAndReturn() or similar
@@ -129,13 +133,15 @@ public class ItemOwningCollectionUpdateRestController {
      * @param context          The context Object
      * @param itemUuid         The uuid of the item to be moved
      * @param targetCollection The target collection
+     *
      * @return The new owning collection of the item when authorized or null when not authorized
+     *
      * @throws SQLException       If something goes wrong
      * @throws IOException        If something goes wrong
      * @throws AuthorizeException If the user is not authorized to perform the move action
      */
     private Collection performItemMove(final Context context, final UUID itemUuid, final Collection targetCollection)
-            throws SQLException, IOException, AuthorizeException {
+        throws SQLException, IOException, AuthorizeException {
 
         Item item = itemService.find(context, itemUuid);
 

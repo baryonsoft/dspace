@@ -31,7 +31,8 @@ public interface IndexableObject<T extends ReloadableEntity<PK>, PK extends Seri
 
     /**
      * Return the identifier of this indexableObject, this will be the identifier of the object in the database
-     * @return for a DSpaceObject a uuid will be returned, for a tasks or workflow items an integer will be returned
+     *
+     * @return for a DSpaceObject an uuid will be returned, for a tasks or workflow items an integer will be returned
      */
     PK getID();
 
@@ -62,7 +63,8 @@ public interface IndexableObject<T extends ReloadableEntity<PK>, PK extends Seri
     String getTypeText();
 
     /**
-     * Return the last modified date of an of an object, or if no modification dates are stored, return NUll
+     * Return the last modified date of an object, or if no modification dates are stored, return NUll
+     *
      * @return the last modified date
      */
     default Date getLastModified() {

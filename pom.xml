@@ -894,9 +894,6 @@
                    <name>release</name>
                </property>
            </activation>
-           <modules>
-               <module>dspace-rest</module>
-           </modules>
            <dependencyManagement>
                <dependencies>
                    <dependency>

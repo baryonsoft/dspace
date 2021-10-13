@@ -27,10 +27,7 @@ import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
@@ -42,7 +39,6 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,12 +58,7 @@ public class OpenSearchController {
     private static final String errorpath = "/error";
     private List<String> searchIndices = null;
 
-    private CommunityService communityService;
-    private CollectionService collectionService;
-    private AuthorizeService authorizeService;
     private OpenSearchService openSearchService;
-
-    private Context context;
 
     /**
      * This method provides the OpenSearch query on the path /search
@@ -75,13 +66,13 @@ public class OpenSearchController {
      */
     @GetMapping("/search")
     public void search(HttpServletRequest request,
-                         HttpServletResponse response,
-                         @RequestParam(name = "query", required = false) String query,
-                         @RequestParam(name = "start", required = false) Integer start,
-                         @RequestParam(name = "rpp", required = false) Integer count,
-                         @RequestParam(name = "format", required = false) String format,
-                         Model model) throws IOException, ServletException {
-        context = ContextUtil.obtainContext(request);
+                       HttpServletResponse response,
+                       @RequestParam(name = "query", required = false) String query,
+                       @RequestParam(name = "start", required = false) Integer start,
+                       @RequestParam(name = "rpp", required = false) Integer count,
+                       @RequestParam(name = "format", required = false) String format)
+        throws IOException, ServletException {
+        Context context = ContextUtil.obtainContext(request);
         if (start == null) {
             start = 0;
         }
@@ -111,7 +102,7 @@ public class OpenSearchController {
             }
 
             // then the rest - we are processing the query
-            IndexableObject container = null;
+            // IndexableObject container = null;
 
             // support pagination parameters
             DiscoverQuery queryArgs = new DiscoverQuery();
@@ -120,27 +111,27 @@ public class OpenSearchController {
             queryArgs.setMaxResults(count);
 
             // Perform the search
-            DiscoverResult qResults = null;
+            DiscoverResult qResults;
             try {
                 qResults = SearchUtils.getSearchService().search(context,
-                    container, queryArgs);
+                    null, queryArgs);
             } catch (SearchServiceException e) {
                 log.error(LogHelper.getHeader(context, "opensearch", "query="
-                            + queryArgs.getQuery()
-                            + ",error=" + e.getMessage()), e);
+                    + queryArgs.getQuery()
+                    + ",error=" + e.getMessage()), e);
                 throw new RuntimeException(e.getMessage(), e);
             }
 
             // Log
             log.info("opensearch done, query=\"" + query + "\",results="
-                        + qResults.getTotalSearchResults());
+                + qResults.getTotalSearchResults());
 
             // format and return results
-            Map<String, String> labelMap = getLabels(request);
+            Map<String, String> labelMap = getLabels();
             List<IndexableObject> dsoResults = qResults.getIndexableObjects();
             Document resultsDoc = openSearchService.getResultsDoc(context, format, query,
                 (int) qResults.getTotalSearchResults(), qResults.getStart(),
-                qResults.getMaxResults(), container, dsoResults, labelMap);
+                qResults.getMaxResults(), null, dsoResults, labelMap);
             try {
                 Transformer xf = TransformerFactory.newInstance().newTransformer();
                 response.setContentType(openSearchService.getContentType(format));
@@ -161,12 +152,11 @@ public class OpenSearchController {
     }
 
     /**
-     * This method provides the OpenSearch servicedescription document on the path /service
+     * This method provides the OpenSearch service description document on the path /service
      * It will pass the result as a OpenSearchDocument directly to the client
      */
     @GetMapping("/service")
-    public void service(HttpServletRequest request,
-                         HttpServletResponse response) throws IOException {
+    public void service(HttpServletResponse response) throws IOException {
         log.debug("Show OpenSearch Service document");
         if (openSearchService == null) {
             openSearchService = UtilServiceFactory.getInstance().getOpenSearchService();
@@ -193,17 +183,17 @@ public class OpenSearchController {
      */
     private void init() {
         if (searchIndices == null) {
-            searchIndices = new ArrayList<String>();
+            searchIndices = new ArrayList<>();
             DiscoveryConfiguration discoveryConfiguration = SearchUtils
-                    .getDiscoveryConfiguration();
+                .getDiscoveryConfiguration();
             searchIndices.add("any");
             for (DiscoverySearchFilter sFilter : discoveryConfiguration.getSearchFilters()) {
                 searchIndices.add(sFilter.getIndexFieldName());
             }
         }
-        communityService = ContentServiceFactory.getInstance().getCommunityService();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
-        authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        ContentServiceFactory.getInstance().getCommunityService();
+        ContentServiceFactory.getInstance().getCollectionService();
+        AuthorizeServiceFactory.getInstance().getAuthorizeService();
     }
 
     public void setOpenSearchService(OpenSearchService oSS) {
@@ -214,9 +204,9 @@ public class OpenSearchController {
     /**
      * Internal method to get labels for the returned document
      */
-    private Map<String, String> getLabels(HttpServletRequest request) {
+    private Map<String, String> getLabels() {
         // TODO: get strings from translation file or configuration
-        Map<String, String> labelMap = new HashMap<String, String>();
+        Map<String, String> labelMap = new HashMap<>();
         labelMap.put(SyndicationFeed.MSG_UNTITLED, "notitle");
         labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, "logo.title");
         labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, "general-feed.description");
