@@ -15,16 +15,14 @@ import org.dspace.core.ReloadableEntity;
 
 /**
  * This is the basic interface that a data model entity need to implement to be indexable in Discover
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
- * @param <PK>
- *            the Class of the primary key
+ * @param <PK> the Class of the primary key
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public interface IndexableObject<T extends ReloadableEntity<PK>, PK extends Serializable> {
 
     /**
-     * 
      * @return the string constant representing the Entity Type, @see {@link Constants}
      */
     String getType();
@@ -38,18 +36,19 @@ public interface IndexableObject<T extends ReloadableEntity<PK>, PK extends Seri
 
     /**
      * Get the entity that is linked to this indexable object
+     *
      * @return a database entity
      */
     T getIndexedObject();
 
     /**
      * Set the entity that is linked to this indexable object
+     *
      * @param object the database entity
      */
     void setIndexedObject(T object);
 
     /**
-     * 
      * @return an unique id to index
      */
     default String getUniqueIndexID() {
@@ -57,7 +56,6 @@ public interface IndexableObject<T extends ReloadableEntity<PK>, PK extends Seri
     }
 
     /**
-     *
      * @return a textual alias of the Entity Type @see {@link #getType()}
      */
     String getTypeText();

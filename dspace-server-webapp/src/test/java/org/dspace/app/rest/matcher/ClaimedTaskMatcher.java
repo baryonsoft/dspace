@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.startsWith;
 
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.hamcrest.Matcher;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility class to construct a Matcher for a Claimed Task
@@ -30,9 +31,9 @@ public class ClaimedTaskMatcher {
      * Check if the returned json expose all the required links and properties
      *
      * @param cTask the pool task
-     * @param step  the step name
      */
-    public static Matcher matchClaimedTask(ClaimedTask cTask, String step) {
+    @org.jetbrains.annotations.NotNull
+    public static Matcher<? super Object> matchClaimedTask(ClaimedTask cTask) {
         return allOf(
             // Check workflowitem properties
             matchProperties(cTask),
@@ -45,7 +46,8 @@ public class ClaimedTaskMatcher {
      *
      * @param cTask the claimed task, if empty only the type will be checked
      */
-    public static Matcher<? super Object> matchProperties(ClaimedTask cTask) {
+    public static @NotNull
+    Matcher<? super Object> matchProperties(ClaimedTask cTask) {
         return allOf(
             cTask != null ? hasJsonPath("$.id", is(cTask.getID())) : hasJsonPath("$.id"),
             hasJsonPath("$.type", is("claimedtask"))
@@ -57,7 +59,8 @@ public class ClaimedTaskMatcher {
      *
      * @param cTask the claimed task, if empty only the generic links structure will be checked
      */
-    public static Matcher<? super Object> matchLinks(ClaimedTask cTask) {
+    public static @NotNull
+    Matcher<? super Object> matchLinks(ClaimedTask cTask) {
         return allOf(
             cTask != null
                 ? hasJsonPath("$._links.self.href",

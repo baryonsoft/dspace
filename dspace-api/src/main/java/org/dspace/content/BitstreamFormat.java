@@ -45,31 +45,42 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Table(name = "bitstreamformatregistry")
 public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> {
 
+    /**
+     * The "unknown" support level - for bitstream formats that are unknown to
+     * the system
+     */
+    @Transient
+    public static final int UNKNOWN = 0;
+    /**
+     * The "known" support level - for bitstream formats that are known to the
+     * system, but not fully supported
+     */
+    @Transient
+    public static final int KNOWN = 1;
+    /**
+     * The "supported" support level - for bitstream formats known to the system
+     * and fully supported.
+     */
+    @Transient
+    public static final int SUPPORTED = 2;
     @Id
     @Column(name = "bitstream_format_id", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bitstreamformatregistry_seq")
     @SequenceGenerator(name = "bitstreamformatregistry_seq", sequenceName = "bitstreamformatregistry_seq",
-        allocationSize = 1, initialValue = 1)
+        allocationSize = 1)
     private Integer id;
-
     @Column(name = "short_description", length = 128, unique = true)
     private String shortDescription;
-
     //    @Column(name="description")
 //    @Lob //Generates a TEXT or LONGTEXT data type
     @Column(name = "description", columnDefinition = "text")
     private String description;
-
-
     @Column(name = "mimetype", length = 256)
     private String mimetype;
-
     @Column(name = "support_level")
     private int supportLevel = -1;
-
     @Column(name = "internal")
     private boolean internal = false;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "fileextension", joinColumns = @JoinColumn(name = "bitstream_format_id"))
     @CollectionId(
@@ -79,32 +90,10 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
     )
     @SequenceGenerator(name = "fileextension_seq", sequenceName = "fileextension_seq", allocationSize = 1)
     @Column(name = "extension")
-    @Cascade( {org.hibernate.annotations.CascadeType.ALL, org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
+    @Cascade({org.hibernate.annotations.CascadeType.ALL, org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
     private List<String> fileExtensions;
-
     @Transient
     private transient BitstreamFormatService bitstreamFormatService;
-
-    /**
-     * The "unknown" support level - for bitstream formats that are unknown to
-     * the system
-     */
-    @Transient
-    public static final int UNKNOWN = 0;
-
-    /**
-     * The "known" support level - for bitstream formats that are known to the
-     * system, but not fully supported
-     */
-    @Transient
-    public static final int KNOWN = 1;
-
-    /**
-     * The "supported" support level - for bitstream formats known to the system
-     * and fully supported.
-     */
-    @Transient
-    public static final int SUPPORTED = 2;
 
     /**
      * Protected constructor, create object using:
@@ -187,6 +176,10 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
         return supportLevel;
     }
 
+    public void setSupportLevel(int sl) {
+        getBitstreamFormatService().setSupportLevel(this, sl);
+    }
+
     /**
      * Set the support level for this bitstream format - one of
      * <code>UNKNOWN</code>,<code>KNOWN</code> or <code>SUPPORTED</code>.
@@ -218,7 +211,6 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
         internal = b;
     }
 
-
     /**
      * Get the filename extensions associated with this format
      *
@@ -227,6 +219,11 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
     public List<String> getExtensions() {
         return fileExtensions;
     }
+
+        /*
+        Getters & setters which should be removed on the long run, they are just here to provide all getters &
+        setters to the item object
+    */
 
     /**
      * Set the filename extensions associated with this format
@@ -237,17 +234,8 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
         this.fileExtensions = exts;
     }
 
-        /*
-        Getters & setters which should be removed on the long run, they are just here to provide all getters &
-        setters to the item object
-    */
-
     public void setShortDescription(Context context, String s) throws SQLException {
         getBitstreamFormatService().setShortDescription(context, this, s);
-    }
-
-    public void setSupportLevel(int sl) {
-        getBitstreamFormatService().setSupportLevel(this, sl);
     }
 
     private BitstreamFormatService getBitstreamFormatService() {
@@ -262,6 +250,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
      * as this object, <code>false</code> otherwise
      *
      * @param other object to compare to
+     *
      * @return <code>true</code> if object passed in represents the same
      * collection as this object
      */

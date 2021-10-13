@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.collections4.ListUtils;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
@@ -27,23 +28,23 @@ public class DiscoverResult {
 
     private long totalSearchResults;
     private int start;
-    private List<IndexableObject> indexableObjects;
-    private Map<String, List<FacetResult>> facetResults;
+    private final List<IndexableObject> indexableObjects;
+    private final Map<String, List<FacetResult>> facetResults;
 
     /**
-     * A map that contains all the documents sougth after, the key is a string representation of the Indexable Object
+     * A map that contains all the documents sought after, the key is a string representation of the Indexable Object
      */
-    private Map<String, List<SearchDocument>> searchDocuments;
+    private final Map<String, List<SearchDocument>> searchDocuments;
     private int maxResults = -1;
     private int searchTime;
-    private Map<String, IndexableObjectHighlightResult> highlightedResults;
+    private final Map<String, IndexableObjectHighlightResult> highlightedResults;
     private String spellCheckQuery;
 
     public DiscoverResult() {
-        indexableObjects = new ArrayList<IndexableObject>();
-        facetResults = new LinkedHashMap<String, List<FacetResult>>();
-        searchDocuments = new LinkedHashMap<String, List<SearchDocument>>();
-        highlightedResults = new HashMap<String, IndexableObjectHighlightResult>();
+        indexableObjects = new ArrayList<>();
+        facetResults = new LinkedHashMap<>();
+        searchDocuments = new LinkedHashMap<>();
+        highlightedResults = new HashMap<>();
     }
 
     public void addIndexableObject(IndexableObject idxObj) {
@@ -89,7 +90,7 @@ public class DiscoverResult {
     public void addFacetResult(String facetField, FacetResult... facetResults) {
         List<FacetResult> facetValues = this.facetResults.get(facetField);
         if (facetValues == null) {
-            facetValues = new ArrayList<FacetResult>();
+            facetValues = new ArrayList<>();
         }
         facetValues.addAll(Arrays.asList(facetResults));
         this.facetResults.put(facetField, facetValues);
@@ -120,16 +121,47 @@ public class DiscoverResult {
         this.highlightedResults.put(dso.getUniqueIndexID(), highlightedResult);
     }
 
+    public void addSearchDocument(IndexableObject dso, SearchDocument searchDocument) {
+        String dsoString = SearchDocument.getIndexableObjectStringRepresentation(dso);
+        List<SearchDocument> docs = searchDocuments.get(dsoString);
+        if (docs == null) {
+            docs = new ArrayList<>();
+        }
+        docs.add(searchDocument);
+        searchDocuments.put(dsoString, docs);
+    }
+
+    public String getSpellCheckQuery() {
+        return spellCheckQuery;
+    }
+
+    public void setSpellCheckQuery(String spellCheckQuery) {
+        this.spellCheckQuery = spellCheckQuery;
+    }
+
+    /**
+     * Returns all the sought after search document values
+     *
+     * @param idxObj the indexable object we want our search documents for
+     *
+     * @return the search documents list
+     */
+    public List<SearchDocument> getSearchDocument(IndexableObject idxObj) {
+        String dsoString = SearchDocument.getIndexableObjectStringRepresentation(idxObj);
+        List<SearchDocument> result = searchDocuments.get(dsoString);
+        return Objects.requireNonNullElseGet(result, ArrayList::new);
+    }
+
     public static final class FacetResult {
-        private String asFilterQuery;
-        private String displayedValue;
-        private String authorityKey;
-        private String sortValue;
-        private long count;
-        private String fieldType;
+        private final String asFilterQuery;
+        private final String displayedValue;
+        private final String authorityKey;
+        private final String sortValue;
+        private final long count;
+        private final String fieldType;
 
         public FacetResult(String asFilterQuery, String displayedValue, String authorityKey, String sortValue,
-                long count, String fieldType) {
+                           long count, String fieldType) {
             this.asFilterQuery = asFilterQuery;
             this.displayedValue = displayedValue;
             this.authorityKey = authorityKey;
@@ -139,11 +171,8 @@ public class DiscoverResult {
         }
 
         public String getAsFilterQuery() {
-            if (asFilterQuery == null) {
-                // missing facet filter query
-                return "[* TO *]";
-            }
-            return asFilterQuery;
+            // missing facet filter query
+            return Objects.requireNonNullElse(asFilterQuery, "[* TO *]");
         }
 
         public String getDisplayedValue() {
@@ -171,21 +200,13 @@ public class DiscoverResult {
         }
     }
 
-    public String getSpellCheckQuery() {
-        return spellCheckQuery;
-    }
-
-    public void setSpellCheckQuery(String spellCheckQuery) {
-        this.spellCheckQuery = spellCheckQuery;
-    }
-
     /**
-     * An utility class to represent the highlighting section of a Discovery Search
+     * A utility class to represent the highlighting section of a Discovery Search
      *
      */
     public static final class IndexableObjectHighlightResult {
-        private IndexableObject indexableObject;
-        private Map<String, List<String>> highlightResults;
+        private final IndexableObject indexableObject;
+        private final Map<String, List<String>> highlightResults;
 
         public IndexableObjectHighlightResult(IndexableObject idxObj, Map<String, List<String>> highlightResults) {
             this.indexableObject = idxObj;
@@ -194,7 +215,7 @@ public class DiscoverResult {
 
         /**
          * Return the indexable object that the highlighting snippets refer to
-         * 
+         *
          * @return the indexable object
          */
         public IndexableObject getIndexableObject() {
@@ -203,7 +224,7 @@ public class DiscoverResult {
 
         /**
          * The matching snippets for a specific metadata ignoring any authority value
-         * 
+         *
          * @param metadataKey
          *            the metadata where the snippets have been found
          * @return the matching snippets
@@ -214,7 +235,7 @@ public class DiscoverResult {
 
         /**
          * All the matching snippets in whatever metadata ignoring any authority value
-         * 
+         *
          * @return All the matching snippets
          */
         public Map<String, List<String>> getHighlightResults() {
@@ -222,47 +243,20 @@ public class DiscoverResult {
         }
     }
 
-    public void addSearchDocument(IndexableObject dso, SearchDocument searchDocument) {
-        String dsoString = SearchDocument.getIndexableObjectStringRepresentation(dso);
-        List<SearchDocument> docs = searchDocuments.get(dsoString);
-        if (docs == null) {
-            docs = new ArrayList<SearchDocument>();
-        }
-        docs.add(searchDocument);
-        searchDocuments.put(dsoString, docs);
-    }
-
-    /**
-     * Returns all the sought after search document values
-     *
-     * @param idxObj
-     *            the indexable object we want our search documents for
-     * @return the search documents list
-     */
-    public List<SearchDocument> getSearchDocument(IndexableObject idxObj) {
-        String dsoString = SearchDocument.getIndexableObjectStringRepresentation(idxObj);
-        List<SearchDocument> result = searchDocuments.get(dsoString);
-        if (result == null) {
-            return new ArrayList<>();
-        } else {
-            return result;
-        }
-    }
-
     /**
      * This class contains values from the fields searched for in DiscoveryQuery.java
      */
     public static final class SearchDocument {
-        private Map<String, List<String>> searchFields;
+        private final Map<String, List<String>> searchFields;
 
         public SearchDocument() {
-            this.searchFields = new LinkedHashMap<String, List<String>>();
+            this.searchFields = new LinkedHashMap<>();
         }
 
         public void addSearchField(String field, String... values) {
             List<String> searchFieldValues = searchFields.get(field);
             if (searchFieldValues == null) {
-                searchFieldValues = new ArrayList<String>();
+                searchFieldValues = new ArrayList<>();
             }
             searchFieldValues.addAll(Arrays.asList(values));
             searchFields.put(field, searchFieldValues);
@@ -274,7 +268,7 @@ public class DiscoverResult {
 
         public List<String> getSearchFieldValues(String field) {
             if (searchFields.get(field) == null) {
-                return new ArrayList<String>();
+                return new ArrayList<>();
             } else {
                 return searchFields.get(field);
             }

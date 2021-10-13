@@ -792,7 +792,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         // get the claimed task as reviewer
         getClient(reviewerToken).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask, "reviewstep"))))
+            .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask))))
             .andExpect(jsonPath("$._embedded.workflowitem",
                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
@@ -800,7 +800,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         // get the claimed task as admin
         getClient(adminToken).perform(get("/api/workflow/claimedtasks/" + claimedTask.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask, "reviewstep"))))
+            .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask))))
             .andExpect(jsonPath("$._embedded.workflowitem",
                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                             witem, "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
@@ -1231,16 +1231,16 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.containsInAnyOrder(
                     Matchers.allOf(
-                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask1, "reviewstep")),
-                            hasJsonPath("$._embedded.workflowitem",
-                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                            witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
+                        hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask1)),
+                        hasJsonPath("$._embedded.workflowitem",
+                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
                     ),
                     Matchers.allOf(
-                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask2, "reviewstep")),
-                            hasJsonPath("$._embedded.workflowitem",
-                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                            witem2, "Workflow Item 2", "2017-10-18", "ExtraEntry2")))
+                        hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask2)),
+                        hasJsonPath("$._embedded.workflowitem",
+                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                witem2, "Workflow Item 2", "2017-10-18", "ExtraEntry2")))
                     )
             )))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
@@ -1252,10 +1252,10 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                     Matchers.allOf(
-                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask3, "reviewstep")),
-                            hasJsonPath("$._embedded.workflowitem",
-                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                            witem3, "Workflow Item 3", "2017-10-19", "ExtraEntry3")))
+                        hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask3)),
+                        hasJsonPath("$._embedded.workflowitem",
+                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                witem3, "Workflow Item 3", "2017-10-19", "ExtraEntry3")))
                     ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -1267,16 +1267,16 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.containsInAnyOrder(
                     Matchers.allOf(
-                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask1, "reviewstep")),
-                            hasJsonPath("$._embedded.workflowitem",
-                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                            witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
+                        hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask1)),
+                        hasJsonPath("$._embedded.workflowitem",
+                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
                     ),
                     Matchers.allOf(
-                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask2, "reviewstep")),
-                            hasJsonPath("$._embedded.workflowitem",
-                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                            witem2, "Workflow Item 2", "2017-10-18", "ExtraEntry2")))
+                        hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask2)),
+                        hasJsonPath("$._embedded.workflowitem",
+                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                witem2, "Workflow Item 2", "2017-10-18", "ExtraEntry2")))
                     )
             )))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
@@ -1288,10 +1288,10 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                     Matchers.allOf(
-                            hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask3, "reviewstep")),
-                            hasJsonPath("$._embedded.workflowitem",
-                                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                            witem3, "Workflow Item 3", "2017-10-19", "ExtraEntry3")))
+                        hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask3)),
+                        hasJsonPath("$._embedded.workflowitem",
+                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                                witem3, "Workflow Item 3", "2017-10-19", "ExtraEntry3")))
                     ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -3579,9 +3579,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .param("uuid", claimedTask1.getWorkflowItem().getItem().getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.containsInAnyOrder(
-                    Matchers.allOf(hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask1, "reviewstep")),
-                                   hasJsonPath("$._embedded.workflowitem",
-                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                    Matchers.allOf(hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask1)),
+                        hasJsonPath("$._embedded.workflowitem",
+                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                 claimedTask1.getWorkflowItem(), "Workflow Item 1", "2017-10-17", "ExtraEntry")))))))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
 
@@ -3589,9 +3589,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .param("uuid", claimedTask2.getWorkflowItem().getItem().getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.containsInAnyOrder(
-                    Matchers.allOf(hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask2, "reviewstep")),
-                                   hasJsonPath("$._embedded.workflowitem",
-                    Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                    Matchers.allOf(hasJsonPath("$", ClaimedTaskMatcher.matchClaimedTask(claimedTask2)),
+                        hasJsonPath("$._embedded.workflowitem",
+                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                 claimedTask2.getWorkflowItem(), "Workflow Item 2", "2020-10-20", "ExtraEntry")))))))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
@@ -3852,20 +3852,20 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem")
                 .param("uuid", claimedTask1.getWorkflowItem().getItem().getID().toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(claimedTask1.getID())))
-                .andExpect(jsonPath("$.type", is("claimedtask")))
-                .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask1, "reviewstep"))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(claimedTask1.getID())))
+            .andExpect(jsonPath("$.type", is("claimedtask")))
+            .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask1))))
                 .andExpect(jsonPath("$._embedded.workflowitem",
                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                    claimedTask1.getWorkflowItem(), "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
 
         getClient(reviewer2Token).perform(get("/api/workflow/claimedtask/search/findByItem")
                 .param("uuid", claimedTask2.getWorkflowItem().getItem().getID().toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(claimedTask2.getID())))
-                .andExpect(jsonPath("$.type", is("claimedtask")))
-                .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask2, "reviewstep"))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(claimedTask2.getID())))
+            .andExpect(jsonPath("$.type", is("claimedtask")))
+            .andExpect(jsonPath("$", Matchers.is(ClaimedTaskMatcher.matchClaimedTask(claimedTask2))))
                 .andExpect(jsonPath("$._embedded.workflowitem",
                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                    claimedTask2.getWorkflowItem(), "Workflow Item 2", "2020-10-19", "ExtraEntry"))));
