@@ -39,15 +39,17 @@ public class CurationScriptConfiguration<T extends Curation> extends ScriptConfi
 
     /**
      * Only admin can run Curation script via the scripts and processes endpoints.
-     * @param context   The relevant DSpace context
-     * @return  True if currentUser is admin, otherwise false
+     *
+     * @param context The relevant DSpace context
+     *
+     * @return True if currentUser is admin, otherwise false
      */
     @Override
-    public boolean isAllowedToExecute(Context context) {
+    public boolean isAllowedToExecute(Context context) throws SQLException {
         try {
             return authorizeService.isAdmin(context);
         } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
+            throw new SQLException("SQLException occurred when checking if the current user is an admin", e);
         }
     }
 

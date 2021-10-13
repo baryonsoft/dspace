@@ -32,11 +32,11 @@ public class HarvestScriptConfiguration<T extends Harvest> extends ScriptConfigu
         this.dspaceRunnableClass = dspaceRunnableClass;
     }
 
-    public boolean isAllowedToExecute(final Context context) {
+    public boolean isAllowedToExecute(final Context context) throws SQLException {
         try {
             return authorizeService.isAdmin(context);
         } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred when checking if the current user is an admin");
+            throw new SQLException("SQLException occurred when checking if the current user is an admin", e);
         }
     }
 
@@ -60,16 +60,16 @@ public class HarvestScriptConfiguration<T extends Harvest> extends ScriptConfigu
             "this is equivalent to -p -r, purging all items in a collection and reimporting them");
         options.getOption("o").setType(boolean.class);
         options.addOption("c", "collection", true,
-                          "harvesting collection (handle or id)");
+            "harvesting collection (handle or id)");
         options.addOption("t", "type", true,
-                          "type of harvesting (0 for none)");
+            "type of harvesting (0 for none)");
         options.addOption("a", "address", true,
-                          "address of the OAI-PMH server");
+            "address of the OAI-PMH server");
         options.addOption("i", "oai_set_id", true,
-                          "id of the PMH set representing the harvested collection");
+            "id of the PMH set representing the harvested collection");
         options.addOption("m", "metadata_format", true,
-                          "the name of the desired metadata format for harvesting, resolved to namespace and " +
-                                  "crosswalk in dspace.cfg");
+            "the name of the desired metadata format for harvesting, resolved to namespace and " +
+                "crosswalk in dspace.cfg");
 
         options.addOption("h", "help", false, "help");
         options.getOption("h").setType(boolean.class);
