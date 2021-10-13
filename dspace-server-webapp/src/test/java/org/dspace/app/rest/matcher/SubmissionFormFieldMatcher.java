@@ -19,7 +19,6 @@ import org.hamcrest.Matcher;
  * Helper class to simplify testing of the submission form configuration
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
- *
  */
 public class SubmissionFormFieldMatcher {
 
@@ -31,19 +30,14 @@ public class SubmissionFormFieldMatcher {
      * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, boolean, String, String, String, String)}
      * with a null style and vocabulary name
      *
-     * @param type
-     *            the expected input type
-     * @param label
-     *            the expected label
-     * @param mandatoryMessage
-     *            the expected mandatoryMessage, can be null. If not empty the fiedl is expected to be flagged as
-     *            mandatory
-     * @param repeatable
-     *            the expected repeatable flag
-     * @param hints
-     *            the expected hints message
-     * @param metadata
-     *            the expected metadata
+     * @param type             the expected input type
+     * @param label            the expected label
+     * @param mandatoryMessage the expected mandatoryMessage, can be null. If not empty the field
+     *                         is expected to be flagged as mandatory
+     * @param repeatable       the expected repeatable flag
+     * @param hints            the expected hints message
+     * @param metadata         the expected metadata
+     *
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
@@ -57,52 +51,40 @@ public class SubmissionFormFieldMatcher {
      * {@link SubmissionFormFieldMatcher#matchFormFieldDefinition(String, String, String, boolean, String, String, String, String)}
      * with a null controlled vocabulary
      *
-     * @param type
-     *            the expected input type
-     * @param label
-     *            the expected label
-     * @param mandatoryMessage
-     *            the expected mandatoryMessage, can be null. If not empty the field is expected to be flagged as
-     *            mandatory
-     * @param repeatable
-     *            the expected repeatable flag
-     * @param hints
-     *            the expected hints message
-     * @param style
-     *            the expected style for the field, can be null. If null the corresponding json path is expected to be
-     *            missing
-     * @param metadata
-     *            the expected metadata
+     * @param type             the expected input type
+     * @param label            the expected label
+     * @param mandatoryMessage the expected mandatoryMessage, can be null. If not empty the field is expected
+     *                         to be flagged as mandatory
+     * @param repeatable       the expected repeatable flag
+     * @param hints            the expected hints message
+     * @param style            the expected style for the field, can be null. If null the corresponding
+     *                         json path is expected to be missing
+     * @param metadata         the expected metadata
+     *
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
-            boolean repeatable,
-            String hints, String style, String metadata) {
+                                                                   boolean repeatable,
+                                                                   String hints, String style, String metadata) {
         return matchFormFieldDefinition(type, label, mandatoryMessage, repeatable, hints, style, metadata, null);
     }
 
     /**
      * Check the json representation of a submission form
      *
-     * @param type
-     *            the expected input type
-     * @param label
-     *            the expected label
-     * @param mandatoryMessage
-     *            the expected mandatoryMessage, can be null. If not empty the field is expected to be flagged as
-     *            mandatory
-     * @param repeatable
-     *            the expected repeatable flag
-     * @param hints
-     *            the expected hints message
-     * @param style
-     *            the expected style for the field, can be null. If null the corresponding json path is expected to be
-     *            missing
-     * @param metadata
-     *            the expected metadata
-     * @param controlled vocabulary
-     *            the expected controlled vocabulary, can be null. If null the corresponding json path is expected to be
-     *            missing
+     * @param type                 the expected input type
+     * @param label                the expected label
+     * @param mandatoryMessage     the expected mandatoryMessage, can be null. If not empty the field is expected to
+     *                             be flagged as mandatory
+     * @param repeatable           the expected repeatable flag
+     * @param hints                the expected hints message
+     * @param style                the expected style for the field, can be null. If null the corresponding json
+     *                             path is expected to be missing
+     * @param metadata             the expected metadata
+     * @param controlledVocabulary vocabulary
+     *                             the expected controlled vocabulary, can be null. If null the corresponding json
+     *                             path is expected to be missing
+     *
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormFieldDefinition(String type, String label, String mandatoryMessage,
@@ -114,7 +96,7 @@ public class SubmissionFormFieldMatcher {
             hasJsonPath("$.label", containsString(label)),
             hasJsonPath("$.selectableMetadata[0].metadata", is(metadata)),
             controlledVocabulary != null ? hasJsonPath("$.selectableMetadata[0].controlledVocabulary",
-                    is(controlledVocabulary)) : hasNoJsonPath("$.selectableMetadata[0].controlledVocabulary"),
+                is(controlledVocabulary)) : hasNoJsonPath("$.selectableMetadata[0].controlledVocabulary"),
             mandatoryMessage != null ? hasJsonPath("$.mandatoryMessage", containsString(mandatoryMessage)) :
                 hasNoJsonPath("$.mandatoryMessage"),
             hasJsonPath("$.mandatory", is(mandatoryMessage != null)),
@@ -129,27 +111,18 @@ public class SubmissionFormFieldMatcher {
      * Check the json representation of an open relationship field.
      * This is a combination of an entity relationship lookup and a plain text metadata entry field
      *
-     * @param type
-     *            the expected input type
-     * @param label
-     *            the expected label
-     * @param mandatoryMessage
-     *            the expected mandatoryMessage, can be null. If not empty the field is expected to be flagged as
-     *            mandatory
-     * @param repeatable
-     *            the expected repeatable flag
-     * @param hints
-     *            the expected hints message
-     * @param metadata
-     *            the expected metadata
-     * @param relationshipType
-     *            the type of relationship
-     * @param filter
-     *            the optional filter to be used for the lookup
-     * @param searchConfiguration
-     *            the searchConfiguration to be used for the lookup
-     * @param nameVariants
-     *            the optional name variants allowed flag
+     * @param type                the expected input type
+     * @param label               the expected label
+     * @param mandatoryMessage    the expected mandatoryMessage, can be null. If not empty the field is expected to
+     *                            be flagged as mandatory
+     * @param repeatable          the expected repeatable flag
+     * @param hints               the expected hints message
+     * @param metadata            the expected metadata
+     * @param relationshipType    the type of relationship
+     * @param filter              the optional filter to be used for the lookup
+     * @param searchConfiguration the searchConfiguration to be used for the lookup
+     * @param nameVariants        the optional name variants allowed flag
+     *
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormOpenRelationshipFieldDefinition(String type, String label,
@@ -173,23 +146,16 @@ public class SubmissionFormFieldMatcher {
      * Check the json representation of a closed relationship field.
      * This is an entity relationship lookup without a plain text metadata entry field
      *
-     * @param label
-     *            the expected label
-     * @param mandatoryMessage
-     *            the expected mandatoryMessage, can be null. If not empty the field is expected to be flagged as
-     *            mandatory
-     * @param repeatable
-     *            the expected repeatable flag
-     * @param hints
-     *            the expected hints message
-     * @param relationshipType
-     *            the type of relationship
-     * @param filter
-     *            the optional filter to be used for the lookup
-     * @param searchConfiguration
-     *            the searchConfiguration to be used for the lookup
-     * @param nameVariants
-     *            the optional name variants allowed flag
+     * @param label               the expected label
+     * @param mandatoryMessage    the expected mandatoryMessage, can be null. If not empty the field is
+     *                            expected to be flagged as mandatory
+     * @param repeatable          the expected repeatable flag
+     * @param hints               the expected hints message
+     * @param relationshipType    the type of relationship
+     * @param filter              the optional filter to be used for the lookup
+     * @param searchConfiguration the searchConfiguration to be used for the lookup
+     * @param nameVariants        the optional name variants allowed flag
+     *
      * @return a Matcher for all the condition above
      */
     public static Matcher<? super Object> matchFormClosedRelationshipFieldDefinition(String label,

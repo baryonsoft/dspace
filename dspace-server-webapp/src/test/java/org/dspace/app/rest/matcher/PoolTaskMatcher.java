@@ -23,54 +23,48 @@ import org.hamcrest.Matcher;
  */
 public class PoolTaskMatcher {
 
-    private PoolTaskMatcher() { }
+    private PoolTaskMatcher() {
+    }
 
     /**
      * Check if the returned json expose all the required links and properties
-     * 
-     * @param ptask
-     *            the pool task
-     * @param step
-     *            the step name
-     * @return
+     *
+     * @param pTask the pool task
+     * @param step  the step name
      */
     public static Matcher matchPoolTask(PoolTask pTask, String step) {
         return allOf(
-                // Check workflowitem properties
-                matchProperties(pTask),
-                // Check links
-                matchLinks(pTask));
+            // Check workflowitem properties
+            matchProperties(pTask),
+            // Check links
+            matchLinks(pTask));
     }
 
     /**
      * Check that the id and type are exposed
-     * 
-     * @param pTask
-     *            the pool task, if empty only the type will be checked
-     * @return
+     *
+     * @param pTask the pool task, if empty only the type will be checked
      */
     public static Matcher<? super Object> matchProperties(PoolTask pTask) {
         return allOf(
-                pTask != null ? hasJsonPath("$.id", is(pTask.getID())) : hasJsonPath("$.id"),
-                hasJsonPath("$.type", is("pooltask"))
+            pTask != null ? hasJsonPath("$.id", is(pTask.getID())) : hasJsonPath("$.id"),
+            hasJsonPath("$.type", is("pooltask"))
         );
     }
 
     /**
      * Check that the required links are present
-     * 
-     * @param pTask
-     *            the pool task, if empty only the generic links structure will be checked
-     * @return
+     *
+     * @param pTask the pool task, if empty only the generic links structure will be checked
      */
     public static Matcher<? super Object> matchLinks(PoolTask pTask) {
         return allOf(
-                pTask != null
-                        ? hasJsonPath("$._links.self.href",
-                                is(REST_SERVER_URL + "workflow/pooltasks/" + pTask.getID()))
-                        : hasJsonPath("$._links.self.href"),
-                hasJsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)),
-                hasJsonPath("$._links.workflowitem.href", startsWith(REST_SERVER_URL)),
-                hasJsonPath("$._links.group.href", startsWith(REST_SERVER_URL)));
+            pTask != null
+                ? hasJsonPath("$._links.self.href",
+                is(REST_SERVER_URL + "workflow/pooltasks/" + pTask.getID()))
+                : hasJsonPath("$._links.self.href"),
+            hasJsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)),
+            hasJsonPath("$._links.workflowitem.href", startsWith(REST_SERVER_URL)),
+            hasJsonPath("$._links.group.href", startsWith(REST_SERVER_URL)));
     }
 }

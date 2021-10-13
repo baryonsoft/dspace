@@ -33,7 +33,6 @@ public class DCInputSet {
      * constructor
      *
      * @param formName       form name
-     * @param mandatoryFlags
      * @param rows           the rows
      * @param listMap        map
      */
@@ -169,11 +168,7 @@ public class DCInputSet {
         if (rowName.equals("dc.publisher.null") && !addPublishedBefore) {
             return false;
         }
-        if (rowName.equals("dc.identifier.citation") && !addPublishedBefore) {
-            return false;
-        }
-
-        return true;
+        return !rowName.equals("dc.identifier.citation") || addPublishedBefore;
     }
 
 }
