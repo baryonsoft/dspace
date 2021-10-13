@@ -71,6 +71,5 @@
 
     <!-- DSpaceServicesFactory (for easy access to above core services) -->
     <bean id="dSpaceServicesFactory" class="org.dspace.services.factory.DSpaceServicesFactoryImpl"/>
-    <bean id="org.dspace.services.ConfigurationService" class="java.lang.Object"/>
 
 </beans>
