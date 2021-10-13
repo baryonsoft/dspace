@@ -19,16 +19,17 @@
     <!-- Configure a custom PropertySourcesPlaceholderConfigurer to use our DSpaceConfigurationService. This allows us
          resolve ${...} placeholders in both Bean definitions property values (e.g. within Spring XML config files)
          and in @Value annotations using our DSpaceConfigurationService. These are resolved at runtime. -->
-    <bean id="dspaceConfigurationFactoryBean" class="org.dspace.servicemanager.config.DSpaceConfigurationPlaceholderConfigurer">
+    <bean id="dspaceConfigurationFactoryBean"
+          class="org.dspace.servicemanager.config.DSpaceConfigurationPlaceholderConfigurer">
         <constructor-arg>
-          <ref bean="dspaceConfiguration" />
+            <ref bean="dspaceConfiguration"/>
         </constructor-arg>
     </bean>
     <!-- This wires up our ConfigurationService.getConfiguration() method to be called to provide its properties
          to the above PropertySourcesPlaceholderConfigurer bean. -->
     <bean id="dspaceConfiguration" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetObject" ref="org.dspace.services.ConfigurationService" />
-        <property name="targetMethod" value="getConfiguration" />
+        <property name="targetObject" ref="org.dspace.services.ConfigurationService"/>
+        <property name="targetMethod" value="getConfiguration"/>
     </bean>
     <!-- end PROPERTY PLACEHOLDER SETUP-->
 
@@ -70,5 +71,6 @@
 
     <!-- DSpaceServicesFactory (for easy access to above core services) -->
     <bean id="dSpaceServicesFactory" class="org.dspace.services.factory.DSpaceServicesFactoryImpl"/>
+    <bean id="org.dspace.services.ConfigurationService" class="java.lang.Object"/>
 
 </beans>

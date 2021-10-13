@@ -38,5 +38,6 @@
     <bean id="dynamicPropertyBean" class="org.dspace.servicemanager.config.TestDynamicPropertyBean">
         <property name="property" value="${testDynamicBean.property}"/>
     </bean>
+    <bean id="org.dspace.caching.ehcache.CacheManager" class="net.sf.ehcache.CacheManager"/>
 
 </beans>

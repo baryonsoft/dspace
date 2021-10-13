@@ -9,8 +9,6 @@ package org.dspace.services.caching;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +30,8 @@ import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.services.model.RequestInterceptor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,17 +45,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 public final class CachingServiceImpl
     implements CachingService, ConfigChangeListener {
 
-    private static final Logger log = LoggerFactory.getLogger(CachingServiceImpl.class);
-
     /**
      * This is the event key for a full cache reset.
      */
-    protected static final String EVENT_RESET = "caching.reset";
+    private static final String EVENT_RESET = "caching.reset";
     /**
      * The default configuration location.
      */
-    protected static final String DEFAULT_CONFIG = "org/dspace/services/caching/ehcache-config.xml";
-
+    private static final String DEFAULT_CONFIG = "org/dspace/services/caching/ehcache-config.xml";
+    private static final Logger log = LoggerFactory.getLogger(CachingServiceImpl.class);
     /**
      * All the non-thread caches that we know about.
      * Mostly used for tracking purposes.
@@ -68,87 +66,6 @@ public final class CachingServiceImpl
      * created.
      */
     private final Map<String, Map<String, MapCache>> requestCachesMap = new ConcurrentHashMap<>();
-
-    /**
-     * @return the current request map which is bound to the current thread
-     */
-    protected Map<String, MapCache> getRequestCaches() {
-        if (requestService == null || requestService.getCurrentRequestId() == null) {
-            return null;
-        }
-
-        Map<String, MapCache> requestCaches = requestCachesMap.get(requestService.getCurrentRequestId());
-        if (requestCaches == null) {
-            requestCaches = new HashMap<>();
-            requestCachesMap.put(requestService.getCurrentRequestId(), requestCaches);
-        }
-
-        return requestCaches;
-    }
-
-    /**
-     * Unbinds all request caches.  Destroys the caches completely.
-     */
-    @Override
-    public void unbindRequestCaches() {
-        if (requestService != null) {
-            requestCachesMap.remove(requestService.getCurrentRequestId());
-        }
-    }
-
-    private ConfigurationService configurationService;
-
-    @Autowired(required = true)
-    public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
-    private RequestService requestService;
-
-    @Autowired
-    public void setRequestService(RequestService requestService) {
-        this.requestService = requestService;
-    }
-
-    private ServiceManager serviceManager;
-
-    @Autowired(required = true)
-    public void setServiceManager(ServiceManager serviceManager) {
-        this.serviceManager = serviceManager;
-    }
-
-    /**
-     * The underlying cache manager; injected.
-     */
-    protected net.sf.ehcache.CacheManager cacheManager;
-
-    @Autowired(required = true)
-    public void setCacheManager(net.sf.ehcache.CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-    }
-
-    public net.sf.ehcache.CacheManager getCacheManager() {
-        return cacheManager;
-    }
-
-    private boolean useClustering = false;
-    private boolean useDiskStore = true;
-    private int maxElementsInMemory = 2000;
-    private int timeToLiveSecs = 3600;
-    private int timeToIdleSecs = 600;
-
-    /**
-     * Reloads the configuration settings from the configuration service.
-     */
-    protected void reloadConfig() {
-        // Reload caching configurations, but have sane default values if unspecified in configs
-        useClustering = configurationService.getPropertyAsType(knownConfigNames[0], false);
-        useDiskStore = configurationService.getPropertyAsType(knownConfigNames[1], true);
-        maxElementsInMemory = configurationService.getPropertyAsType(knownConfigNames[2], 2000);
-        timeToLiveSecs = configurationService.getPropertyAsType(knownConfigNames[3], 3600);
-        timeToIdleSecs = configurationService.getPropertyAsType(knownConfigNames[4], 600);
-    }
-
     /**
      * WARNING: Do not change the order of these! <br/>
      * If you do, you have to fix the {@link #reloadConfig()} method -AZ
@@ -161,6 +78,100 @@ public final class CachingServiceImpl
         "caching.default.time.to.idle.secs", // the default amount of time to live for an element from its last
         // accessed or modified date
     };
+    /**
+     * The underlying cache manager; injected.
+     */
+    private net.sf.ehcache.CacheManager cacheManager;
+    private ConfigurationService configurationService;
+    private RequestService requestService;
+    private ServiceManager serviceManager;
+    private boolean useClustering = false;
+
+    /**
+     * Generate some stats for this cache.
+     * Note that this is not cheap so do not use it very often.
+     *
+     * @param cache an Ehcache
+     *
+     * @return the stats of this cache as a string
+     */
+    private static @NotNull String generateCacheStats(Ehcache cache) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(cache.getName()).append(":");
+        // this will make this costly but it is important to get accurate settings
+        cache.setStatisticsAccuracy(Statistics.STATISTICS_ACCURACY_GUARANTEED);
+        Statistics stats = cache.getStatistics();
+        final long memSize = cache.getMemoryStoreSize();
+        final long diskSize = cache.getDiskStoreSize();
+        final long size = memSize + diskSize;
+        final long hits = stats.getCacheHits();
+        final long misses = stats.getCacheMisses();
+        final String hitPercentage = ((hits + misses) > 0) ? ((100L * hits) / (hits + misses)) + "%" : "N/A";
+        final String missPercentage = ((hits + misses) > 0) ? ((100L * misses) / (hits + misses)) + "%" : "N/A";
+        sb.append("  Size: ").append(size).append(" [memory:").append(memSize).append(", disk:").append(diskSize)
+            .append("]");
+        sb.append(",  Hits: ").append(hits).append(" [memory:").append(stats.getInMemoryHits()).append(", disk:")
+            .append(stats.getOnDiskHits()).append("] (").append(hitPercentage).append(")");
+        sb.append(",  Misses: ").append(misses).append(" (").append(missPercentage).append(")");
+        return sb.toString();
+    }
+
+    /**
+     * @return the current request map which is bound to the current thread
+     */
+    private @Nullable Map<String, MapCache> getRequestCaches() {
+        if (requestService == null || requestService.getCurrentRequestId() == null) {
+            return null;
+        }
+
+        return requestCachesMap.computeIfAbsent(requestService.getCurrentRequestId(), k -> new HashMap<>());
+    }
+
+    /**
+     * Unbinds all request caches.  Destroys the caches completely.
+     */
+    @Override
+    public void unbindRequestCaches() {
+        if (requestService != null) {
+            requestCachesMap.remove(requestService.getCurrentRequestId());
+        }
+    }
+
+    @Autowired()
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
+
+    @Autowired
+    public void setRequestService(RequestService requestService) {
+        this.requestService = requestService;
+    }
+
+    @Autowired()
+    public void setServiceManager(ServiceManager serviceManager) {
+        this.serviceManager = serviceManager;
+    }
+
+    public net.sf.ehcache.CacheManager getCacheManager() {
+        return cacheManager;
+    }
+
+    @Autowired()
+    public void setCacheManager(net.sf.ehcache.CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
+
+    /**
+     * Reloads the configuration settings from the configuration service.
+     */
+    void reloadConfig() {
+        // Reload caching configurations, but have sane default values if unspecified in configs
+        useClustering = configurationService.getPropertyAsType(knownConfigNames[0], false);
+        boolean useDiskStore = configurationService.getPropertyAsType(knownConfigNames[1], true);
+        int maxElementsInMemory = configurationService.getPropertyAsType(knownConfigNames[2], 2000);
+        int timeToLiveSecs = configurationService.getPropertyAsType(knownConfigNames[3], 3600);
+        int timeToIdleSecs = configurationService.getPropertyAsType(knownConfigNames[4], 600);
+    }
 
     /* (non-Javadoc)
      * @see org.dspace.kernel.mixins.ConfigChangeListener#notifyForConfigNames()
@@ -185,7 +196,7 @@ public final class CachingServiceImpl
         reloadConfig();
 
         // get all caches out of the cachemanager and load them into the cache list
-        List<Ehcache> ehcaches = getAllEhCaches(false);
+        List<Ehcache> ehcaches = getAllEhCaches();
         for (Ehcache ehcache : ehcaches) {
             EhcacheCache cache = new EhcacheCache(ehcache, null);
             cacheRecord.put(cache.getName(), cache);
@@ -286,7 +297,7 @@ public final class CachingServiceImpl
         List<Cache> caches = new ArrayList<>(this.cacheRecord.values());
 //        TODO implement reporting on request caches?
 //        caches.addAll(this.requestMap.values());
-        Collections.sort(caches, new NameComparator());
+        caches.sort(new NameComparator());
         return caches;
     }
 
@@ -334,7 +345,7 @@ public final class CachingServiceImpl
                 sb.append(" * Could not find cache by this name: ").append(cacheName);
             } else {
                 sb.append(" * ");
-                sb.append(cache.toString());
+                sb.append(cache);
                 sb.append("\n");
                 if (cache instanceof EhcacheCache) {
                     Ehcache ehcache = ((EhcacheCache) cache).getCache();
@@ -368,16 +379,12 @@ public final class CachingServiceImpl
     /**
      * Return all caches from the CacheManager.
      *
-     * @param sorted if true then sort by name
      * @return the list of all known ehcaches
      */
-    protected List<Ehcache> getAllEhCaches(boolean sorted) {
+    private List<Ehcache> getAllEhCaches() {
         log.debug("getAllCaches()");
 
         final String[] cacheNames = cacheManager.getCacheNames();
-        if (sorted) {
-            Arrays.sort(cacheNames);
-        }
         final List<Ehcache> caches = new ArrayList<>(cacheNames.length);
         for (String cacheName : cacheNames) {
             caches.add(cacheManager.getEhcache(cacheName));
@@ -403,9 +410,10 @@ public final class CachingServiceImpl
      *
      * @param cacheName   the name of the cache
      * @param cacheConfig the config for this cache
+     *
      * @return a cache instance
      */
-    protected EhcacheCache instantiateEhCache(String cacheName, CacheConfig cacheConfig) {
+    @NotNull EhcacheCache instantiateEhCache(String cacheName, CacheConfig cacheConfig) {
         if (log.isDebugEnabled()) {
             log.debug("instantiateEhCache(String " + cacheName + ")");
         }
@@ -452,9 +460,10 @@ public final class CachingServiceImpl
      *
      * @param cacheName   the name of the cache
      * @param cacheConfig the config for this cache
+     *
      * @return a cache instance
      */
-    protected MapCache instantiateMapCache(String cacheName, CacheConfig cacheConfig) {
+    MapCache instantiateMapCache(String cacheName, CacheConfig cacheConfig) {
         if (log.isDebugEnabled()) {
             log.debug("instantiateMapCache(String " + cacheName + ")");
         }
@@ -489,38 +498,10 @@ public final class CachingServiceImpl
     }
 
     /**
-     * Generate some stats for this cache.
-     * Note that this is not cheap so do not use it very often.
-     *
-     * @param cache an Ehcache
-     * @return the stats of this cache as a string
-     */
-    protected static String generateCacheStats(Ehcache cache) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(cache.getName()).append(":");
-        // this will make this costly but it is important to get accurate settings
-        cache.setStatisticsAccuracy(Statistics.STATISTICS_ACCURACY_GUARANTEED);
-        Statistics stats = cache.getStatistics();
-        final long memSize = cache.getMemoryStoreSize();
-        final long diskSize = cache.getDiskStoreSize();
-        final long size = memSize + diskSize;
-        final long hits = stats.getCacheHits();
-        final long misses = stats.getCacheMisses();
-        final String hitPercentage = ((hits + misses) > 0) ? ((100l * hits) / (hits + misses)) + "%" : "N/A";
-        final String missPercentage = ((hits + misses) > 0) ? ((100l * misses) / (hits + misses)) + "%" : "N/A";
-        sb.append("  Size: ").append(size).append(" [memory:").append(memSize).append(", disk:").append(diskSize)
-          .append("]");
-        sb.append(",  Hits: ").append(hits).append(" [memory:").append(stats.getInMemoryHits()).append(", disk:")
-          .append(stats.getOnDiskHits()).append("] (").append(hitPercentage).append(")");
-        sb.append(",  Misses: ").append(misses).append(" (").append(missPercentage).append(")");
-        return sb.toString();
-    }
-
-    /**
      * Compare two Cache objects by name.
      */
     public static final class NameComparator implements Comparator<Cache>, Serializable {
-        public static final long serialVersionUID = 1l;
+        public static final long serialVersionUID = 1L;
 
         @Override
         public int compare(Cache o1, Cache o2) {
@@ -533,11 +514,7 @@ public final class CachingServiceImpl
         @Override
         public void onStart(String requestId) {
             if (requestId != null) {
-                Map<String, MapCache> requestCaches = requestCachesMap.get(requestId);
-                if (requestCaches == null) {
-                    requestCaches = new HashMap<>();
-                    requestCachesMap.put(requestId, requestCaches);
-                }
+                Map<String, MapCache> requestCaches = requestCachesMap.computeIfAbsent(requestId, k -> new HashMap<>());
             }
         }
 

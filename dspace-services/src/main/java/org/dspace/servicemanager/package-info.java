@@ -7,7 +7,7 @@
  */
 /**
  * Register, configure, manipulate, locate services.
- * See {@link DSpaceServiceManager} for a starting point.
+ * See {@link org.dspace.servicemanager.DSpaceServiceManager} for a starting point.
  */
 
 package org.dspace.servicemanager;
