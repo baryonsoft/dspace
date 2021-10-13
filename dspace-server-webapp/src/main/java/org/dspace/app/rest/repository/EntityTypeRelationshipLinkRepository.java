@@ -66,7 +66,7 @@ public class EntityTypeRelationshipLinkRepository extends AbstractDSpaceRestRepo
                                           pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(list, pageable, total, projection);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException();
         }
     }
 

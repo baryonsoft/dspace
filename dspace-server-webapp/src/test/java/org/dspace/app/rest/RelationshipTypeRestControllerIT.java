@@ -179,25 +179,25 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         EntityType orgunitEntityType = entityTypeService.findByEntityType(context, "OrgUnit");
         EntityType journalIssueEntityType = entityTypeService.findByEntityType(context, "journalIssue");
 
-        RelationshipType relationshipType1 = relationshipTypeService
+        relationshipTypeService
             .findbyTypesAndTypeName(context, publicationEntityType, personEntityType, "isAuthorOfPublication",
-                                  "isPublicationOfAuthor");
-        RelationshipType relationshipType2 = relationshipTypeService
+                "isPublicationOfAuthor");
+        relationshipTypeService
             .findbyTypesAndTypeName(context, publicationEntityType, projectEntityType, "isProjectOfPublication",
-                                  "isPublicationOfProject");
-        RelationshipType relationshipType3 = relationshipTypeService
+                "isPublicationOfProject");
+        relationshipTypeService
             .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isOrgUnitOfPublication",
-                                  "isPublicationOfOrgUnit");
-        RelationshipType relationshipType4 = relationshipTypeService
+                "isPublicationOfOrgUnit");
+        relationshipTypeService
             .findbyTypesAndTypeName(context, journalIssueEntityType, publicationEntityType,
-                    "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
-        RelationshipType relationshipType5 = relationshipTypeService
+                "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
+        relationshipTypeService
             .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
-                                  "isPublicationOfAuthor");
+                "isPublicationOfAuthor");
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/core/relationships?embed=relationshipType"))
-                             .andExpect(status().isOk());
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -233,55 +233,55 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withAuthor("Smith, Maria")
-                                  .withEntityType("Person")
-                                  .build();
+            .withEntityType("Person")
+            .build();
 
         Item author3 = ItemBuilder.createItem(context, col2)
-                                  .withTitle("Author3")
-                                  .withIssueDate("2016-02-13")
-                                  .withAuthor("Maybe, Maybe")
-                                  .withEntityType("Person")
-                                  .build();
+            .withTitle("Author3")
+            .withIssueDate("2016-02-13")
+            .withAuthor("Maybe, Maybe")
+            .withEntityType("Person")
+            .build();
 
-        Item orgUnit1 = ItemBuilder.createItem(context, col3)
-                                   .withTitle("OrgUnit1")
-                                   .withAuthor("Testy, TEst")
-                                   .withIssueDate("2015-01-01")
-                                   .withEntityType("OrgUnit")
-                                   .build();
+        ItemBuilder.createItem(context, col3)
+            .withTitle("OrgUnit1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withEntityType("OrgUnit")
+            .build();
 
-        Item project1 = ItemBuilder.createItem(context, col3)
-                                   .withTitle("Project1")
-                                   .withAuthor("Testy, TEst")
-                                   .withIssueDate("2015-01-01")
-                                   .withEntityType("Project")
-                                   .build();
+        ItemBuilder.createItem(context, col3)
+            .withTitle("Project1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withEntityType("Project")
+            .build();
 
         Item publication = ItemBuilder.createItem(context, col3)
-                                      .withTitle("Publication1")
-                                      .withAuthor("Testy, TEst")
-                                      .withIssueDate("2015-01-01")
-                                      .withEntityType("Publication")
-                                      .build();
+            .withTitle("Publication1")
+            .withAuthor("Testy, TEst")
+            .withIssueDate("2015-01-01")
+            .withEntityType("Publication")
+            .build();
 
         Item publication2 = ItemBuilder.createItem(context, col3)
-                                       .withTitle("Publication2")
-                                       .withIssueDate("2015-01-01")
-                                       .withEntityType("Publication")
-                                       .build();
+            .withTitle("Publication2")
+            .withIssueDate("2015-01-01")
+            .withEntityType("Publication")
+            .build();
 
-        RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
+        relationshipTypeService
             .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Person"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
-                                  "isOrgUnitOfPerson", "isPersonOfOrgUnit");
-        RelationshipType isOrgUnitOfProjectRelationshipType = relationshipTypeService
+                entityTypeService.findByEntityType(context, "OrgUnit"),
+                "isOrgUnitOfPerson", "isPersonOfOrgUnit");
+        relationshipTypeService
             .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Project"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
-                                  "isOrgUnitOfProject", "isProjectOfOrgUnit");
+                entityTypeService.findByEntityType(context, "OrgUnit"),
+                "isOrgUnitOfProject", "isProjectOfOrgUnit");
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
             .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+                entityTypeService.findByEntityType(context, "Person"),
+                "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship1 = RelationshipBuilder
             .createRelationshipBuilder(context, publication, author1, isAuthorOfPublicationRelationshipType).build();
