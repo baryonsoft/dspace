@@ -32,7 +32,6 @@ import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
-import org.hibernate.Session;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -50,70 +49,92 @@ import org.springframework.util.CollectionUtils;
  * The context object is also used as a cache for CM API objects.
  */
 public class Context implements AutoCloseable {
-    protected static final AtomicBoolean databaseUpdated = new AtomicBoolean(false);
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Context.class);
-    /**
-     * Cache that is only used the context is in READ_ONLY mode
-     */
-    private final ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
-    protected EventService eventService;
+    protected static final AtomicBoolean databaseUpdated = new AtomicBoolean(false);
+
     /**
      * Current user - null means anonymous access
      */
     private EPerson currentUser;
+
     /**
      * Temporary store when the current user is temporary switched
      */
     private EPerson currentUserPreviousState;
+
     /**
      * Current Locale
      */
     private Locale currentLocale;
+
     /**
      * Extra log info
      */
     private String extraLogInfo;
+
     /**
-     * Indicates whether authorization subsystem should be ignored
+     * Indicates whether authorisation subsystem should be ignored
      */
     private boolean ignoreAuth;
+
     /**
      * A stack with the history of authorisation system check modify
      */
     private Deque<Boolean> authStateChangeHistory;
+
     /**
      * A stack with the name of the caller class that modify authorisation
      * system check
      */
     private Deque<String> authStateClassCallHistory;
+
     /**
      * Group IDs of special groups user is a member of
      */
     private List<UUID> specialGroups;
+
     /**
      * Temporary store for the specialGroups when the current user is temporary switched
      */
     private List<UUID> specialGroupsPreviousState;
+
     /**
      * Content events
      */
     private LinkedList<Event> events = null;
+
     /**
      * Event dispatcher name
      */
     private String dispName = null;
+
     /**
      * Context mode
      */
-    private Mode mode;
+    private Mode mode = Mode.READ_WRITE;
+
+    /**
+     * Cache that is only used the context is in READ_ONLY mode
+     */
+    private final ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
+
+    protected EventService eventService;
+
     private DBConnection dbConnection;
 
-    protected Context(EventService eventService, DBConnection<Session> dbConnection) {
+    public enum Mode {
+        READ_ONLY,
+        READ_WRITE,
+        BATCH_EDIT
+    }
+
+    protected Context(EventService eventService, DBConnection dbConnection) {
         this.mode = Mode.READ_WRITE;
         this.eventService = eventService;
         this.dbConnection = dbConnection;
         init();
     }
+
 
     /**
      * Construct a new context object with default options. A database connection is opened.
@@ -124,7 +145,6 @@ public class Context implements AutoCloseable {
         init();
     }
 
-
     /**
      * Construct a new context object with the given mode enabled. A database connection is opened.
      * No user is authenticated.
@@ -134,6 +154,37 @@ public class Context implements AutoCloseable {
     public Context(Mode mode) {
         this.mode = mode;
         init();
+    }
+
+    /**
+     * Initializes a new context object.
+     */
+    protected void init() {
+        updateDatabase();
+
+        if (eventService == null) {
+            eventService = EventServiceFactory.getInstance().getEventService();
+        }
+        if (dbConnection == null) {
+            // Obtain a non-auto-committing connection
+            dbConnection = new DSpace().getServiceManager()
+                                       .getServiceByName(null, DBConnection.class);
+            if (dbConnection == null) {
+                log.fatal("Cannot obtain the bean which provides a database connection. " +
+                              "Check previous entries in the dspace.log to find why the db failed to initialize.");
+            }
+        }
+
+        currentUser = null;
+        currentLocale = I18nUtil.getDefaultLocale();
+        extraLogInfo = "";
+        ignoreAuth = false;
+
+        specialGroups = new ArrayList<>();
+
+        authStateChangeHistory = new ConcurrentLinkedDeque<>();
+        authStateClassCallHistory = new ConcurrentLinkedDeque<>();
+        setMode(this.mode);
     }
 
     /**
@@ -163,37 +214,6 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Initializes a new context object.
-     */
-    protected void init() {
-        updateDatabase();
-
-        if (eventService == null) {
-            eventService = EventServiceFactory.getInstance().getEventService();
-        }
-        if (dbConnection == null) {
-            // Obtain a non-auto-committing connection
-            dbConnection = new DSpace().getServiceManager()
-                .getServiceByName(null, DBConnection.class);
-            if (dbConnection == null) {
-                log.fatal("Cannot obtain the bean which provides a database connection. " +
-                    "Check previous entries in the dspace.log to find why the db failed to initialize.");
-            }
-        }
-
-        currentUser = null;
-        currentLocale = I18nUtil.getDefaultLocale();
-        extraLogInfo = "";
-        ignoreAuth = false;
-
-        specialGroups = new ArrayList<>();
-
-        authStateChangeHistory = new ConcurrentLinkedDeque<>();
-        authStateClassCallHistory = new ConcurrentLinkedDeque<>();
-        setMode(this.mode);
-    }
-
-    /**
      * Get the database connection associated with the context
      *
      * @return the database connection
@@ -211,16 +231,6 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Get the current (authenticated) user
-     *
-     * @return the current user, or <code>null</code> if no user is
-     * authenticated
-     */
-    public EPerson getCurrentUser() {
-        return currentUser;
-    }
-
-    /**
      * Set the current user. Authentication must have been performed by the
      * caller - this call does not attempt any authentication.
      *
@@ -229,6 +239,16 @@ public class Context implements AutoCloseable {
      */
     public void setCurrentUser(EPerson user) {
         currentUser = user;
+    }
+
+    /**
+     * Get the current (authenticated) user
+     *
+     * @return the current user, or <code>null</code> if no user is
+     * authenticated
+     */
+    public EPerson getCurrentUser() {
+        return currentUser;
     }
 
     /**
@@ -292,7 +312,7 @@ public class Context implements AutoCloseable {
         } catch (NoSuchElementException ex) {
             log.warn(LogHelper.getHeader(this, "restore_auth_sys_state",
                     "not previous state info available:  {}"),
-                ex::getLocalizedMessage);
+                    ex::getLocalizedMessage);
             previousState = Boolean.FALSE;
         }
         if (log.isDebugEnabled()) {
@@ -302,36 +322,26 @@ public class Context implements AutoCloseable {
 
             String previousCaller;
             try {
-                previousCaller = authStateClassCallHistory.pop();
+                previousCaller = (String) authStateClassCallHistory.pop();
             } catch (NoSuchElementException ex) {
                 previousCaller = "none";
                 log.warn(LogHelper.getHeader(this, "restore_auth_sys_state",
                         "no previous caller info available:  {}"),
-                    ex::getLocalizedMessage);
+                        ex::getLocalizedMessage);
             }
 
             // if previousCaller is not the current caller *only* log a warning
             if (!previousCaller.equals(caller)) {
                 log.warn(LogHelper.getHeader(
-                    this,
-                    "restore_auth_sys_state",
-                    "Class: "
-                        + caller
-                        + " call restore but previous state change made by "
-                        + previousCaller));
+                                  this,
+                                  "restore_auth_sys_state",
+                                  "Class: "
+                                      + caller
+                                      + " call restore but previous state change made by "
+                                      + previousCaller));
             }
         }
         ignoreAuth = previousState;
-    }
-
-    /**
-     * Get extra information to be logged with message logged in the scope of
-     * this context.
-     *
-     * @return the extra log info - guaranteed non- <code>null</code>
-     */
-    public String getExtraLogInfo() {
-        return extraLogInfo;
     }
 
     /**
@@ -345,6 +355,16 @@ public class Context implements AutoCloseable {
      */
     public void setExtraLogInfo(String info) {
         extraLogInfo = info;
+    }
+
+    /**
+     * Get extra information to be logged with message logged in the scope of
+     * this context.
+     *
+     * @return the extra log info - guaranteed non- <code>null</code>
+     */
+    public String getExtraLogInfo() {
+        return extraLogInfo;
     }
 
     /**
@@ -418,6 +438,7 @@ public class Context implements AutoCloseable {
         }
     }
 
+
     /**
      * Dispatch any events (cached in current Context) to configured EventListeners (consumers)
      * in the EventService. This should be called prior to any commit as some consumers may add
@@ -451,8 +472,8 @@ public class Context implements AutoCloseable {
      */
     public void setDispatcher(String dispatcher) {
         if (log.isDebugEnabled()) {
-            log.debug(this + ": setDispatcher(\"" + dispatcher
-                + "\")");
+            log.debug(this.toString() + ": setDispatcher(\"" + dispatcher
+                          + "\")");
         }
         dispName = dispatcher;
     }
@@ -490,7 +511,6 @@ public class Context implements AutoCloseable {
 
     /**
      * Whether or not the context has events cached.
-     *
      * @return true or false
      */
     public boolean hasEvents() {
@@ -578,6 +598,8 @@ public class Context implements AutoCloseable {
      * <code>false</code> if the context is invalid (e.g. abort() or complete())
      * was called OR no current transaction exists (e.g. commit() was just called
      * and no new transaction has begun)
+     *
+     * @return
      */
     protected boolean isTransactionAlive() {
         // Only return true if both Context is valid *and* transaction is alive
@@ -596,7 +618,6 @@ public class Context implements AutoCloseable {
 
     /**
      * Add a group's UUID to the list of special groups cached in Context
-     *
      * @param groupID UUID of group
      */
     public void setSpecialGroup(UUID groupID) {
@@ -607,7 +628,6 @@ public class Context implements AutoCloseable {
      * Test if a group is a special group
      *
      * @param groupID ID of special group to test
-     *
      * @return true if member
      */
     public boolean inSpecialGroup(UUID groupID) {
@@ -618,7 +638,6 @@ public class Context implements AutoCloseable {
      * Get an array of all of the special groups that current user is a member of.
      *
      * @return list of special groups
-     *
      * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups() throws SQLException {
@@ -642,7 +661,7 @@ public class Context implements AutoCloseable {
     public void switchContextUser(EPerson newUser) {
         if (currentUserPreviousState != null) {
             throw new IllegalStateException(
-                "A previous user is already set, you can only switch back and foreward one time");
+                    "A previous user is already set, you can only switch back and foreward one time");
         }
 
         currentUserPreviousState = currentUser;
@@ -667,7 +686,8 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Close the context, aborting any open transactions (if any).
+     *  Close the context, aborting any open transactions (if any).
+     * @throws Throwable
      */
     @Override
     protected void finalize() throws Throwable {
@@ -682,9 +702,10 @@ public class Context implements AutoCloseable {
         super.finalize();
     }
 
-    public void shutDownDatabase() {
+    public void shutDownDatabase() throws SQLException {
         dbConnection.shutdown();
     }
+
 
     /**
      * Returns the size of the cache of all object that have been read from the
@@ -694,7 +715,6 @@ public class Context implements AutoCloseable {
      * needed (see {@link Context#uncacheEntity(ReloadableEntity)} () uncacheEntity}).
      *
      * @return cache size.
-     *
      * @throws SQLException When connecting to the active cache fails.
      */
     public long getCacheSize() throws SQLException {
@@ -766,9 +786,10 @@ public class Context implements AutoCloseable {
      * small number of records.
      *
      * @param batchModeEnabled When true, batch processing mode will be enabled. If false, it will be disabled.
+     * @throws SQLException When configuring the database connection fails.
      */
     @Deprecated
-    public void enableBatchMode(boolean batchModeEnabled) {
+    public void enableBatchMode(boolean batchModeEnabled) throws SQLException {
         if (batchModeEnabled) {
             setMode(Mode.BATCH_EDIT);
         } else {
@@ -792,9 +813,7 @@ public class Context implements AutoCloseable {
      *
      * @param entity The entity to reload
      * @param <E>    The class of the entity. The entity must implement the {@link ReloadableEntity} interface.
-     *
      * @return A (possibly) <b>NEW</b> reference to the entity that should be used for further processing.
-     *
      * @throws SQLException When reloading the entity from the database fails.
      */
     @SuppressWarnings("unchecked")
@@ -807,7 +826,6 @@ public class Context implements AutoCloseable {
      *
      * @param entity The entity to reload
      * @param <E>    The class of the entity. The entity must implement the {@link ReloadableEntity} interface.
-     *
      * @throws SQLException When reloading the entity from the database fails.
      */
     @SuppressWarnings("unchecked")
@@ -870,12 +888,6 @@ public class Context implements AutoCloseable {
      */
     private void reloadContextBoundEntities() throws SQLException {
         currentUser = reloadEntity(currentUser);
-    }
-
-    public enum Mode {
-        READ_ONLY,
-        READ_WRITE,
-        BATCH_EDIT
     }
 
 }
