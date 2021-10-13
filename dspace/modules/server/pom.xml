@@ -15,7 +15,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>baryonics-0.3.5</version>
+        <version>baryonics-0.3.6</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -284,6 +284,7 @@
             </activation>
             <dependencies>
                 <dependency>
+                    <!--suppress MavenModelInspection -->
                     <groupId>com.oracle</groupId>
                     <!--suppress MavenModelInspection -->
                     <artifactId>ojdbc6</artifactId>

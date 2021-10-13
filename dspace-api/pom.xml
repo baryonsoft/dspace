@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>baryonics-0.3.5</version>
+        <version>baryonics-0.3.6</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -236,6 +236,7 @@
                 <plugins>
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
+                        <!--suppress MavenModelInspection -->
                         <artifactId>spotbugs-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
