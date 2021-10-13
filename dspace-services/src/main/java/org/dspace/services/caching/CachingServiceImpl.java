@@ -167,10 +167,10 @@ public final class CachingServiceImpl
     void reloadConfig() {
         // Reload caching configurations, but have sane default values if unspecified in configs
         useClustering = configurationService.getPropertyAsType(knownConfigNames[0], false);
-        boolean useDiskStore = configurationService.getPropertyAsType(knownConfigNames[1], true);
-        int maxElementsInMemory = configurationService.getPropertyAsType(knownConfigNames[2], 2000);
-        int timeToLiveSecs = configurationService.getPropertyAsType(knownConfigNames[3], 3600);
-        int timeToIdleSecs = configurationService.getPropertyAsType(knownConfigNames[4], 600);
+        configurationService.getPropertyAsType(knownConfigNames[1], true);
+        configurationService.getPropertyAsType(knownConfigNames[2], 2000);
+        configurationService.getPropertyAsType(knownConfigNames[3], 3600);
+        configurationService.getPropertyAsType(knownConfigNames[4], 600);
     }
 
     /* (non-Javadoc)
@@ -196,8 +196,8 @@ public final class CachingServiceImpl
         reloadConfig();
 
         // get all caches out of the cachemanager and load them into the cache list
-        List<Ehcache> ehcaches = getAllEhCaches();
-        for (Ehcache ehcache : ehcaches) {
+        List<Ehcache> ehCaches = getAllEhCaches();
+        for (Ehcache ehcache : ehCaches) {
             EhcacheCache cache = new EhcacheCache(ehcache, null);
             cacheRecord.put(cache.getName(), cache);
         }
@@ -514,7 +514,7 @@ public final class CachingServiceImpl
         @Override
         public void onStart(String requestId) {
             if (requestId != null) {
-                Map<String, MapCache> requestCaches = requestCachesMap.computeIfAbsent(requestId, k -> new HashMap<>());
+                requestCachesMap.computeIfAbsent(requestId, k -> new HashMap<>());
             }
         }
 
