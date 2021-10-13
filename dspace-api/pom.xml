@@ -1001,6 +1001,11 @@
             <artifactId>styles</artifactId>
             <version>21.10</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 

@@ -51,6 +51,7 @@ import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +124,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public void setName(Group group, String name) throws SQLException {
         if (group.isPermanent()) {
             log.error("Attempt to rename permanent Group {} to {}.",
-                      group.getName(), name);
+                group.getName(), name);
             throw new SQLException("Attempt to rename a permanent Group");
         } else {
             group.setName(name);
@@ -139,7 +140,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         e.getGroups().add(group);
         context.addEvent(
             new Event(Event.ADD, Constants.GROUP, group.getID(), Constants.EPERSON, e.getID(), e.getEmail(),
-                      getIdentifiers(context, group)));
+                getIdentifiers(context, group)));
     }
 
     @Override
@@ -154,7 +155,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         groupChild.addParentGroup(groupParent);
 
         context.addEvent(new Event(Event.ADD, Constants.GROUP, groupParent.getID(), Constants.GROUP, groupChild.getID(),
-                                   groupChild.getName(), getIdentifiers(context, groupParent)));
+            groupChild.getName(), getIdentifiers(context, groupParent)));
     }
 
     /**
@@ -165,6 +166,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      * @param context DSpace context object
      * @param group   DSpace group
      * @param ePerson eperson
+     *
      * @throws SQLException SQLException
      */
     @Override
@@ -178,13 +180,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 Role role = stepByName.getRole();
                 for (CollectionRole collectionRole : collectionRoles) {
                     if (StringUtils.equals(collectionRole.getRoleId(), role.getId())
-                            && claimedTask.getWorkflowItem().getCollection() == collectionRole.getCollection()) {
+                        && claimedTask.getWorkflowItem().getCollection() == collectionRole.getCollection()) {
                         List<EPerson> ePeople = allMembers(context, group);
                         if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
                             throw new IllegalStateException(
-                                    "Refused to remove user " + ePerson
-                                            .getID() + " from workflow group because the group " + group
-                                            .getID() + " has tasks assigned and no other members");
+                                "Refused to remove user " + ePerson
+                                    .getID() + " from workflow group because the group " + group
+                                    .getID() + " has tasks assigned and no other members");
                         }
 
                     }
@@ -194,15 +196,15 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 List<EPerson> ePeople = allMembers(context, group);
                 if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
                     throw new IllegalStateException(
-                            "Refused to remove user " + ePerson
-                                    .getID() + " from workflow group because the group " + group
-                                    .getID() + " has tasks assigned and no other members");
+                        "Refused to remove user " + ePerson
+                            .getID() + " from workflow group because the group " + group
+                            .getID() + " has tasks assigned and no other members");
                 }
             }
         }
         if (group.remove(ePerson)) {
             context.addEvent(new Event(Event.REMOVE, Constants.GROUP, group.getID(), Constants.EPERSON, ePerson.getID(),
-                                       ePerson.getEmail(), getIdentifiers(context, group)));
+                ePerson.getEmail(), getIdentifiers(context, group)));
         }
     }
 
@@ -216,9 +218,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 List<EPerson> childPeople = allMembers(context, childGroup);
                 if (childPeople.containsAll(parentPeople)) {
                     throw new IllegalStateException(
-                            "Refused to remove sub group " + childGroup
-                                    .getID() + " from workflow group because the group " + groupParent
-                                    .getID() + " has tasks assigned and no other members");
+                        "Refused to remove sub group " + childGroup
+                            .getID() + " from workflow group because the group " + groupParent
+                            .getID() + " has tasks assigned and no other members");
                 }
             }
         }
@@ -226,7 +228,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             childGroup.removeParentGroup(groupParent);
             context.addEvent(
                 new Event(Event.REMOVE, Constants.GROUP, groupParent.getID(), Constants.GROUP, childGroup.getID(),
-                          childGroup.getName(), getIdentifiers(context, groupParent)));
+                    childGroup.getName(), getIdentifiers(context, groupParent)));
         }
     }
 
@@ -259,7 +261,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
             // special, everyone is member of group 0 (anonymous)
         } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS) ||
-                   isParentOf(context, group, findByName(context, Group.ANONYMOUS))) {
+            isParentOf(context, group, findByName(context, Group.ANONYMOUS))) {
             return true;
 
         } else {
@@ -476,7 +478,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
 
         context.addEvent(new Event(Event.DELETE, Constants.GROUP, group.getID(),
-                                   group.getName(), getIdentifiers(context, group)));
+            group.getName(), getIdentifiers(context, group)));
 
         //Remove the supervised group from any workspace items linked to us.
         group.getSupervisedItems().clear();
@@ -497,7 +499,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         // empty out group2groupcache table (if we do it after we delete our object we get an issue with references)
         group2GroupCacheDAO.deleteAll(context);
-        // Remove ourself
+        // Remove ourselves
         groupDAO.delete(context, group);
         rethinkGroupCache(context, false);
 
@@ -514,7 +516,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      * Return true if group has no direct or indirect members
      */
     @Override
-    public boolean isEmpty(Group group) {
+    public boolean isEmpty(@NotNull Group group) {
         // the only fast check available is on epeople...
         boolean hasMembers = (!group.getMembers().isEmpty());
 
@@ -559,7 +561,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      * Get a list of groups with no members.
      *
      * @param context The relevant DSpace Context.
+     *
      * @return list of groups with no members
+     *
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     @Override
@@ -572,6 +576,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      *
      * @param context The relevant DSpace Context.
      * @param group   Group to update
+     *
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
@@ -585,7 +590,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         if (group.isMetadataModified()) {
             context.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, group.getID(), group.getDetails(),
-                                       getIdentifiers(context, group)));
+                getIdentifiers(context, group)));
             group.clearDetails();
         }
 
@@ -599,7 +604,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
 
-    protected boolean isEPersonInGroup(Context context, Group group, EPerson ePerson)
+    protected boolean isEPersonInGroup(Context context, @NotNull Group group, EPerson ePerson)
         throws SQLException {
         return groupDAO.findByIdAndMembership(context, group.getID(), ePerson) != null;
     }
@@ -611,6 +616,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      *
      * @param context      The relevant DSpace Context.
      * @param flushQueries flushQueries Flush all pending queries
+     *
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     protected void rethinkGroupCache(Context context, boolean flushQueries) throws SQLException {
@@ -637,8 +643,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             }
         }
 
-        // now parents is a hash of all of the IDs of groups that are parents
-        // and each hash entry is a hash of all of the IDs of children of those
+        // now parents is a hash of all the IDs of groups that are parents
+        // and each hash entry is a hash of all the IDs of children of those
         // parent groups
         // so now to establish all parent,child relationships we can iterate
         // through the parents hash
@@ -709,7 +715,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 }
             } else {
                 if (AuthorizeConfiguration.canCollectionAdminManageWorkflows()
-                        || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
+                    || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
                     // if the group is used for one or more roles on a single collection,
                     // admins can eventually manage it
                     List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
@@ -733,12 +739,12 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             List<Group> groups = new ArrayList<>();
                             groups.add(group);
                             List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
-                                                            Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
+                                Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
                             if (policies.size() > 0) {
                                 return policies.get(0).getdSpaceObject();
                             }
                             policies = resourcePolicyService.find(context, null, groups,
-                                                             Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
+                                Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
                             if (policies.size() > 0) {
                                 return policies.get(0).getdSpaceObject();
                             }
@@ -761,12 +767,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     /**
-     * Used recursively to generate a map of ALL of the children of the given
+     * Used recursively to generate a map of All the children of the given
      * parent
      *
      * @param parents Map of parent,child relationships
      * @param parent  the parent you're interested in
-     * @return Map whose keys are all of the children of a parent
+     *
+     * @return Map whose keys are all the children of a parent
      */
     protected Set<UUID> getChildren(Map<UUID, Set<UUID>> parents, UUID parent) {
         Set<UUID> myChildren = new HashSet<>();
@@ -779,7 +786,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         // got this far, so we must have children
         Set<UUID> children = parents.get(parent);
 
-        // now iterate over all of the children
+        // now iterate over all the children
 
         for (UUID child : children) {
             // add this child's ID to our return set
