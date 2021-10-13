@@ -999,7 +999,7 @@
         <dependency>
             <groupId>org.citationstyles</groupId>
             <artifactId>styles</artifactId>
-            <version>1.0</version>
+            <version>21.10</version>
         </dependency>
 
     </dependencies>
