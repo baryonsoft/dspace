@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -47,8 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Component(ScriptRest.CATEGORY + "." + ScriptRest.NAME)
 public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, String> {
 
-    private static final Logger log = LogManager.getLogger();
-
     @Autowired
     private ScriptService scriptService;
 
@@ -60,7 +56,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     // for Comm/Coll Admins in EPersonRestAuthenticationProvider to use on this endpoint
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ScriptRest findOne(Context context, String name) {
+    public ScriptRest findOne(Context context, String name) throws SQLException {
 
         ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(name);
         if (scriptConfiguration != null) {
@@ -91,8 +87,11 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     /**
      * This method will take a String scriptname parameter and it'll try to resolve this to a script known by DSpace.
      * If a script is found, it'll start a process for this script with the given properties to this request
-     * @param scriptName    The name of the script that will try to be resolved and started
+     *
+     * @param scriptName The name of the script that will try to be resolved and started
+     *
      * @return A ProcessRest object representing the started process for this script
+     *
      * @throws SQLException If something goes wrong
      * @throws IOException  If something goes wrong
      */
@@ -123,11 +122,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
             parameterValueRestList = Arrays.asList(objectMapper.readValue(propertiesJson, ParameterValueRest[].class));
         }
 
-        List<DSpaceCommandLineParameter> dSpaceCommandLineParameters = new LinkedList<>();
-        dSpaceCommandLineParameters.addAll(
-            parameterValueRestList.stream().map(x -> dSpaceRunnableParameterConverter.toModel(x))
-                                  .collect(Collectors.toList()));
-        return dSpaceCommandLineParameters;
+        return parameterValueRestList.stream().map(x -> dSpaceRunnableParameterConverter.toModel(x))
+            .collect(Collectors.toCollection(LinkedList::new));
     }
 
     private List<String> constructArgs(List<DSpaceCommandLineParameter> dSpaceCommandLineParameters) {
@@ -175,8 +171,9 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     /**
      * This method checks if the files referenced in the options are actually present for the request
      * If this isn't the case, we'll abort the script now instead of creating issues later on
-     * @param dSpaceRunnable   The script that we'll attempt to run
-     * @param files             The list of files in the request
+     *
+     * @param dSpaceRunnable The script that we'll attempt to run
+     * @param files          The list of files in the request
      */
     private void checkFileNames(DSpaceRunnable dSpaceRunnable, List<MultipartFile> files) {
         List<String> fileNames = new LinkedList<>();
