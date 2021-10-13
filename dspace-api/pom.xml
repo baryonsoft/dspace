@@ -994,7 +994,7 @@
         <dependency>
             <groupId>org.citationstyles</groupId>
             <artifactId>locales</artifactId>
-            <version>1.0</version>
+            <version>21.10</version>
         </dependency>
         <dependency>
             <groupId>org.citationstyles</groupId>
