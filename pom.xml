@@ -5,7 +5,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>baryonics-0.3.5</version>
+    <version>7.0-preview-1</version>
     <name>DSpace Parent Project</name>
     <description>
         Baryonics is a comprehensive bibliographic database that powers BaryonBib.
@@ -899,14 +899,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>baryonics-0.3.5</version>
+                       <version>7.0-preview-1</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>baryonics-0.3.5</version>
+                       <version>7.0-preview-1</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
