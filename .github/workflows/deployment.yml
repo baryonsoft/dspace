@@ -16,6 +16,7 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_APP }}
+          flavor: latest=false
           tags: |
             type=semver,pattern={{version}},prefix=
             type=semver,pattern={{major}}.{{minor}},prefix=
