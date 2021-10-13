@@ -25,14 +25,15 @@ public class ConfigurationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.values[0]", is("public_value")))
             .andExpect(jsonPath("$.type", is("property")))
             .andExpect(jsonPath("$.name", is("configuration.exposed.single.value")))
-            .andExpect(jsonPath("$._links.self.href", is("http://localhost/api/config/properties/configuration.exposed.single.value")));
+            .andExpect(jsonPath("$._links.self.href",
+                is("http://localhost/api/config/properties/configuration.exposed.single.value")));
     }
 
     @Test
     public void getArrayValue() throws Exception {
         getClient().perform(get("/api/config/properties/configuration.exposed.array.value"))
-        .andExpect(jsonPath("$.values[0]", is("public_value_1")))
-        .andExpect(jsonPath("$.values[1]", is("public_value_2")));
+            .andExpect(jsonPath("$.values[0]", is("public_value_1")))
+            .andExpect(jsonPath("$.values[1]", is("public_value_2")));
     }
 
     @Test

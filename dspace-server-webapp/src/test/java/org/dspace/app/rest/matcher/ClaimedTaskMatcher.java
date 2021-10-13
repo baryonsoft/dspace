@@ -23,53 +23,47 @@ import org.hamcrest.Matcher;
  */
 public class ClaimedTaskMatcher {
 
-    private ClaimedTaskMatcher() { }
+    private ClaimedTaskMatcher() {
+    }
 
     /**
      * Check if the returned json expose all the required links and properties
-     * 
-     * @param ptask
-     *            the pool task
-     * @param step
-     *            the step name
-     * @return
+     *
+     * @param cTask the pool task
+     * @param step  the step name
      */
     public static Matcher matchClaimedTask(ClaimedTask cTask, String step) {
         return allOf(
-                // Check workflowitem properties
-                matchProperties(cTask),
-                // Check links
-                matchLinks(cTask));
+            // Check workflowitem properties
+            matchProperties(cTask),
+            // Check links
+            matchLinks(cTask));
     }
 
     /**
      * Check that the id and type are exposed
-     * 
-     * @param cTask
-     *            the claimed task, if empty only the type will be checked
-     * @return
+     *
+     * @param cTask the claimed task, if empty only the type will be checked
      */
     public static Matcher<? super Object> matchProperties(ClaimedTask cTask) {
         return allOf(
-                cTask != null ? hasJsonPath("$.id", is(cTask.getID())) : hasJsonPath("$.id"),
-                hasJsonPath("$.type", is("claimedtask"))
+            cTask != null ? hasJsonPath("$.id", is(cTask.getID())) : hasJsonPath("$.id"),
+            hasJsonPath("$.type", is("claimedtask"))
         );
     }
 
     /**
      * Check that the required links are present
-     * 
-     * @param cTask
-     *            the claimed task, if empty only the generic links structure will be checked
-     * @return
+     *
+     * @param cTask the claimed task, if empty only the generic links structure will be checked
      */
     public static Matcher<? super Object> matchLinks(ClaimedTask cTask) {
         return allOf(
-                cTask != null
-                        ? hasJsonPath("$._links.self.href",
-                                is(REST_SERVER_URL + "workflow/claimedtasks/" + cTask.getID()))
-                        : hasJsonPath("$._links.self.href"),
-                hasJsonPath("$._links.owner.href", startsWith(REST_SERVER_URL)),
-                hasJsonPath("$._links.workflowitem.href", startsWith(REST_SERVER_URL)));
+            cTask != null
+                ? hasJsonPath("$._links.self.href",
+                is(REST_SERVER_URL + "workflow/claimedtasks/" + cTask.getID()))
+                : hasJsonPath("$._links.self.href"),
+            hasJsonPath("$._links.owner.href", startsWith(REST_SERVER_URL)),
+            hasJsonPath("$._links.workflowitem.href", startsWith(REST_SERVER_URL)));
     }
 }

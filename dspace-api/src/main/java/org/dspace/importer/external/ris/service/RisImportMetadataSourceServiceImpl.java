@@ -10,6 +10,7 @@ package org.dspace.importer.external.ris.service;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,8 +27,8 @@ import org.dspace.importer.external.service.components.dto.PlainMetadataSourceDt
 
 /**
  * Implements a metadata importer for RIS files
- * Implementations insprider by BTE DataLoader {@link https://github.com/EKT/Biblio-Transformation-Engine/blob/master/bte-io/src/main/java/gr/ekt/bteio/loaders/RISDataLoader.java}
- * 
+ * Implementations insprider by BTE DataLoader {@link <a href="https://github.com/EKT/Biblio-Transformation-Engine/blob/master/bte-io/src/main/java/gr/ekt/bteio/loaders/RISDataLoader.java">...</a>}
+ *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
 public class RisImportMetadataSourceServiceImpl extends AbstractPlainMetadataSource {
@@ -45,12 +46,12 @@ public class RisImportMetadataSourceServiceImpl extends AbstractPlainMetadataSou
     /**
      * This method map the data present in the inputStream, then return a list PlainMetadataSourceDto.
      * Any PlainMetadataSourceDto will be used to create a single {@link org.dspace.importer.external.datamodel.ImportRecord}
-     * 
-     * @see org.dspace.importer.external.service.components.AbstractPlainMetadataSource
-     * 
+     *
      * @param inputStream the inputStream of the RIS file
+     *
      * @return List of {@link org.dspace.importer.external.service.components.dto.PlainMetadataSourceDto}
-     * @throws FileSourceException
+     *
+     * @see org.dspace.importer.external.service.components.AbstractPlainMetadataSource
      */
     private List<PlainMetadataSourceDto> aggregateData(InputStream inputStream) throws FileSourceException {
         List<PlainMetadataSourceDto> metadata = new ArrayList<>();
@@ -90,16 +91,16 @@ public class RisImportMetadataSourceServiceImpl extends AbstractPlainMetadataSou
      * This method transform any row of the RIS file into a PlainMetadataKeyValueItem,
      * splitting the row sequentially through a RegExp without take care of the means of the data.
      * In this way, all entries present in the file are mapped in the resulting list.
-     * 
+     *
      * @param inputStream the inputStrem of the file
+     *
      * @return A list
-     * @throws FileSourceException
      */
     private List<PlainMetadataKeyValueItem> notAggregatedData(InputStream inputStream) throws FileSourceException {
         LinkedList<PlainMetadataKeyValueItem> items = new LinkedList<>();
         BufferedReader reader;
         try {
-            reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.isEmpty() || line.equals("") || line.matches("^\\s*$")) {
@@ -128,8 +129,6 @@ public class RisImportMetadataSourceServiceImpl extends AbstractPlainMetadataSou
     /**
      * Retrieve the MetadataFieldMapping containing the mapping between RecordType
      * (in this case PlainMetadataSourceDto.class) and Metadata
-     *
-     * @return The configured MetadataFieldMapping
      */
     @Override
     @SuppressWarnings("unchecked")

@@ -49,8 +49,8 @@ public class BibtexImportMetadataSourceServiceImpl extends AbstractPlainMetadata
     }
 
     @Override
-    protected List<PlainMetadataSourceDto> readData (InputStream
-        inputStream) throws FileSourceException {
+    protected List<PlainMetadataSourceDto> readData(InputStream
+                                                        inputStream) throws FileSourceException {
         List<PlainMetadataSourceDto> list = new ArrayList<>();
         BibTeXDatabase database;
         try {
@@ -71,7 +71,7 @@ public class BibtexImportMetadataSourceServiceImpl extends AbstractPlainMetadata
                 keyValueItem.setValue(entry.getKey().getValue());
                 keyValues.add(keyValueItem);
                 if (entry.getValue().getFields() != null) {
-                    for (Entry<Key,Value> subentry : entry.getValue().getFields().entrySet()) {
+                    for (Entry<Key, Value> subentry : entry.getValue().getFields().entrySet()) {
                         PlainMetadataKeyValueItem innerItem = new PlainMetadataKeyValueItem();
                         innerItem.setKey(subentry.getKey().getValue());
                         innerItem.setValue(subentry.getValue().toUserString());
@@ -94,8 +94,6 @@ public class BibtexImportMetadataSourceServiceImpl extends AbstractPlainMetadata
     /**
      * Retrieve the MetadataFieldMapping containing the mapping between RecordType
      * (in this case PlainMetadataSourceDto.class) and Metadata
-     *
-     * @return The configured MetadataFieldMapping
      */
     @Override
     @SuppressWarnings("unchecked")

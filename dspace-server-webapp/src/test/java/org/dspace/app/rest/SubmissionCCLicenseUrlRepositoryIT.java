@@ -35,14 +35,14 @@ public class SubmissionCCLicenseUrlRepositoryIT extends AbstractControllerIntegr
 
         getClient(epersonToken).perform(get(
                 "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license2&answer_license2-field0" +
-                        "=license2-field0-enum1"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.url", is("mock-license-uri")))
-                   .andExpect(jsonPath("$.type", is("submissioncclicenseUrl")))
-                   .andExpect(jsonPath("$._links.self.href",
-                                       is("http://localhost/api/config/submissioncclicenseUrls/search/rightsByQuestions" +
-                                                  "?license=license2" +
-                                                  "&answer_license2-field0=license2-field0-enum1")));
+                    "=license2-field0-enum1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.url", is("mock-license-uri")))
+            .andExpect(jsonPath("$.type", is("submissioncclicenseUrl")))
+            .andExpect(jsonPath("$._links.self.href",
+                is("http://localhost/api/config/submissioncclicenseUrls/search/rightsByQuestions" +
+                    "?license=license2" +
+                    "&answer_license2-field0=license2-field0-enum1")));
     }
 
     @Test
@@ -50,13 +50,13 @@ public class SubmissionCCLicenseUrlRepositoryIT extends AbstractControllerIntegr
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(epersonToken)
-                .perform(get("/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license3"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.url", is("mock-license-uri")))
-                   .andExpect(jsonPath("$.type", is("submissioncclicenseUrl")))
-                   .andExpect(jsonPath("$._links.self.href",
-                                       is("http://localhost/api/config/submissioncclicenseUrls/search/rightsByQuestions" +
-                                                  "?license=license3")));
+            .perform(get("/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license3"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.url", is("mock-license-uri")))
+            .andExpect(jsonPath("$.type", is("submissioncclicenseUrl")))
+            .andExpect(jsonPath("$._links.self.href",
+                is("http://localhost/api/config/submissioncclicenseUrls/search/rightsByQuestions" +
+                    "?license=license3")));
     }
 
     @Test
@@ -65,8 +65,8 @@ public class SubmissionCCLicenseUrlRepositoryIT extends AbstractControllerIntegr
 
         getClient(epersonToken).perform(get(
                 "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=nonexisting-license" +
-                        "&answer_license2-field0=license2-field0-enum1"))
-                   .andExpect(status().isNotFound());
+                    "&answer_license2-field0=license2-field0-enum1"))
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -75,8 +75,8 @@ public class SubmissionCCLicenseUrlRepositoryIT extends AbstractControllerIntegr
 
         getClient(epersonToken).perform(get(
                 "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license1&answer_license1field0" +
-                        "=license1field0enum1"))
-                   .andExpect(status().isBadRequest());
+                    "=license1field0enum1"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -85,8 +85,8 @@ public class SubmissionCCLicenseUrlRepositoryIT extends AbstractControllerIntegr
 
         getClient(epersonToken).perform(get(
                 "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license2" +
-                        "&answer_license2field0=license2field0enum1&answer_nonexisting=test"))
-                   .andExpect(status().isBadRequest());
+                    "&answer_license2field0=license2field0enum1&answer_nonexisting=test"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -94,8 +94,8 @@ public class SubmissionCCLicenseUrlRepositoryIT extends AbstractControllerIntegr
 
         getClient().perform(get(
                 "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license2&answer_license2-field0" +
-                        "=license2-field0-enum1"))
-                               .andExpect(status().isUnauthorized());
+                    "=license2-field0-enum1"))
+            .andExpect(status().isUnauthorized());
 
     }
 
@@ -103,29 +103,29 @@ public class SubmissionCCLicenseUrlRepositoryIT extends AbstractControllerIntegr
     public void submissionCCLicenseUrlSerchMethodWithSingleModelTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/config/submissioncclicenseUrl/search"))
-                             .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 
     @Test
     public void submissionCCLicenseUrlSerchMethodWithPluralModelTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/config/submissioncclicenseUrls/search"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._links.rightsByQuestions.href", Matchers.allOf(Matchers
-                                 .containsString("/api/config/submissioncclicenseUrls/search/rightsByQuestions"))));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._links.rightsByQuestions.href", Matchers.allOf(Matchers
+                .containsString("/api/config/submissioncclicenseUrls/search/rightsByQuestions"))));
     }
 
     @Test
     public void discoverableNestedLinkTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._links",Matchers.allOf(
-                                hasJsonPath("$.submissioncclicenseUrls.href",
-                                         is("http://localhost/api/config/submissioncclicenseUrls")),
-                                hasJsonPath("$.submissioncclicenseUrls-search.href",
-                                         is("http://localhost/api/config/submissioncclicenseUrls/search"))
-                        )));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._links", Matchers.allOf(
+                hasJsonPath("$.submissioncclicenseUrls.href",
+                    is("http://localhost/api/config/submissioncclicenseUrls")),
+                hasJsonPath("$.submissioncclicenseUrls-search.href",
+                    is("http://localhost/api/config/submissioncclicenseUrls/search"))
+            )));
     }
 
 }
