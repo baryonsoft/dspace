@@ -25,7 +25,6 @@ import edu.harvard.hul.ois.mets.Name;
 import edu.harvard.hul.ois.mets.Role;
 import edu.harvard.hul.ois.mets.StructMap;
 import edu.harvard.hul.ois.mets.Type;
-import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.PCData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -82,8 +81,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @see AbstractPackageDisseminator
  */
 public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceAIPDisseminator.class);
-
     /**
      * Unique identifier for the profile of the METS document.
      * To ensure uniqueness, it is the URL that the XML schema document would
@@ -91,32 +88,28 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      */
     public static final String PROFILE_1_0 =
         "http://www.dspace.org/schema/aip/mets_aip_1_0.xsd";
-
     /**
      * TYPE of the div containing AIP's parent handle in its mptr.
      */
     public static final String PARENT_DIV_TYPE = "AIP Parent Link";
-
     // Default MDTYPE value for deposit license -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
     protected static final String DSPACE_DEPOSIT_LICENSE_MDTYPE =
         "DSpaceDepositLicense:DSPACE_DEPLICENSE";
-
     // Default MDTYPE value for CC license in RDF -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
     protected static final String CREATIVE_COMMONS_RDF_MDTYPE =
         "CreativeCommonsRDF:DSPACE_CCRDF";
-
     // Default MDTYPE value for CC license in Text -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
     protected static final String CREATIVE_COMMONS_TEXT_MDTYPE =
         "CreativeCommonsText:DSPACE_CCTXT";
-
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceAIPDisseminator.class);
     // dissemination parameters passed to the AIP Disseminator
     protected PackageParameters disseminateParams = null;
 
     // List of Bundles to filter on, when building AIP
-    protected List<String> filterBundles = new ArrayList<String>();
+    protected List<String> filterBundles = new ArrayList<>();
     // Whether 'filterBundles' specifies an exclusion list (default) or inclusion list.
     protected boolean excludeBundles = true;
 
@@ -148,11 +141,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
 
             //check when this item was last modified.
             Item i = (Item) dso;
-            if (i.getLastModified().after(afterDate)) {
-                disseminate = true;
-            } else {
-                disseminate = false;
-            }
+            disseminate = i.getLastModified().after(afterDate);
         }
 
         if (disseminate) {
@@ -176,6 +165,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      * For AIP the mapping is direct.
      *
      * @param bname name of DSpace bundle.
+     *
      * @return string name of fileGrp
      */
     @Override
@@ -193,7 +183,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      * @param context DSpace Context
      * @param dso     current DSpace Object
      * @param params  Packager Parameters
+     *
      * @return List of crosswalk names to run
+     *
      * @throws SQLException if error
      */
     @Override
@@ -228,7 +220,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
         agentCreator.setOTHERTYPE("DSpace Software");
         Name creatorName = new Name();
         creatorName.getContent()
-                   .add(new PCData("DSpace " + Util.getSourceVersion()));
+            .add(new PCData("DSpace " + Util.getSourceVersion()));
         agentCreator.getContent().add(creatorName);
         metsHdr.getContent().add(agentCreator);
 
@@ -244,14 +236,11 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      * @param context DSpace Context
      * @param dso     current DSpace Object
      * @param params  Packager Parameters
+     *
      * @return List of crosswalk names to run
-     * @throws SQLException       if database error
-     * @throws IOException        if IO error
-     * @throws AuthorizeException if authorization error
      */
     @Override
-    public String[] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
-        throws SQLException, IOException, AuthorizeException {
+    public String[] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params) {
         String[] dmdTypes = configurationService.getArrayProperty("aip.disseminate.dmd");
         if (ArrayUtils.isEmpty(dmdTypes)) {
             return new String[] {"MODS", "DIM"};
@@ -269,14 +258,11 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      * @param context DSpace Context
      * @param dso     current DSpace Object
      * @param params  Packager Parameters
+     *
      * @return List of crosswalk names to run
-     * @throws SQLException       if database error
-     * @throws IOException        if IO error
-     * @throws AuthorizeException if authorization error
      */
     @Override
-    public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
-        throws SQLException, IOException, AuthorizeException {
+    public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params) {
         String[] techTypes = configurationService.getArrayProperty("aip.disseminate.techMD");
         if (ArrayUtils.isEmpty(techTypes)) {
             if (dso.getType() == Constants.BITSTREAM) {
@@ -302,14 +288,11 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      * @param context DSpace Context
      * @param dso     current DSpace Object
      * @param params  Packager Parameters
+     *
      * @return List of crosswalk names to run
-     * @throws SQLException       if database error
-     * @throws IOException        if IO error
-     * @throws AuthorizeException if authorization error
      */
     @Override
-    public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
-        throws SQLException, IOException, AuthorizeException {
+    public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params) {
         String[] sourceTypes = configurationService.getArrayProperty("aip.disseminate.sourceMD");
         if (ArrayUtils.isEmpty(sourceTypes)) {
             return new String[] {"AIP-TECHMD"};
@@ -327,14 +310,11 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      * @param context DSpace Context
      * @param dso     current DSpace Object
      * @param params  Packager Parameters
+     *
      * @return List of crosswalk names to run
-     * @throws SQLException       if database error
-     * @throws IOException        if IO error
-     * @throws AuthorizeException if authorization error
      */
     @Override
-    public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params)
-        throws SQLException, IOException, AuthorizeException {
+    public String[] getDigiprovMdTypes(Context context, DSpaceObject dso, PackageParameters params) {
         String[] dpTypes = configurationService.getArrayProperty("aip.disseminate.digiprovMD");
         if (ArrayUtils.isEmpty(dpTypes)) {
             return new String[0];
@@ -347,13 +327,15 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      * Return the name of all crosswalks to run for the rightsMD section of
      * the METS Manifest.
      * <p>
-     * By default, Deposit Licenses and CC Licenses will be added for Items.
+     * By default, Deposit Licences and CC Licences will be added for Items.
      * Also, by default METSRights info will be added for all objects.
      *
      * @param context DSpace Context
      * @param dso     current DSpace Object
      * @param params  Packager Parameters
+     *
      * @return List of crosswalk names to run
+     *
      * @throws SQLException       if database error
      * @throws IOException        if IO error
      * @throws AuthorizeException if authorization error
@@ -362,12 +344,12 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
     public String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException {
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         String[] rTypes = configurationService.getArrayProperty("aip.disseminate.rightsMD");
 
         //If unspecified in configuration file, add default settings
         if (ArrayUtils.isEmpty(rTypes)) {
-            // Licenses only apply to an Item
+            // Licences only apply to an Item
             if (dso.getType() == Constants.ITEM) {
                 //By default, disseminate Deposit License, and any CC Licenses
                 // to an item's rightsMD section
@@ -388,7 +370,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
             return rTypes;
         }
 
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
 
@@ -414,15 +396,13 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      * @param dso     Current DSpace object
      * @param params  Packager Parameters
      * @param mets    METS manifest
-     * @throws SQLException       if database error
-     * @throws IOException        if IO error
-     * @throws AuthorizeException if authorization error
-     * @throws MetsException      METS Java toolkit exception class.
+     *
+     * @throws SQLException if database error
      */
     @Override
     public void addStructMap(Context context, DSpaceObject dso,
                              PackageParameters params, Mets mets)
-        throws SQLException, IOException, AuthorizeException, MetsException {
+        throws SQLException {
         // find parent Handle
         String parentHandle = null;
         switch (dso.getType()) {
@@ -441,8 +421,6 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
                 } else {
                     parentHandle = parents.get(0).getHandle();
                 }
-                break;
-            case Constants.SITE:
                 break;
             default:
                 break;
@@ -477,6 +455,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
      * bundle is in that list.  If it is, return true.  If it is not, return false.
      *
      * @param bundle Bundle to check for
+     *
      * @return true if bundle should be disseminated when disseminating Item AIPs
      */
     @Override
@@ -491,7 +470,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
             boolean inList = filterBundles.contains(bundle.getName());
             //Based on whether this is an inclusion or exclusion filter,
             //return whether this bundle should be included.
-            return this.excludeBundles ? !inList : inList;
+            return this.excludeBundles != inList;
         }
     }
 

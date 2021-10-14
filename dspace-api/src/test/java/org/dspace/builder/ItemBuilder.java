@@ -174,7 +174,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
      * @return this builder
      */
     public ItemBuilder withAdminUser(EPerson ePerson) throws SQLException, AuthorizeException {
-        return setAdminPermission(item, ePerson, null);
+        return setAdminPermission(item, ePerson);
     }
 
     @Override

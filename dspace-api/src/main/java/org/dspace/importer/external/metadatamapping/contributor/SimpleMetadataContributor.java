@@ -29,9 +29,6 @@ public class SimpleMetadataContributor implements MetadataContributor<PlainMetad
 
     private String key;
 
-    private MetadataFieldMapping<PlainMetadataSourceDto,
-        MetadataContributor<PlainMetadataSourceDto>> metadataFieldMapping;
-
     public SimpleMetadataContributor(MetadataFieldConfig field, String key) {
         this.field = field;
         this.key = key;
@@ -48,7 +45,6 @@ public class SimpleMetadataContributor implements MetadataContributor<PlainMetad
     public void setMetadataFieldMapping(
         MetadataFieldMapping<PlainMetadataSourceDto,
         MetadataContributor<PlainMetadataSourceDto>> metadataFieldMapping) {
-        this.metadataFieldMapping = metadataFieldMapping;
     }
 
     /**

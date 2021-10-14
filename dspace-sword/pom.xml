@@ -121,10 +121,10 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
-	<dependency>
+        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-web</artifactId>
-	</dependency>
+        </dependency>
 
         <dependency>
             <groupId>xom</groupId>

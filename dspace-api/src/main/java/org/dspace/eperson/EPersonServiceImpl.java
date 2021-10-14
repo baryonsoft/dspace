@@ -343,7 +343,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                             }
                         }
                     } else if (StringUtils.equals(tableName, "resourcepolicy")) {
-                        // we delete the EPerson, it won't need any rights anymore.
+                        // we delete the EPerson, it won't need any rights any more.
                         authorizeService.removeAllEPersonPolicies(context, ePerson);
                     } else if (StringUtils.equals(tableName, "cwf_pooltask")) {
                         PoolTaskService poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
