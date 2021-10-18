@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.5
 
       - name: Docker meta
         id: meta
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-18.04
     needs: docker-build
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.5
       - name: Get SENTRY_RELEASE
         run: |
           echo "SENTRY_RELEASE=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
