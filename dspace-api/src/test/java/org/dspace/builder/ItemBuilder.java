@@ -44,6 +44,26 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return builder.create(context, col);
     }
 
+    /**
+     * Delete the Test Item referred to by the given UUID
+     *
+     * @param uuid UUID of Test Item to delete
+     */
+    public static void deleteItem(UUID uuid) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Item item = itemService.find(c, uuid);
+            if (item != null) {
+                try {
+                    itemService.delete(c, item);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
+        }
+    }
+
     private ItemBuilder create(final Context context, final Collection col) {
         this.context = context;
 
@@ -63,7 +83,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withIssueDate(final String issueDate) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(),
-                                "date", "issued", new DCDate(issueDate).toString());
+            "date", "issued", new DCDate(issueDate).toString());
     }
 
     public ItemBuilder withIdentifierOther(final String identifierOther) {
@@ -73,9 +93,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     public ItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
+
     public ItemBuilder withAuthor(final String authorName, final String authority, final int confidence) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author",
-                                null, authorName, authority, confidence);
+            null, authorName, authority, confidence);
     }
 
     public ItemBuilder withPersonIdentifierFirstName(final String personIdentifierFirstName) {
@@ -92,7 +113,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withSubject(final String subject, final String authority, final int confidence) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "subject", null, null,
-                                subject, authority, confidence);
+            subject, authority, confidence);
     }
 
     public ItemBuilder withType(final String type) {
@@ -140,7 +161,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     public ItemBuilder withMetadata(final String schema, final String element, final String qualifier,
-        final String value) {
+                                    final String value) {
         return addMetadataValue(item, schema, element, qualifier, value);
     }
 
@@ -180,7 +201,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setAdminPermission(item, ePerson, null);
     }
 
-
     @Override
     public Item build() {
         try {
@@ -207,39 +227,20 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     @Override
     public void cleanup() throws Exception {
-       try (Context c = new Context()) {
+        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             item = c.reloadEntity(item);
             if (item != null) {
-                 delete(c, item);
-                 c.complete();
+                delete(c, item);
+                c.complete();
             }
-       }
+        }
     }
 
     @Override
     protected DSpaceObjectService<Item> getService() {
         return itemService;
-    }
-
-    /**
-     * Delete the Test Item referred to by the given UUID
-     * @param uuid UUID of Test Item to delete
-     */
-    public static void deleteItem(UUID uuid) throws SQLException, IOException {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            Item item = itemService.find(c, uuid);
-            if (item != null) {
-                try {
-                    itemService.delete(c, item);
-                } catch (AuthorizeException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            c.complete();
-        }
     }
 
 }

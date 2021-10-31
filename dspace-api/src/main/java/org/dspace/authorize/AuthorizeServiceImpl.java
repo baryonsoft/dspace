@@ -9,7 +9,6 @@ package org.dspace.authorize;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -63,19 +62,19 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
     private static final Logger log = LogManager.getLogger();
 
-    @Autowired(required = true)
+    @Autowired()
     protected BitstreamService bitstreamService;
-    @Autowired(required = true)
+    @Autowired()
     protected ContentServiceFactory serviceFactory;
-    @Autowired(required = true)
+    @Autowired()
     protected GroupService groupService;
-    @Autowired(required = true)
+    @Autowired()
     protected ResourcePolicyService resourcePolicyService;
-    @Autowired(required = true)
+    @Autowired()
     protected WorkspaceItemService workspaceItemService;
-    @Autowired(required = true)
+    @Autowired()
     protected WorkflowItemService workflowItemService;
-    @Autowired(required = true)
+    @Autowired()
     private SearchService searchService;
 
 
@@ -99,6 +98,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             }
         }
 
+        assert ex != null;
         throw ex;
     }
 
@@ -164,8 +164,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             }
 
             throw new AuthorizeException("Authorization denied for action "
-                                             + actionText + " on " + Constants.typeText[otype] + ":"
-                                             + oid + " by user " + userid, o, action);
+                + actionText + " on " + Constants.typeText[otype] + ":"
+                + oid + " by user " + userid, o, action);
         }
     }
 
@@ -223,8 +223,10 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @param e              user attempting action
      * @param useInheritance flag to say if ADMIN action on the current object or parent
      *                       object can be used
+     *
      * @return <code>true</code> if user is authorized to perform the given
      * action, <code>false</code> otherwise
+     *
      * @throws SQLException if database error
      */
     protected boolean authorize(Context c, DSpaceObject o, int action, EPerson e, boolean useInheritance)
@@ -272,13 +274,13 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             }
         }
         if (o instanceof Bundle) {
-            ignoreCustomPolicies = !isAnyItemInstalled(c, Arrays.asList(((Bundle) o)));
+            ignoreCustomPolicies = !isAnyItemInstalled(c, List.of(((Bundle) o)));
         }
         if (o instanceof Item) {
             // the isArchived check is fast and would exclude the possibility that the item
             // is a workspace or workflow without further queries
             if (!((Item) o).isArchived() &&
-                    (workspaceItemService.findByItem(c, (Item) o) != null ||
+                (workspaceItemService.findByItem(c, (Item) o) != null ||
                     workflowItemService.findByItem(c, (Item) o) != null)) {
                 ignoreCustomPolicies = true;
             }
@@ -322,7 +324,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (e != null) {
             // if user is an Admin on this object
             DSpaceObject adminObject = useInheritance ? serviceFactory.getDSpaceObjectService(o)
-                                                                      .getAdminObject(c, o, action) : null;
+                .getAdminObject(c, o, action) : null;
 
             if (isAdmin(c, e, adminObject)) {
                 c.cacheAuthorizedAction(o, action, e, true, null);
@@ -650,6 +652,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      * @param reason           embargo reason
      * @param dso              DSpace object
      * @param owningCollection collection to get group policies from
+     *
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
@@ -658,7 +661,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                           String reason, DSpaceObject dso, Collection owningCollection)
         throws SQLException, AuthorizeException {
 
-        if (embargoDate != null || (embargoDate == null && dso instanceof Bitstream)) {
+        if (embargoDate != null || dso instanceof Bitstream) {
 
             List<Group> authorizedGroups = getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_ITEM_READ);
 
@@ -675,7 +678,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 // add policies for all the groups
                 for (Group g : authorizedGroups) {
                     ResourcePolicy rp = createOrModifyPolicy(null, context, null, g, null, embargoDate, Constants.READ,
-                                                             reason, dso);
+                        reason, dso);
                     if (rp != null) {
                         resourcePolicyService.update(context, rp);
                     }
@@ -684,8 +687,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             } else {
                 // add policy just for anonymous
                 ResourcePolicy rp = createOrModifyPolicy(null, context, null,
-                                                         groupService.findByName(context, Group.ANONYMOUS), null,
-                                                         embargoDate, Constants.READ, reason, dso);
+                    groupService.findByName(context, Group.ANONYMOUS), null,
+                    embargoDate, Constants.READ, reason, dso);
                 if (rp != null) {
                     resourcePolicyService.update(context, rp);
                 }
@@ -771,9 +774,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     /**
      * Checks that the context's current user is a community admin in the site by querying the solr database.
      *
-     * @param context   context with the current user
-     * @return          true if the current user is a community admin in the site
-     *                  false when this is not the case, or an exception occurred
+     * @param context context with the current user
+     *
+     * @return true if the current user is a community admin in the site
+     * false when this is not the case, or an exception occurred
+     *
      * @throws java.sql.SQLException passed through.
      */
     @Override
@@ -784,9 +789,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     /**
      * Checks that the context's current user is a collection admin in the site by querying the solr database.
      *
-     * @param context   context with the current user
-     * @return          true if the current user is a collection admin in the site
-     *                  false when this is not the case, or an exception occurred
+     * @param context context with the current user
+     *
+     * @return true if the current user is a collection admin in the site
+     * false when this is not the case, or an exception occurred
+     *
      * @throws java.sql.SQLException passed through.
      */
     @Override
@@ -797,9 +804,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     /**
      * Checks that the context's current user is a community or collection admin in the site.
      *
-     * @param context   context with the current user
-     * @return          true if the current user is a community or collection admin in the site
-     *                  false when this is not the case, or an exception occurred
+     * @param context context with the current user
+     *
+     * @return true if the current user is a community or collection admin in the site
+     * false when this is not the case, or an exception occurred
+     *
      * @throws java.sql.SQLException passed through.
      */
     @Override
@@ -810,14 +819,14 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     /**
-     *  Finds communities for which the logged in user has ADMIN rights.
+     * Finds communities for which the logged-in user has ADMIN rights.
      *
-     * @param context   the context whose user is checked against
-     * @param query     the optional extra query
-     * @param offset    the offset for pagination
-     * @param limit     the amount of dso's to return
-     * @return          a list of communities for which the logged in user has ADMIN rights.
-     * @throws SearchServiceException
+     * @param context the context whose user is checked against
+     * @param query   the optional extra query
+     * @param offset  the offset for pagination
+     * @param limit   the amount of dso's to return
+     *
+     * @return a list of communities for which the logged-in user has ADMIN rights.
      */
     @Override
     public List<Community> findAdminAuthorizedCommunity(Context context, String query, int offset, int limit)
@@ -825,7 +834,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         List<Community> communities = new ArrayList<>();
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCommunity.TYPE,
+                IndexableCommunity.TYPE,
             offset, limit);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Community community = ((IndexableCommunity) solrCollections).getIndexedObject();
@@ -835,32 +844,32 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     /**
-     *  Finds the amount of communities for which the logged in user has ADMIN rights.
+     * Finds the amount of communities for which the logged-in user has ADMIN rights.
      *
-     * @param context   the context whose user is checked against
-     * @param query     the optional extra query
-     * @return          the number of communities for which the logged in user has ADMIN rights.
-     * @throws SearchServiceException
+     * @param context the context whose user is checked against
+     * @param query   the optional extra query
+     *
+     * @return the number of communities for which the logged-in user has ADMIN rights.
      */
     @Override
     public long countAdminAuthorizedCommunity(Context context, String query)
         throws SearchServiceException, SQLException {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCommunity.TYPE,
+                IndexableCommunity.TYPE,
             null, null);
         return discoverResult.getTotalSearchResults();
     }
 
     /**
-     *  Finds collections for which the logged in user has ADMIN rights.
+     * Finds collections for which the logged in user has ADMIN rights.
      *
-     * @param context   the context whose user is checked against
-     * @param query     the optional extra query
-     * @param offset    the offset for pagination
-     * @param limit     the amount of dso's to return
-     * @return          a list of collections for which the logged in user has ADMIN rights.
-     * @throws SearchServiceException
+     * @param context the context whose user is checked against
+     * @param query   the optional extra query
+     * @param offset  the offset for pagination
+     * @param limit   the amount of dso's to return
+     *
+     * @return a list of collections for which the logged in user has ADMIN rights.
      */
     @Override
     public List<Collection> findAdminAuthorizedCollection(Context context, String query, int offset, int limit)
@@ -872,7 +881,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCollection.TYPE,
+                IndexableCollection.TYPE,
             offset, limit);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
@@ -882,19 +891,19 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     /**
-     *  Finds the amount of collections for which the logged in user has ADMIN rights.
+     * Finds the amount of collections for which the logged in user has ADMIN rights.
      *
-     * @param context   the context whose user is checked against
-     * @param query     the optional extra query
-     * @return          the number of collections for which the logged in user has ADMIN rights.
-     * @throws SearchServiceException
+     * @param context the context whose user is checked against
+     * @param query   the optional extra query
+     *
+     * @return the number of collections for which the logged in user has ADMIN rights.
      */
     @Override
     public long countAdminAuthorizedCollection(Context context, String query)
         throws SearchServiceException, SQLException {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
-                                                              IndexableCollection.TYPE,
+                IndexableCollection.TYPE,
             null, null);
         return discoverResult.getTotalSearchResults();
     }
@@ -942,7 +951,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         StringBuilder groupQuery = new StringBuilder();
 
         if (groups != null) {
-            for (Group group: groups) {
+            for (Group group : groups) {
                 groupQuery.append(" OR admin:g");
                 groupQuery.append(group.getID());
             }

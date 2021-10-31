@@ -27,12 +27,10 @@ import org.dspace.event.Event;
 public class IIIFCacheEventConsumer implements Consumer {
 
     private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFCacheEventConsumer.class);
-
-    // When true all entries will be cleared from cache.
-    private boolean clearAll = false;
-
     // Collects modified items for individual removal from cache.
     private final Set<DSpaceObject> toEvictFromManifestCache = new HashSet<>();
+    // When true all entries will be cleared from cache.
+    private boolean clearAll = false;
 
     @Override
     public void initialize() throws Exception {
@@ -74,7 +72,7 @@ public class IIIFCacheEventConsumer implements Consumer {
                 clearAll = true;
             }
 
-            if ((et == Event.ADD || et == Event.MODIFY_METADATA  ) && subject != null) {
+            if ((et == Event.ADD || et == Event.MODIFY_METADATA) && subject != null) {
                 // set subject to be the parent Item.
                 Bundle bundle = ((Bitstream) subject).getBundles().get(0);
                 subject = bundle.getItems().get(0);
@@ -94,17 +92,9 @@ public class IIIFCacheEventConsumer implements Consumer {
 
         switch (et) {
             case Event.ADD:
-                toEvictFromManifestCache.add(subject);
-                break;
             case Event.MODIFY:
-                toEvictFromManifestCache.add(subject);
-                break;
             case Event.MODIFY_METADATA:
-                toEvictFromManifestCache.add(subject);
-                break;
             case Event.REMOVE:
-                toEvictFromManifestCache.add(subject);
-                break;
             case Event.DELETE:
                 toEvictFromManifestCache.add(subject);
                 break;
