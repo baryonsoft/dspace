@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -147,9 +147,7 @@ public class DSpaceCSV implements Serializable {
         init();
 
         // Open the CSV file
-        BufferedReader input = null;
-        try {
-            input = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        try (BufferedReader input = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
             // Read the heading line
             String head = input.readLine();
@@ -167,7 +165,7 @@ public class DSpaceCSV implements Serializable {
                 if ("collection".equals(element)) {
                     // Store the heading
                     headings.add(element);
-                }   else if ("rowName".equals(element)) {
+                } else if ("rowName".equals(element)) {
                     // Store the heading
                     headings.add(element);
                 } else if ("action".equals(element)) { // Store the action
@@ -191,8 +189,8 @@ public class DSpaceCSV implements Serializable {
 
                     if (parts.length < 2) {
                         throw new MetadataImportInvalidHeadingException(element,
-                                                                        MetadataImportInvalidHeadingException.ENTRY,
-                                                                        columnCounter);
+                            MetadataImportInvalidHeadingException.ENTRY,
+                            columnCounter);
                     }
 
                     String metadataSchema = parts[0];
@@ -207,9 +205,9 @@ public class DSpaceCSV implements Serializable {
                         MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
                         if (foundSchema == null) {
                             throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                            MetadataImportInvalidHeadingException
-                                                                                .SCHEMA,
-                                                                            columnCounter);
+                                MetadataImportInvalidHeadingException
+                                    .SCHEMA,
+                                columnCounter);
                         }
 
                         // Check that the metadata element exists in the schema
@@ -217,9 +215,9 @@ public class DSpaceCSV implements Serializable {
                             .findByElement(c, foundSchema, metadataElement, metadataQualifier);
                         if (foundField == null) {
                             throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                            MetadataImportInvalidHeadingException
-                                                                                .ELEMENT,
-                                                                            columnCounter);
+                                MetadataImportInvalidHeadingException
+                                    .ELEMENT,
+                                columnCounter);
                         }
                     }
 
@@ -271,10 +269,6 @@ public class DSpaceCSV implements Serializable {
                     addItem(lineRead);
                 }
             }
-        } finally {
-            if (input != null) {
-                input.close();
-            }
         }
     }
 
@@ -322,7 +316,7 @@ public class DSpaceCSV implements Serializable {
     /**
      * Decide if this CSV file has an 'action' (case-dependent!) header.
      *
-     * @return Whether or not there is an 'action' header
+     * @return Whether there is an 'action' header
      */
     public boolean hasActions() {
         // Look for a heading called 'action'
@@ -352,7 +346,7 @@ public class DSpaceCSV implements Serializable {
         }
 
         // Now store the escaped version
-        Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
+        Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}$.?^|])");
         Matcher match = spchars.matcher(valueSeparator);
         escapedValueSeparator = match.replaceAll("\\\\$1");
     }
@@ -373,21 +367,26 @@ public class DSpaceCSV implements Serializable {
                                               .getProperty("bulkedit.fieldseparator");
         if ((fieldSeparator != null) && !fieldSeparator.trim().isEmpty()) {
             fieldSeparator = fieldSeparator.trim();
-            if ("tab".equals(fieldSeparator)) {
-                fieldSeparator = "\t";
-            } else if ("semicolon".equals(fieldSeparator)) {
-                fieldSeparator = ";";
-            } else if ("hash".equals(fieldSeparator)) {
-                fieldSeparator = "#";
-            } else {
-                fieldSeparator = fieldSeparator.trim();
+            switch (fieldSeparator) {
+                case "tab":
+                    fieldSeparator = "\t";
+                    break;
+                case "semicolon":
+                    fieldSeparator = ";";
+                    break;
+                case "hash":
+                    fieldSeparator = "#";
+                    break;
+                default:
+                    fieldSeparator = fieldSeparator.trim();
+                    break;
             }
         } else {
             fieldSeparator = ",";
         }
 
         // Now store the escaped version
-        Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
+        Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}$.?^|])");
         Matcher match = spchars.matcher(fieldSeparator);
         escapedFieldSeparator = match.replaceAll("\\\\$1");
     }
@@ -410,7 +409,7 @@ public class DSpaceCSV implements Serializable {
         }
 
         // Now store the escaped version
-        Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
+        Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}$.?^|])");
         Matcher match = spchars.matcher(authoritySeparator);
         escapedAuthoritySeparator = match.replaceAll("\\\\$1");
     }
@@ -422,7 +421,7 @@ public class DSpaceCSV implements Serializable {
      * @throws Exception if something goes wrong with adding the Item
      */
     public final void addItem(Item i) throws Exception {
-        // If the item does not have an "owningCollection" the the below "getHandle()" call will fail
+        // If the item does not have an "owningCollection" the below "getHandle()" call will fail
         // This should not happen but is here for safety.
         if (i.getOwningCollection() == null) {
             return;
@@ -457,7 +456,7 @@ public class DSpaceCSV implements Serializable {
                 key = key + "." + metadataField.getQualifier();
             }
 
-            // Add the language if there is one (schema.element.qualifier[langauge])
+            // Add the language if there is one (schema.element.qualifier[language])
             //if ((value.language != null) && (!"".equals(value.language)))
             if (value.getLanguage() != null) {
                 key = key + "[" + value.getLanguage() + "]";
@@ -498,17 +497,16 @@ public class DSpaceCSV implements Serializable {
 
         // Split up on field separator
         String[] parts = line.split(escapedFieldSeparator);
-        ArrayList<String> bits = new ArrayList<>();
-        bits.addAll(Arrays.asList(parts));
+        ArrayList<String> bits = new ArrayList<>(Arrays.asList(parts));
 
         // Merge parts with embedded separators
-        boolean alldone = false;
-        while (!alldone) {
+        boolean allDone = false;
+        while (!allDone) {
             boolean found = false;
             int i = 0;
             for (String part : bits) {
-                int bitcounter = part.length() - part.replaceAll("\"", "").length();
-                if (part.startsWith("\"") && (!part.endsWith("\"") || ((bitcounter & 1) == 1))) {
+                int bitCounter = part.length() - part.replaceAll("\"", "").length();
+                if (part.startsWith("\"") && (!part.endsWith("\"") || ((bitCounter & 1) == 1))) {
                     found = true;
                     String add = bits.get(i) + fieldSeparator + bits.get(i + 1);
                     bits.remove(i);
@@ -518,7 +516,7 @@ public class DSpaceCSV implements Serializable {
                 }
                 i++;
             }
-            alldone = !found;
+            allDone = !found;
         }
 
         // Deal with quotes around the elements
@@ -636,12 +634,12 @@ public class DSpaceCSV implements Serializable {
 
     /**
      * Is it okay to export this value? When exportAll is set to false, we don't export
-     * some of the metadata elements.
-     *
+     * some metadata elements.
+     * <p>
      * The list can be configured via the key ignore-on-export in {@code bulkedit.cfg}.
      *
      * @param md The MetadataField to examine
-     * @return Whether or not it is OK to export this element
+     * @return Whether it is OK to export this element
      */
     protected boolean okToExport(MetadataField md) {
         // Now compare with the list to ignore

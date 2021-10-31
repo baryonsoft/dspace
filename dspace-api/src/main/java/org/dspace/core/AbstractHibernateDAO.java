@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -28,8 +28,9 @@ import org.hibernate.Session;
  * Hibernate calls that are commonly used.
  * Each DAO should extend this class to prevent code duplication.
  *
- * @author kevinvandevelde at atmire.com
  * @param <T> class type
+ *
+ * @author kevinvandevelde at atmire.com
  */
 public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
@@ -48,13 +49,13 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         //Isn't required, is just here for other DB implementation. Hibernate auto keeps track of changes.
     }
 
-   /**
-    * The Session used to manipulate entities of this type.
-    *
-    * @param context current DSpace context.
-    * @return the current Session.
-    * @throws SQLException
-    */
+    /**
+     * The Session used to manipulate entities of this type.
+     *
+     * @param context current DSpace context.
+     *
+     * @return the current Session.
+     */
     protected Session getHibernateSession(Context context) throws SQLException {
         return ((Session) context.getDBConnection().getSession());
     }
@@ -112,14 +113,12 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * Execute a JPA Criteria query and return a collection of results.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param query
-     *     JPQL query string
+     * @param context The relevant DSpace Context.
+     * @param query   JPQL query string
+     *
      * @return list of DAOs specified by the query string
-     * @throws SQLException if database error
      */
-    public List<T> findMany(Context context, Query query) throws SQLException {
+    public List<T> findMany(Context context, Query query) {
         @SuppressWarnings("unchecked")
         List<T> result = (List<T>) query.getResultList();
         return result;
@@ -130,8 +129,8 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      *
      * @param context current DSpace context.
      * @param query   textual form of the query.
+     *
      * @return parsed form of the query.
-     * @throws SQLException
      */
     public Query createQuery(Context context, String query) throws SQLException {
         return getHibernateSession(context).createQuery(query);
@@ -140,20 +139,14 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * This method will return a list with unique results, no duplicates, made by the given CriteriaQuery and parameters
      *
-     * @param context
-     *         The standard DSpace context object
-     * @param criteriaQuery
-     *         The CriteriaQuery for which this list will be retrieved
-     * @param cacheable
-     *         Whether or not this query should be cacheable
-     * @param clazz
-     *         The class for which this CriteriaQuery will be executed on
-     * @param maxResults
-     *         The maximum amount of results that will be returned for this CriteriaQuery
-     * @param offset
-     *         The offset to be used for the CriteriaQuery
+     * @param context       The standard DSpace context object
+     * @param criteriaQuery The CriteriaQuery for which this list will be retrieved
+     * @param cacheable     Whether this query should be cacheable
+     * @param clazz         The class for which this CriteriaQuery will be executed on
+     * @param maxResults    The maximum amount of results that will be returned for this CriteriaQuery
+     * @param offset        The offset to be used for the CriteriaQuery
+     *
      * @return A list of distinct results as depicted by the CriteriaQuery and parameters
-     * @throws SQLException
      */
     public List<T> list(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults,
                         int offset) throws SQLException {
@@ -166,22 +159,15 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * This method will return a list of results for the given CriteriaQuery and parameters
      *
-     * @param context
-     *         The standard DSpace context object
-     * @param criteriaQuery
-     *         The CriteriaQuery to be used to find the list of results
-     * @param cacheable
-     *         A boolean value indicating whether this query should be cached or not
-     * @param clazz
-     *         The class on which the CriteriaQuery will search
-     * @param maxResults
-     *         The maximum amount of results to be returned
-     * @param offset
-     *         The offset to be used for the CriteriaQuery
-     * @param distinct
-     *         A boolean value indicating whether this list should be distinct or not
+     * @param context       The standard DSpace context object
+     * @param criteriaQuery The CriteriaQuery to be used to find the list of results
+     * @param cacheable     A boolean value indicating whether this query should be cached or not
+     * @param clazz         The class on which the CriteriaQuery will search
+     * @param maxResults    The maximum amount of results to be returned
+     * @param offset        The offset to be used for the CriteriaQuery
+     * @param distinct      A boolean value indicating whether this list should be distinct or not
+     *
      * @return A list of results determined by the CriteriaQuery and parameters
-     * @throws SQLException
      */
     public List<T> list(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults,
                         int offset, boolean distinct) throws SQLException {
@@ -194,8 +180,8 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * This method will be used to return a list of results for the given query
      *
-     * @param query
-     *         The query for which the resulting list will be returned
+     * @param query The query for which the resulting list will be returned
+     *
      * @return The list of results for the given query
      */
     public List<T> list(Query query) {
@@ -224,17 +210,20 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * Retrieve a unique result from the query.  If multiple results CAN be
      * retrieved an exception will be thrown, so only use when the criteria
      * state uniqueness in the database.
-     * @param context current DSpace session.
+     *
+     * @param context       current DSpace session.
      * @param criteriaQuery JPA criteria
-     * @param cacheable whether or not this query should be cacheable.
-     * @param clazz type of object that should match the query.
+     * @param cacheable     whether this query should be cacheable.
+     * @param clazz         type of object that should match the query.
+     *
      * @return the single model object specified by the criteria,
-     *          or {@code null} if none match.
-     * @throws java.sql.SQLException passed through.
+     * or {@code null} if none match.
+     *
+     * @throws java.sql.SQLException    passed through.
      * @throws IllegalArgumentException if multiple objects match.
      */
     public T uniqueResult(Context context, CriteriaQuery criteriaQuery,
-            boolean cacheable, Class<T> clazz) throws SQLException {
+                          boolean cacheable, Class<T> clazz) throws SQLException {
         List<T> list = list(context, criteriaQuery, cacheable, clazz, -1, -1);
         if (CollectionUtils.isNotEmpty(list)) {
             if (list.size() == 1) {
@@ -250,9 +239,12 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * Retrieve a single result from the query.  Best used if you expect a
      * single result, but this isn't enforced on the database.
-     * @param context current DSpace session
+     *
+     * @param context       current DSpace session
      * @param criteriaQuery JPA criteria
+     *
      * @return a DAO specified by the criteria
+     *
      * @throws java.sql.SQLException passed through.
      */
     public T singleResult(Context context, CriteriaQuery criteriaQuery) throws SQLException {
@@ -264,8 +256,8 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * This method will return the first result from the given query or null if no results were found
      *
-     * @param query
-     *         The query that is to be executed
+     * @param query The query that is to be executed
+     *
      * @return One result from the given query or null if none was found
      */
     public T singleResult(final Query query) {
@@ -282,8 +274,8 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * This method will return a singular result for the given query
      *
-     * @param query
-     *         The query for which a single result will be given
+     * @param query The query for which a single result will be given
+     *
      * @return The single result for this query
      */
     public T uniqueResult(Query query) {
@@ -295,20 +287,20 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * This method will return an Iterator for the given Query
      *
-     * @param query
-     *         The query for which an Iterator will be made
+     * @param query The query for which an Iterator will be made
+     *
      * @return The Iterator for the results of this query
      */
     public Iterator<T> iterate(Query query) {
-        @SuppressWarnings("unchecked")
-        org.hibernate.query.Query hquery = query.unwrap(org.hibernate.query.Query.class);
-        Stream<T> stream = hquery.stream();
+        org.hibernate.query.Query hQuery = query.unwrap(org.hibernate.query.Query.class);
+        Stream<T> stream = hQuery.stream();
         Iterator<T> iter = stream.iterator();
-        return new AbstractIterator<T> () {
+        return new AbstractIterator<>() {
             @Override
             protected T computeNext() {
                 return iter.hasNext() ? iter.next() : endOfData();
             }
+
             @Override
             public void finalize() {
                 stream.close();
@@ -319,16 +311,12 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * This method will return the amount of results that would be generated for this CriteriaQuery as an integer
      *
-     * @param context
-     *         The standard DSpace Context object
-     * @param criteriaQuery
-     *         The CriteriaQuery for which this result will be retrieved
-     * @param criteriaBuilder
-     *         The CriteriaBuilder that accompanies the CriteriaQuery
-     * @param root
-     *         The root that'll determine on which class object we need to calculate the result
+     * @param context         The standard DSpace Context object
+     * @param criteriaQuery   The CriteriaQuery for which this result will be retrieved
+     * @param criteriaBuilder The CriteriaBuilder that accompanies the CriteriaQuery
+     * @param root            The root that'll determine on which class object we need to calculate the result
+     *
      * @return The amount of results that would be found by this CriteriaQuery as an integer value
-     * @throws SQLException
      */
     public int count(Context context, CriteriaQuery criteriaQuery, CriteriaBuilder criteriaBuilder, Root<T> root)
         throws SQLException {
@@ -337,10 +325,10 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     /**
      * This method will return the count of items for this query as an integer
-     * This query needs to already be in a formate that'll return one record that contains the amount
+     * This query needs to already be in a format that'll return one record that contains the amount
      *
-     * @param query
-     *         The query for which the amount of results will be returned.
+     * @param query The query for which the amount of results will be returned.
+     *
      * @return The amount of results
      */
     public int count(Query query) {
@@ -350,16 +338,12 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * This method will return the count of items for this query as a long
      *
-     * @param context
-     *         The standard DSpace Context object
-     * @param criteriaQuery
-     *         The CriteriaQuery for which the amount of results will be retrieved
-     * @param criteriaBuilder
-     *         The CriteriaBuilder that goes along with this CriteriaQuery
-     * @param root
-     *         The root created for a DSpace class on which this query will search
+     * @param context         The standard DSpace Context object
+     * @param criteriaQuery   The CriteriaQuery for which the amount of results will be retrieved
+     * @param criteriaBuilder The CriteriaBuilder that goes along with this CriteriaQuery
+     * @param root            The root created for a DSpace class on which this query will search
+     *
      * @return A long value that depicts the amount of results this query has found
-     * @throws SQLException
      */
     public long countLong(Context context, CriteriaQuery criteriaQuery, CriteriaBuilder criteriaBuilder, Root<T> root)
         throws SQLException {
@@ -372,10 +356,9 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * This method should always be used in order to retrieve the CriteriaQuery in order to
      * start creating a query that has to be executed
      *
-     * @param criteriaBuilder
-     *         The CriteriaBuilder for which this CriteriaQuery will be constructed
-     * @param clazz
-     *         The class that this CriteriaQuery will be constructed for
+     * @param criteriaBuilder The CriteriaBuilder for which this CriteriaQuery will be constructed
+     * @param clazz           The class that this CriteriaQuery will be constructed for
+     *
      * @return A CriteriaQuery on which a query can be built
      */
     public CriteriaQuery<T> getCriteriaQuery(CriteriaBuilder criteriaBuilder, Class<T> clazz) {
@@ -386,10 +369,9 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * This method should always be used in order to retrieve a CriteriaBuilder for the given context
      *
-     * @param context
-     *         The standard DSpace Context class for which a CriteriaBuilder will be made
+     * @param context The standard DSpace Context class for which a CriteriaBuilder will be made
+     *
      * @return A CriteriaBuilder that can be used to create the query
-     * @throws SQLException
      */
     public CriteriaBuilder getCriteriaBuilder(Context context) throws SQLException {
         return this.getHibernateSession(context).getCriteriaBuilder();
@@ -399,20 +381,15 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * This method will return a list of objects to be returned that match the given criteriaQuery and parameters.
      * The maxResults and offSet can be circumvented by entering the value -1 for them.
      *
-     * @param context
-     *         The standard context DSpace object
-     * @param criteriaQuery
-     *         The CriteriaQuery that will be used for executing the query
-     * @param cacheable
-     *         Whether or not this query is able to be cached
-     * @param maxResults
-     *         The maximum amount of results that this query will return
-     *         This can be circumvented by passing along -1 as the value
-     * @param offset
-     *         The offset to be used in this query
-     *         This can be circumvented by passing along -1 as the value
+     * @param context       The standard context DSpace object
+     * @param criteriaQuery The CriteriaQuery that will be used for executing the query
+     * @param cacheable     Whether this query is to be cached
+     * @param maxResults    The maximum amount of results that this query will return
+     *                      This can be circumvented by passing along -1 as the value
+     * @param offset        The offset to be used in this query
+     *                      This can be circumvented by passing along -1 as the value
+     *
      * @return This will return a list of objects that conform to the made query
-     * @throws SQLException
      */
     public List<T> executeCriteriaQuery(Context context, CriteriaQuery<T> criteriaQuery, boolean cacheable,
                                         int maxResults, int offset) throws SQLException {
@@ -433,21 +410,15 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * This method can be used to construct a query for which there needs to be a bunch of equal properties
      * These properties can be passed along in the equals hashmap
      *
-     * @param context
-     *         The standard DSpace context object
-     * @param clazz
-     *         The class on which the criteriaQuery will be built
-     * @param equals
-     *         A hashmap that can be used to store the String representation of the column
-     *         and the value that should match that in the DB
-     * @param cacheable
-     *         A boolean indicating whether this query should be cacheable or not
-     * @param maxResults
-     *         The max amount of results to be returned by this query
-     * @param offset
-     *         The offset to be used in this query
+     * @param context    The standard DSpace context object
+     * @param clazz      The class on which the criteriaQuery will be built
+     * @param equals     A hashmap that can be used to store the String representation of the column
+     *                   and the value that should match that in the DB
+     * @param cacheable  A boolean indicating whether this query should be cacheable or not
+     * @param maxResults The max amount of results to be returned by this query
+     * @param offset     The offset to be used in this query
+     *
      * @return Will return a list of objects that correspond with the constructed query and parameters
-     * @throws SQLException
      */
     public List<T> findByX(Context context, Class clazz, Map<String, Object> equals, boolean cacheable, int maxResults,
                            int offset) throws SQLException {

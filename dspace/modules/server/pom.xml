@@ -1,20 +1,22 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace.modules</groupId>
     <artifactId>server</artifactId>
     <packaging>war</packaging>
     <name>DSpace Server Webapp:: Local Customizations</name>
     <description>Overlay customizations.
-This is probably a temporary solution to the build problems. We like to investigate about
-the possibility to remove the overlays enable a more flexible extension mechanism.
-The use of web-fragment and spring mvc technology allow us to add request handlers
-just adding new jar in the classloader</description>
+        This is probably a temporary solution to the build problems. We like to investigate about
+        the possibility to remove the overlays enable a more flexible extension mechanism.
+        The use of web-fragment and spring mvc technology allow us to add request handlers
+        just adding new jar in the classloader
+    </description>
 
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.2-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <version>baryonics-0.3.7-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -24,13 +26,13 @@ just adding new jar in the classloader</description>
 
     <build>
         <plugins>
-            <!-- Unpack the "additions" module into our target directory,
-                 so that any custom classes in that module can be included
-                 into this WAR's WEB-INF/classes (see maven-war-plugin below). -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
+                    <!-- Unpack the "additions" module into our target directory,
+                         so that any custom classes in that module can be included
+                         into this WAR's WEB-INF/classes (see maven-war-plugin below). -->
                     <execution>
                         <id>unpack</id>
                         <phase>prepare-package</phase>
@@ -45,6 +47,29 @@ just adding new jar in the classloader</description>
                             -->
                             <outputDirectory>${project.build.directory}/additions</outputDirectory>
                             <excludes>META-INF/**</excludes>
+                        </configuration>
+                    </execution>
+                    <!-- Testing Environment setup: This plugin unzips the
+                         'testEnvironment.zip' file (created by dspace-parent POM), into
+                         the 'target/testing/' folder, to essentially create a test
+                         install of DSpace, against which Tests can be run. -->
+                    <execution>
+                        <id>setupTestEnvironment</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace</groupId>
+                                    <artifactId>dspace-parent</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>testEnvironment</classifier>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
@@ -95,8 +120,8 @@ just adding new jar in the classloader</description>
                         </goals>
                         <configuration>
                             <source>
-                                project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
-                                log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir']);
+                                project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/')
+                                log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir'])
                             </source>
                         </configuration>
                     </execution>
@@ -155,9 +180,11 @@ just adding new jar in the classloader</description>
                                 <!-- Specify the dspace.dir to use for test environment -->
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
+                                <!--suppress UnresolvedMavenProperty -->
                                 <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
                             </systemPropertyVariables>
                         </configuration>
@@ -224,9 +251,11 @@ just adding new jar in the classloader</description>
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
+                                <!--suppress UnresolvedMavenProperty -->
                                 <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
                             </systemPropertyVariables>
                         </configuration>
@@ -255,7 +284,9 @@ just adding new jar in the classloader</description>
             </activation>
             <dependencies>
                 <dependency>
+                    <!--suppress MavenModelInspection -->
                     <groupId>com.oracle</groupId>
+                    <!--suppress MavenModelInspection -->
                     <artifactId>ojdbc6</artifactId>
                 </dependency>
             </dependencies>
@@ -354,7 +385,6 @@ just adding new jar in the classloader</description>
             <artifactId>lucene-analyzers-icu</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>

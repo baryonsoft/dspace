@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -25,7 +25,7 @@ public interface RequestService {
     /**
      * Request attribute name for the current authenticated user
      */
-    static final String AUTHENTICATED_EPERSON = "authenticated_eperson";
+    String AUTHENTICATED_EPERSON = "authenticated_eperson";
 
     /**
      * Initiates a request in the system.
@@ -39,9 +39,10 @@ public interface RequestService {
      * will not be closed out automatically.
      *
      * @return the unique generated id for the new request
+     *
      * @throws IllegalArgumentException if the session is null, invalid, or there is no current session
      */
-    public String startRequest();
+    String startRequest();
 
     /**
      * Initiates a request in the system,
@@ -52,10 +53,12 @@ public interface RequestService {
      *
      * @param request  servlet request
      * @param response servlet response
+     *
      * @return the unique generated id for the new request
+     *
      * @throws IllegalArgumentException if the session is null, invalid, or there is no current session
      */
-    public String startRequest(ServletRequest request, ServletResponse response);
+    String startRequest(ServletRequest request, ServletResponse response);
 
     /**
      * Ends the current running request, this can indicate success or failure of the request,
@@ -66,10 +69,11 @@ public interface RequestService {
      *                the failure.  Leave as null if the request is ending successfully.
      *                You can make up a {@link RuntimeException} if you just need to
      *                indicate that the request failed.
+     *
      * @return the request ID if the request closes successfully and is
      * not already closed OR null if there is no current request.
      */
-    public String endRequest(Exception failure);
+    String endRequest(Exception failure);
 
     /**
      * Finds out of there is a request running in this thread and if so
@@ -77,14 +81,14 @@ public interface RequestService {
      *
      * @return the id of the current request for this thread OR null if there is not one
      */
-    public String getCurrentRequestId();
+    String getCurrentRequestId();
 
     /**
      * Finds out of there is a request running in this thread and if so returns it
      *
      * @return the current request for this thread OR null if there is not one
      */
-    public Request getCurrentRequest();
+    Request getCurrentRequest();
 
     /**
      * Allows developers to perform actions on the start and end of the request cycle,
@@ -96,9 +100,10 @@ public interface RequestService {
      * this registration is ClassLoader safe
      *
      * @param interceptor an implementation of {@link RequestInterceptor}
+     *
      * @throws IllegalArgumentException if this priority is invalid or the input is null
      */
-    public void registerRequestInterceptor(RequestInterceptor interceptor);
+    void registerRequestInterceptor(RequestInterceptor interceptor);
 
     /**
      * Access the current user id for the current session.
@@ -106,13 +111,11 @@ public interface RequestService {
      *
      * @return the id of the user associated with the current thread OR null if there is no user
      */
-    public String getCurrentUserId();
+    String getCurrentUserId();
 
     /**
      * Set the ID of the current authenticated user
-     *
-     * @return the id of the user associated with the current thread OR null if there is no user
      */
-    public void setCurrentUserId(UUID epersonId);
+    void setCurrentUserId(UUID epersonId);
 
 }

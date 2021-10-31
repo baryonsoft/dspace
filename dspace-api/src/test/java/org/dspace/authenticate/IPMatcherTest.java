@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -100,7 +100,7 @@ public class IPMatcherTest {
     @Test
     public void testIp6MisMatch()
         throws IPMatcherException {
-        assertFalse("IPv6 full nonmatch succeeds", ip6FullMatcher
+        assertFalse("IPv6 full non-match succeeds", ip6FullMatcher
             .match(IP6_FULL_ADDRESS2));
     }
 
@@ -120,9 +120,9 @@ public class IPMatcherTest {
         final IPMatcher ipMatcher = new IPMatcher("1.1.1.1");
 
         assertTrue(ipMatcher.match("1.1.1.1"));
-        ArrayList<String> exceptions = new ArrayList<String>();
+        ArrayList<String> exceptions = new ArrayList<>();
         exceptions.add("1.1.1.1");
-        verifyAllIp4Except(exceptions, false, ipMatcher);
+        verifyAllIp4Except(exceptions, ipMatcher);
     }
 
     @Test
@@ -197,7 +197,7 @@ public class IPMatcherTest {
         assertTrue(ipMatcher.match("192.86.100.75"));
         assertFalse(ipMatcher.match("192.86.100.71"));
         assertFalse(ipMatcher.match("192.86.100.80"));
-        ArrayList<String> exceptions = new ArrayList<String>();
+        ArrayList<String> exceptions = new ArrayList<>();
         exceptions.add("192.86.100.72");
         exceptions.add("192.86.100.73");
         exceptions.add("192.86.100.74");
@@ -206,7 +206,7 @@ public class IPMatcherTest {
         exceptions.add("192.86.100.77");
         exceptions.add("192.86.100.78");
         exceptions.add("192.86.100.79");
-        verifyAllIp4Except(exceptions, false, ipMatcher);
+        verifyAllIp4Except(exceptions, ipMatcher);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class IPMatcherTest {
         assertTrue(ipMatcher.match("192.86.100.75"));
         assertFalse(ipMatcher.match("192.86.100.71"));
         assertFalse(ipMatcher.match("192.86.100.80"));
-        ArrayList<String> exceptions = new ArrayList<String>();
+        ArrayList<String> exceptions = new ArrayList<>();
         exceptions.add("192.86.100.72");
         exceptions.add("192.86.100.73");
         exceptions.add("192.86.100.74");
@@ -225,7 +225,7 @@ public class IPMatcherTest {
         exceptions.add("192.86.100.77");
         exceptions.add("192.86.100.78");
         exceptions.add("192.86.100.79");
-        verifyAllIp4Except(exceptions, false, ipMatcher);
+        verifyAllIp4Except(exceptions, ipMatcher);
     }
 
     @Test
@@ -294,29 +294,21 @@ public class IPMatcherTest {
         return ips;
     }*/
 
-    private void verifyAllIp4Except(ArrayList<String> exceptions, boolean asserted, IPMatcher ipMatcher)
+    private void verifyAllIp4Except(ArrayList<String> exceptions, IPMatcher ipMatcher)
         throws IPMatcherException {
-        int d1 = 0;
-        int d2 = 0;
-        int d3 = 0;
-        int d4 = 0;
+        int d1;
+        int d2;
+        int d3;
+        int d4;
         for (d1 = 0; d1 <= 255; d1 += increment) {
             for (d2 = 0; d2 <= 255; d2 += increment) {
                 for (d3 = 0; d3 <= 255; d3 += increment) {
                     for (d4 = 0; d4 <= 255; d4 += increment) {
                         String IP = d1 + "." + d2 + "." + d3 + "." + d4;
                         if (exceptions != null && exceptions.contains(IP)) {
-                            if (asserted) {
-                                assertFalse(ipMatcher.match(IP));
-                            } else {
-                                assertTrue(ipMatcher.match(IP));
-                            }
+                            assertTrue(ipMatcher.match(IP));
                         } else {
-                            if (asserted) {
-                                assertTrue(ipMatcher.match(IP));
-                            } else {
-                                assertFalse(ipMatcher.match(IP));
-                            }
+                            assertFalse(ipMatcher.match(IP));
                         }
 
                     }

@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -18,18 +18,18 @@ import org.dspace.app.rest.RestResourceController;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @LinksRest(links = {
-        @LinkRest(
-                name = GroupRest.SUBGROUPS,
-                method = "getGroups"
-        ),
-        @LinkRest(
-                name = GroupRest.EPERSONS,
-                method = "getMembers"
-        ),
-        @LinkRest(
-                name = GroupRest.OBJECT,
-                method = "getParentObject"
-        )
+    @LinkRest(
+        name = GroupRest.SUBGROUPS,
+        method = "getGroups"
+    ),
+    @LinkRest(
+        name = GroupRest.EPERSONS,
+        method = "getMembers"
+    ),
+    @LinkRest(
+        name = GroupRest.OBJECT,
+        method = "getParentObject"
+    )
 })
 public class GroupRest extends DSpaceObjectRest {
     public static final String NAME = "group";

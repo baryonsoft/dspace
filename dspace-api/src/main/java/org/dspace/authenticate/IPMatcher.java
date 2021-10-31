@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -9,6 +9,7 @@ package org.dspace.authenticate;
 
 import java.net.Inet6Address;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import org.apache.logging.log4j.Logger;
 
@@ -38,7 +39,7 @@ import org.apache.logging.log4j.Logger;
  * @version $Revision$
  */
 public class IPMatcher {
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IPMatcher.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(IPMatcher.class);
 
     /**
      * Network to match
@@ -100,9 +101,7 @@ public class IPMatcher {
                     }
                     break;
                 case 1: // No explicit mask:  fill the mask with 1s
-                    for (int i = 0; i < netmask.length; i++) {
-                        netmask[i] = (byte) 0Xff;
-                    }
+                    Arrays.fill(netmask, (byte) 0Xff);
                     break;
                 default:
                     throw new IPMatcherException("Malformed IP range specification "
@@ -161,9 +160,7 @@ public class IPMatcher {
 
                 case 1:
                     // Get IP
-                    for (int i = 0; i < netmask.length; i++) {
-                        netmask[i] = -1;
-                    }
+                    Arrays.fill(netmask, (byte) -1);
                     int partCount = ipToBytes(ipPart, network, mustHave4);
 
                     // If partial IP, set mask for remaining bytes
@@ -290,9 +287,7 @@ public class IPMatcher {
         for (int i = 0; i < 16 - 4; i++) {
             ip6[i] = 0;
         }
-        for (int i = 0; i < 4; i++) {
-            ip6[12 + i] = ip4[i];
-        }
+        System.arraycopy(ip4, 0, ip6, 12, 4);
         return ip6;
     }
 
@@ -312,9 +307,7 @@ public class IPMatcher {
         for (int i = 0; i < 16 - 4; i++) {
             ip6[i] = (byte) 0Xff;
         }
-        for (int i = 0; i < 4; i++) {
-            ip6[12 + i] = ip4[i];
-        }
+        System.arraycopy(ip4, 0, ip6, 12, 4);
         return ip6;
     }
 }

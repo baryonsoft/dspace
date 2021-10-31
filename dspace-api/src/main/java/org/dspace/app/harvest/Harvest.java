@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -43,10 +43,10 @@ import org.dspace.utils.DSpace;
  */
 public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
 
-    private HarvestedCollectionService harvestedCollectionService;
     protected EPersonService ePersonService;
+    protected Context context;
+    private HarvestedCollectionService harvestedCollectionService;
     private CollectionService collectionService;
-
     private boolean help;
     private String command = null;
     private String collection = null;
@@ -55,25 +55,21 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
     private String metadataKey = null;
     private int harvestType = 0;
 
-    protected Context context;
-
-
     public HarvestScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
-                           .getServiceByName("harvest", HarvestScriptConfiguration.class);
+            .getServiceByName("harvest", HarvestScriptConfiguration.class);
     }
 
     public void setup() throws ParseException {
         harvestedCollectionService =
-                HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+            HarvestServiceFactory.getInstance().getHarvestedCollectionService();
         ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
         collectionService =
-                ContentServiceFactory.getInstance().getCollectionService();
+            ContentServiceFactory.getInstance().getCollectionService();
 
         assignCurrentUserInContext();
 
         help = commandLine.hasOption('h');
-
 
         if (commandLine.hasOption('s')) {
             command = "config";
@@ -123,9 +119,8 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
      * The instance of the method in this class will fetch the EPersonIdentifier from this class, this identifier
      * was given to this class upon instantiation, it'll then be used to find the {@link EPerson} associated with it
      * and this {@link EPerson} will be set as the currentUser of the created {@link Context}
-     * @throws ParseException If something went wrong with the retrieval of the EPerson Identifier
      */
-    protected void assignCurrentUserInContext() throws ParseException {
+    protected void assignCurrentUserInContext() {
         UUID currentUserUuid = this.getEpersonIdentifier();
         try {
             this.context = new Context(Context.Mode.BATCH_EDIT);
@@ -145,8 +140,8 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             printHelp();
             handler.logInfo("PING OAI server: Harvest -g -a oai_source -i oai_set_id");
             handler.logInfo(
-                    "SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a oai_source -i " +
-                            "oai_set_id -m metadata_format");
+                "SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a oai_source -i " +
+                    "oai_set_id -m metadata_format");
             handler.logInfo("RUN harvest once: Harvest -r -e eperson -c collection");
             handler.logInfo("START harvest scheduler: Harvest -S");
             handler.logInfo("RESET all harvest status: Harvest -R");
@@ -182,9 +177,9 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
             for (HarvestedCollection harvestedCollection : harvestedCollections) {
                 handler.logInfo(
-                        "Purging the following collections (deleting items and resetting harvest status): " +
-                                harvestedCollection
-                                        .getCollection().getID().toString());
+                    "Purging the following collections (deleting items and resetting harvest status): " +
+                        harvestedCollection
+                            .getCollection().getID().toString());
                 purgeCollection(context, harvestedCollection.getCollection().getID().toString());
             }
             context.complete();
@@ -216,29 +211,29 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             }
             if (oaiSource == null || oaiSetID == null) {
                 handler.logError(
-                        "Both the OAI server address and OAI set id must be specified (run with -h flag for details)");
+                    "Both the OAI server address and OAI set id must be specified (run with -h flag for details)");
                 throw new UnsupportedOperationException("Both the OAI server address and OAI set id must be specified");
             }
             if (metadataKey == null) {
                 handler.logError(
-                        "A metadata key (commonly the prefix) must be specified for this collection (run with -h flag" +
-                                " for details)");
+                    "A metadata key (commonly the prefix) must be specified for this collection (run with -h flag" +
+                        " for details)");
                 throw new UnsupportedOperationException(
-                        "A metadata key (commonly the prefix) must be specified for this collection");
+                    "A metadata key (commonly the prefix) must be specified for this collection");
             }
 
             configureCollection(context, collection, harvestType, oaiSource, oaiSetID, metadataKey);
         } else if ("ping".equals(command)) {
             if (oaiSource == null || oaiSetID == null) {
                 handler.logError(
-                        "Both the OAI server address and OAI set id must be specified  (run with -h flag for details)");
+                    "Both the OAI server address and OAI set id must be specified  (run with -h flag for details)");
                 throw new UnsupportedOperationException("Both the OAI server address and OAI set id must be specified");
             }
 
             pingResponder(oaiSource, oaiSetID, metadataKey);
         } else {
             handler.logError(
-                    "Your command '" + command + "' was not recognized properly (run with -h flag for details)");
+                "Your command '" + command + "' was not recognized properly (run with -h flag for details)");
             throw new UnsupportedOperationException("Your command '" + command + "' was not recognized properly");
         }
 
@@ -262,13 +257,11 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
                     dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, collectionID);
 
                     // resolved, now make sure it's a collection
-                    if (dso == null || dso.getType() != Constants.COLLECTION) {
-                        targetCollection = null;
-                    } else {
+                    if (dso != null && dso.getType() == Constants.COLLECTION) {
                         targetCollection = (Collection) dso;
                     }
                 } else {
-                    // not a handle, try and treat it as an collection database UUID
+                    // not a handle, try and treat it as a collection database UUID
                     handler.logInfo("Looking up by UUID: " + collectionID + ", " + "in context: " + context);
                     targetCollection = collectionService.find(context, UUID.fromString(collectionID));
                 }
@@ -318,12 +311,10 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
 
     /**
      * Purges a collection of all harvest-related data and settings. All items in the collection will be deleted.
-     *  @param collectionID
-     *
      */
     private void purgeCollection(Context context, String collectionID) {
         handler.logInfo(
-                "Purging collection of all items and resetting last_harvested and harvest_message: " + collectionID);
+            "Purging collection of all items and resetting last_harvested and harvest_message: " + collectionID);
         Collection collection = resolveCollection(context, collectionID);
 
         try {
@@ -370,7 +361,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         handler.logInfo("Running: a harvest cycle on " + collectionID);
 
         handler.logInfo("Initializing the harvester... ");
-        OAIHarvester harvester = null;
+        OAIHarvester harvester;
         try {
             Collection collection = resolveCollection(context, collectionID);
             HarvestedCollection hc = harvestedCollectionService.find(context, collection);
@@ -443,7 +434,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
 
         handler.logInfo("Testing basic PMH access:  ");
         errors = harvestedCollectionService.verifyOAIharvester(server, set,
-                                                               (null != metadataFormat) ? metadataFormat : "dc", false);
+            (null != metadataFormat) ? metadataFormat : "dc", false);
         if (errors.isEmpty()) {
             handler.logInfo("OK");
         } else {
@@ -454,7 +445,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
 
         handler.logInfo("Testing ORE support:  ");
         errors = harvestedCollectionService.verifyOAIharvester(server, set,
-                                                               (null != metadataFormat) ? metadataFormat : "dc", true);
+            (null != metadataFormat) ? metadataFormat : "dc", true);
         if (errors.isEmpty()) {
             handler.logInfo("OK");
         } else {

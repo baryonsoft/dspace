@@ -6,7 +6,7 @@ name: Check for merge conflicts
 on:
   push:
     branches:
-      - main
+      - baryonics
 
 jobs:
   triage:

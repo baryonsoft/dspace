@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -28,13 +28,13 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables extends BaseJava
      * log4j category
      */
     private static final Logger log =
-            org.apache.logging.log4j.LogManager.getLogger(V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables.class);
+        org.apache.logging.log4j.LogManager.getLogger(V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables.class);
 
     /* The checksum to report for this migration (when successful) */
     private int checksum = -1;
 
     @Override
-    public void migrate(Context context) throws Exception, SQLException {
+    public void migrate(Context context) throws Exception {
         removeDBMSBrowseTables(context.getConnection());
     }
 
@@ -48,7 +48,6 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables extends BaseJava
      * also removes old, obsolete item_count tables and communities2item table
      *
      * @param connection Database Connection
-     * @throws BrowseException
      */
     private void removeDBMSBrowseTables(Connection connection)
         throws BrowseException {
@@ -58,7 +57,7 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables extends BaseJava
         // Keep looping (incrementing our index by 1) until we've hit three index
         // tables that have not been found.
         // We don't actually know how many index tables will be in each database,
-        // and there are no guarrantees it'll match the highest index of the site's
+        // and there are no guarantees it'll match the highest index of the site's
         // existing "webui.browse.index.#" settings.
         // Since that's the case, we'll just keep searching for index tables,
         // until we encounter a total of three that are not found.
@@ -219,9 +218,8 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables extends BaseJava
      *
      * @param connection Database Connection
      * @param bix        BrowseIndex
-     * @throws BrowseException
      */
-    private void dropItemTables(Connection connection, BrowseIndex bix) throws BrowseException {
+    private void dropItemTables(Connection connection, BrowseIndex bix) {
         if (DatabaseUtils.tableExists(connection, bix.getTableName())) {
             String tableName = bix.getTableName();
             String sequence = bix.getSequenceName(false, false);

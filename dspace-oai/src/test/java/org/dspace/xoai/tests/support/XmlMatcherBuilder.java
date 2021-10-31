@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -26,10 +26,10 @@ public class XmlMatcherBuilder extends MatcherBuilder<XmlMatcherBuilder, String>
         return new XmlMatcherBuilder();
     }
 
-    private Namespaces namespaces = new Namespaces();
+    private final Namespaces namespaces = new Namespaces();
 
     public XmlMatcherBuilder() {
-        with(new TypeSafeMatcher<String>() {
+        with(new TypeSafeMatcher<>() {
             @Override
             protected boolean matchesSafely(String item) {
                 try {
@@ -49,7 +49,7 @@ public class XmlMatcherBuilder extends MatcherBuilder<XmlMatcherBuilder, String>
     }
 
     public XmlMatcherBuilder withXPath(final String xPath) {
-        return with(new TypeSafeMatcher<String>() {
+        return with(new TypeSafeMatcher<>() {
             @Override
             protected boolean matchesSafely(String item) {
                 return XmlMatchers.hasXPath(xPath, namespaces).matches(StringSource.toSource(item));
@@ -63,7 +63,7 @@ public class XmlMatcherBuilder extends MatcherBuilder<XmlMatcherBuilder, String>
     }
 
     public XmlMatcherBuilder withXPath(final String xPath, final Matcher<? super String> subMatcher) {
-        return with(new TypeSafeMatcher<String>() {
+        return with(new TypeSafeMatcher<>() {
             @Override
             protected boolean matchesSafely(String item) {
                 return XmlMatchers
@@ -84,7 +84,7 @@ public class XmlMatcherBuilder extends MatcherBuilder<XmlMatcherBuilder, String>
     }
 
     private static class Namespaces implements NamespaceContext {
-        private Map<String, String> namespace = new HashMap<>();
+        private final Map<String, String> namespace = new HashMap<>();
 
         @Override
         public String getNamespaceURI(String prefix) {
@@ -103,7 +103,7 @@ public class XmlMatcherBuilder extends MatcherBuilder<XmlMatcherBuilder, String>
         }
 
         @Override
-        public Iterator getPrefixes(String namespaceURI) {
+        public Iterator<String> getPrefixes(String namespaceURI) {
             List<String> list = new ArrayList<>();
             for (Map.Entry<String, String> stringStringEntry : namespace.entrySet()) {
                 if (stringStringEntry.getValue().equals(namespaceURI)) {

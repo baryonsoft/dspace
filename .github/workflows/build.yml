@@ -10,7 +10,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      # Give Maven 1GB of memory to work with
+      # Give Maven 1 GB of memory to work with
       # Suppress all Maven "downloading" messages in Travis logs (see https://stackoverflow.com/a/35653426)
       # This also slightly speeds builds, as there is less logging
       MAVEN_OPTS: "-Xmx1024M -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
@@ -19,9 +19,8 @@ jobs:
       # This will ensure those tasks are run in parallel
       matrix:
         include:
-          # NOTE: Unit Tests include deprecated REST API v6 (as it has unit tests)
           - type: "Unit Tests"
-            mvnflags: "-DskipUnitTests=false -Pdspace-rest"
+            mvnflags: "-DskipUnitTests=false"
             resultsdir: "**/target/surefire-reports/**"
           # NOTE: ITs skip all code validation checks, as they are already done by Unit Test job.
           #  - enforcer.skip     => Skip maven-enforcer-plugin rules
@@ -34,17 +33,29 @@ jobs:
       # Do NOT exit immediately if one matrix job fails
       # This ensures ITs continue running even if Unit Tests fail, or visa versa
       fail-fast: false
+
+    services:
+      minio:
+        image: bitnami/minio:latest
+        ports:
+          - "9000:9000"
+        env:
+          MINIO_ACCESS_KEY: minio
+          MINIO_SECRET_KEY: minio-key
+          MINIO_DEFAULT_BUCKETS: 'bucket-test:public'
+
     # These are the actual CI steps to perform per job
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2.3.5
 
       # https://github.com/actions/setup-java
       - name: Install JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2.3.1
         with:
           java-version: 11
+          distribution: 'adopt'
 
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
@@ -52,7 +63,7 @@ jobs:
         with:
           # Cache entire ~/.m2/repository
           path: ~/.m2/repository
-          # Cache key is hash of all pom.xml files. Therefore any changes to POMs will invalidate cache
+          # Cache key is hash of all pom.xml files. Therefore, any changes to POMs will invalidate cache
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
 
@@ -60,6 +71,7 @@ jobs:
       - name: Run Maven ${{ matrix.type }}
         env:
           TEST_FLAGS: ${{ matrix.mvnflags }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
 
       # If previous step failed, save results of tests to downloadable artifact for this job
@@ -74,4 +86,26 @@ jobs:
 
       # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.1.0
+
+  docker-build:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/baryonics'
+    needs: tests
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_APP }}:latest

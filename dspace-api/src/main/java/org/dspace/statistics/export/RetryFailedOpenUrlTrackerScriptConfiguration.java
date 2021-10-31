@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -42,11 +42,11 @@ public class RetryFailedOpenUrlTrackerScriptConfiguration<T extends RetryFailedO
     }
 
     @Override
-    public boolean isAllowedToExecute(Context context) {
+    public boolean isAllowedToExecute(Context context) throws SQLException {
         try {
             return authorizeService.isAdmin(context);
         } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
+            throw new SQLException("SQLException occurred when checking if the current user is an admin", e);
         }
     }
 

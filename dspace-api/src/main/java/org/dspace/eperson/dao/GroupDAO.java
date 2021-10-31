@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -23,7 +23,7 @@ import org.dspace.eperson.Group;
  * Database Access Object interface class for the Group object.
  * The implementation of this class is responsible for all database calls for the Group object and is autowired by
  * spring
- * This class should only be accessed from a single service and should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside the API
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -45,10 +45,12 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * Find all groups ordered by the specified metadata fields ascending
      *
      * @param context            The DSpace context
-     * @param sortMetadataFields The metadata fields to sort on
+     * @param metadataSortFields The metadata fields to sort on
      * @param pageSize           how many results return
      * @param offset             the position of the first result to return
+     *
      * @return A list of all groups, ordered by metadata fields
+     *
      * @throws SQLException if database error
      */
     List<Group> findAll(Context context, List<MetadataField> metadataSortFields, int pageSize, int offset)

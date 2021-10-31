@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -33,7 +33,6 @@ public class DCInputSet {
      * constructor
      *
      * @param formName       form name
-     * @param mandatoryFlags
      * @param rows           the rows
      * @param listMap        map
      */
@@ -169,11 +168,7 @@ public class DCInputSet {
         if (rowName.equals("dc.publisher.null") && !addPublishedBefore) {
             return false;
         }
-        if (rowName.equals("dc.identifier.citation") && !addPublishedBefore) {
-            return false;
-        }
-
-        return true;
+        return !rowName.equals("dc.identifier.citation") || addPublishedBefore;
     }
 
 }
