@@ -39,7 +39,7 @@ public class OrcidRestConnector {
     }
 
     public InputStream get(String path, String accessToken) {
-        HttpResponse getResponse = null;
+        HttpResponse getResponse;
         InputStream result = null;
         path = trimSlashes(path);
 

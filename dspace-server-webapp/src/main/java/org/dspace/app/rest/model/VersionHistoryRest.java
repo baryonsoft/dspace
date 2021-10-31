@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -16,15 +17,22 @@ import org.dspace.app.rest.RestResourceController;
     @LinkRest(
         name = VersionHistoryRest.VERSIONS,
         method = "getVersions"
+    ),
+    @LinkRest(
+        name = VersionHistoryRest.DRAFT_VERSION,
+        method = "getDraftVersion"
     )
 })
 public class VersionHistoryRest extends BaseObjectRest<Integer> {
 
-    private Integer id;
-
     public static final String NAME = "versionhistory";
     public static final String CATEGORY = RestAddressableModel.VERSIONING;
     public static final String VERSIONS = "versions";
+    public static final String DRAFT_VERSION = "draftVersion";
+    private static final long serialVersionUID = -6466315011690554740L;
+    private Integer id;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Boolean draftVersion;
 
     @Override
     public String getCategory() {
@@ -43,6 +51,7 @@ public class VersionHistoryRest extends BaseObjectRest<Integer> {
 
     /**
      * Generic getter for the id
+     *
      * @return the id value of this VersionHistoryRest
      */
     @Override
@@ -52,10 +61,20 @@ public class VersionHistoryRest extends BaseObjectRest<Integer> {
 
     /**
      * Generic setter for the id
-     * @param id   The id to be set on this VersionHistoryRest
+     *
+     * @param id The id to be set on this VersionHistoryRest
      */
     @Override
     public void setId(Integer id) {
         this.id = id;
     }
+
+    public Boolean getDraftVersion() {
+        return draftVersion;
+    }
+
+    public void setDraftVersion(Boolean draftVersion) {
+        this.draftVersion = draftVersion;
+    }
+
 }

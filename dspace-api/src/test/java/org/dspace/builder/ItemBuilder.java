@@ -116,10 +116,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             subject, authority, confidence);
     }
 
-    public ItemBuilder withEntityType(final String entityType) {
-        return addMetadataValue(item, "dspace", "entity", "type", entityType);
-    }
-
     public ItemBuilder withType(final String type) {
         return addMetadataValue(item, "dc", "type", null, type);
     }
@@ -136,6 +132,34 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "provenance", provenanceData);
     }
 
+    public ItemBuilder enableIIIF() {
+        return addMetadataValue(item, "dspace", "iiif", "enabled", "true");
+    }
+
+    public ItemBuilder disableIIIF() {
+        return addMetadataValue(item, "dspace", "iiif", "enabled", "false");
+    }
+
+    public ItemBuilder enableIIIFSearch() {
+        return addMetadataValue(item, "iiif", "search", "enabled", "true");
+    }
+
+    public ItemBuilder withIIIFViewingHint(String hint) {
+        return addMetadataValue(item, "iiif", "viewing", "hint", hint);
+    }
+
+    public ItemBuilder withIIIFCanvasNaming(String naming) {
+        return addMetadataValue(item, "iiif", "canvas", "naming", naming);
+    }
+
+    public ItemBuilder withIIIFCanvasWidth(int i) {
+        return addMetadataValue(item, "iiif", "image", "width", String.valueOf(i));
+    }
+
+    public ItemBuilder withIIIFCanvasHeight(int i) {
+        return addMetadataValue(item, "iiif", "image", "height", String.valueOf(i));
+    }
+
     public ItemBuilder withMetadata(final String schema, final String element, final String qualifier,
                                     final String value) {
         return addMetadataValue(item, schema, element, qualifier, value);
@@ -147,7 +171,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     /**
-     * Withdrawn the item under build. Please note that an user need to be loggedin the context to avoid NPE during the
+     * Withdrawn the item under build. Please note that a user need to be logged in the context to avoid NPE during the
      * creation of the provenance metadata
      *
      * @return the ItemBuilder
@@ -173,8 +197,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
      *
      * @return this builder
      */
-    public ItemBuilder withAdminUser(EPerson ePerson) throws SQLException, AuthorizeException {
-        return setAdminPermission(item, ePerson);
+    public ItemBuilder withAdminUser(EPerson ePerson) {
+        return setAdminPermission(item, ePerson, null);
     }
 
     @Override
@@ -183,7 +207,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             installItemService.installItem(context, workspaceItem);
             itemService.update(context, item);
 
-            //Check if we need to make this item private. This has to be done after item install.
+            //Check if we need to make this item private. This has to be done after item installation.
             if (readerGroup != null) {
                 setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);
             }
@@ -218,4 +242,5 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     protected DSpaceObjectService<Item> getService() {
         return itemService;
     }
+
 }
