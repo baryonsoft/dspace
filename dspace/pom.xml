@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>baryonics-0.3.7-SNAPSHOT</version>
+        <version>baryonics-0.4.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
