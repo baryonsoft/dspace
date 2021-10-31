@@ -54,11 +54,7 @@ public class ContextUtil {
     public static boolean isContextAvailable(ServletRequest request) {
         Object object = request.getAttribute(DSPACE_CONTEXT);
 
-        if (object instanceof Context) {
-            return true;
-        } else {
-            return false;
-        }
+        return object instanceof Context;
     }
 
     /**

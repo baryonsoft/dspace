@@ -249,10 +249,7 @@ public class IIIFUtils {
      * @return true if an image
      */
     public boolean checkImageMimeType(String mimetype) {
-        if (mimetype != null && mimetype.contains("image/")) {
-            return true;
-        }
-        return false;
+        return mimetype != null && mimetype.contains("image/");
     }
 
     /**

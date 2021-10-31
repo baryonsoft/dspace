@@ -19,7 +19,7 @@ import de.digitalcollections.iiif.model.image.ImageService;
  */
 public class ImageServiceGenerator implements IIIFService {
 
-    private ImageService imageService;
+    private final ImageService imageService;
 
     public ImageServiceGenerator(String identifier) {
         imageService = new ImageService(identifier);

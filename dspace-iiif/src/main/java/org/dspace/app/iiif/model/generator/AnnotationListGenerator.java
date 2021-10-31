@@ -30,7 +30,7 @@ import org.springframework.web.context.annotation.RequestScope;
 public class AnnotationListGenerator implements IIIFResource {
 
     private String identifier;
-    private List<Annotation> annotations = new ArrayList<>();
+    private final List<Annotation> annotations = new ArrayList<>();
 
     /**
      * Sets the required annotation identifier.

@@ -7,6 +7,7 @@
  */
 package org.dspace.iiif;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -23,7 +24,7 @@ public class CacheEvictBeanLocator implements ApplicationContextAware {
     private static final String CACHE_SERVICE = "cacheEvictService";
 
     @Override
-    public void setApplicationContext(ApplicationContext appContext)
+    public void setApplicationContext(@NotNull ApplicationContext appContext)
         throws BeansException {
         context = appContext;
     }

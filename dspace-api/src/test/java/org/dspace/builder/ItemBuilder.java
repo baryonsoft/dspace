@@ -150,7 +150,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     /**
-     * Withdrawn the item under build. Please note that an user need to be loggedin the context to avoid NPE during the
+     * Withdrawn the item under build. Please note that a user need to be logged in the context to avoid NPE during the
      * creation of the provenance metadata
      *
      * @return the ItemBuilder
@@ -172,12 +172,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     /**
      * Create an admin group for the collection with the specified members
      *
-     * @param members epersons to add to the admin group
+     * @param ePerson epersons to add to the admin group
+     *
      * @return this builder
-     * @throws SQLException
-     * @throws AuthorizeException
      */
-    public ItemBuilder withAdminUser(EPerson ePerson) throws SQLException, AuthorizeException {
+    public ItemBuilder withAdminUser(EPerson ePerson) {
         return setAdminPermission(item, ePerson, null);
     }
 
@@ -188,7 +187,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             installItemService.installItem(context, workspaceItem);
             itemService.update(context, item);
 
-            //Check if we need to make this item private. This has to be done after item install.
+            //Check if we need to make this item private. This has to be done after item installation.
             if (readerGroup != null) {
                 setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);
             }
@@ -227,8 +226,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     /**
      * Delete the Test Item referred to by the given UUID
      * @param uuid UUID of Test Item to delete
-     * @throws SQLException
-     * @throws IOException
      */
     public static void deleteItem(UUID uuid) throws SQLException, IOException {
         try (Context c = new Context()) {

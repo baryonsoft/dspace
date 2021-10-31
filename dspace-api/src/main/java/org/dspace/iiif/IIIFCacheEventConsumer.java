@@ -110,7 +110,7 @@ public class IIIFCacheEventConsumer implements Consumer {
                 break;
             default: {
                 log.warn("IIIFCacheEventConsumer should not have been given this kind of "
-                    + "subject in an event, skipping: " + event.toString());
+                    + "subject in an event, skipping: " + event);
             }
         }
     }

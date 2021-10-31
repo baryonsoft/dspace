@@ -24,8 +24,8 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
  */
 @Configuration
 @EnableSpringDataWebSupport
-@ComponentScan( {"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils",
-        "org.dspace.app.configuration", "org.dspace.iiif", "org.dspace.app.iiif"})
+@ComponentScan({"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils",
+    "org.dspace.app.configuration", "org.dspace.iiif", "org.dspace.app.iiif"})
 public class ApplicationConfig {
     // Allowed CORS origins ("Access-Control-Allow-Origin" header)
     // Can be overridden in DSpace configuration
@@ -54,7 +54,9 @@ public class ApplicationConfig {
     /**
      * Return the array of allowed origins (client URLs) for the CORS "Access-Control-Allow-Origin" header
      * Used by Application class
+     *
      * @param corsOrigins list of allowed origins for the dspace api or iiif endpoints
+     *
      * @return Array of URLs
      */
     public String[] getCorsAllowedOrigins(String[] corsOrigins) {
@@ -78,6 +80,7 @@ public class ApplicationConfig {
 
     /**
      * Returns the rest.cors.allowed-origins defined in DSpace configuration.
+     *
      * @return allowed origins
      */
     public String[] getCorsAllowedOriginsConfig() {
@@ -86,6 +89,7 @@ public class ApplicationConfig {
 
     /**
      * Returns the rest.iiif.cors.allowed-origins (for IIIF access) defined in DSpace configuration.
+     *
      * @return allowed origins
      */
     public String[] getIiifAllowedOriginsConfig() {
@@ -95,6 +99,7 @@ public class ApplicationConfig {
     /**
      * Return whether to allow credentials (cookies) on CORS requests. This is used to set the
      * CORS "Access-Control-Allow-Credentials" header in Application class.
+     *
      * @return true or false
      */
     public boolean getCorsAllowCredentials() {
@@ -104,6 +109,7 @@ public class ApplicationConfig {
     /**
      * Return whether to allow credentials (cookies) on IIIF requests. This is used to set the
      * CORS "Access-Control-Allow-Credentials" header in Application class. Defaults to false.
+     *
      * @return true or false
      */
     public boolean getIiifAllowCredentials() {

@@ -11,8 +11,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -42,37 +42,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * based on OrcidRestConnector it's a rest connector for OpenAIRE API providing
  * ways to perform searches and token grabbing
- * 
- * @author paulo-graca
  *
+ * @author paulo-graca
  */
 public class OpenAIRERestConnector {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenAIRERestConnector.class);
-
-    /**
-     * OpenAIRE API Url
-     *  and can be configured with: openaire.api.url
-     */
-    private String url = "https://api.openaire.eu";
-
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenAIRERestConnector.class);
     /**
      * Boolean with token usage definition true if we want to use a token
-     *  and can be configured with: openaire.token.enabled
+     * and can be configured with: openaire.token.enabled
      */
     boolean tokenEnabled = false;
-
+    /**
+     * OpenAIRE API Url
+     * and can be configured with: openaire.api.url
+     */
+    private String url = "https://api.openaire.eu";
     /**
      * OpenAIRE Authorization and Authentication Token Service URL
-     *  and can be configured with: openaire.token.url
+     * and can be configured with: openaire.token.url
      */
     private String tokenServiceUrl;
 
     /**
      * OpenAIRE clientId
-     *  and can be configured with: openaire.token.clientId
+     * and can be configured with: openaire.token.clientId
      */
     private String clientId;
 
@@ -83,7 +79,7 @@ public class OpenAIRERestConnector {
 
     /**
      * OpenAIRE clientSecret
-     *  and can be configured with: openaire.token.clientSecret
+     * and can be configured with: openaire.token.clientSecret
      */
     private String clientSecret;
 
@@ -92,23 +88,35 @@ public class OpenAIRERestConnector {
         this.url = url;
     }
 
+    /**
+     * trim slashes from the path
+     *
+     * @return string path without trailing slashes
+     */
+    public static String trimSlashes(String path) {
+        while (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        while (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+        return path;
+    }
 
     /**
      * This method grabs an accessToken an sets the expiration time Based.<br/>
      * Based on https://develop.openaire.eu/basic.html
-     * 
-     * @throws IOException
      */
     public OpenAIRERestToken grabNewAccessToken() throws IOException {
 
         if (StringUtils.isBlank(tokenServiceUrl) || StringUtils.isBlank(clientId)
-                || StringUtils.isBlank(clientSecret)) {
+            || StringUtils.isBlank(clientSecret)) {
             throw new IOException("Cannot grab OpenAIRE token with nulls service url, client id or secret");
         }
 
         String auth = clientId + ":" + clientSecret;
         String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
-        String authHeader = "Basic " + new String(encodedAuth);
+        String authHeader = "Basic " + encodedAuth;
 
         HttpPost httpPost = new HttpPost(tokenServiceUrl);
         httpPost.addHeader("Accept", "application/json");
@@ -117,7 +125,7 @@ public class OpenAIRERestConnector {
         httpPost.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
 
         // Request parameters and other properties.
-        List<NameValuePair> params = new ArrayList<NameValuePair>(1);
+        List<NameValuePair> params = new ArrayList<>(1);
         params.add(new BasicNameValuePair("grant_type", "client_credentials"));
         httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
@@ -126,12 +134,12 @@ public class OpenAIRERestConnector {
 
         JSONObject responseObject = null;
         try (InputStream is = getResponse.getEntity().getContent();
-                BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+             BufferedReader streamReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String inputStr;
             // verify if we have basic json
             while ((inputStr = streamReader.readLine()) != null && responseObject == null) {
                 if (inputStr.startsWith("{") && inputStr.endsWith("}") && inputStr.contains("access_token")
-                        && inputStr.contains("expires_in")) {
+                    && inputStr.contains("expires_in")) {
                     try {
                         responseObject = new JSONObject(inputStr);
                     } catch (Exception e) {
@@ -146,26 +154,24 @@ public class OpenAIRERestConnector {
         }
 
         return new OpenAIRERestToken(responseObject.get("access_token").toString(),
-                Long.valueOf(responseObject.get("expires_in").toString()));
+            Long.valueOf(responseObject.get("expires_in").toString()));
 
     }
 
     /**
      * Perform a GET request to the OpenAIRE API
-     * 
-     * @param file
-     * @param accessToken
+     *
      * @return an InputStream with a Result
      */
     public InputStream get(String file, String accessToken) {
-        HttpResponse getResponse = null;
+        HttpResponse getResponse;
         InputStream result = null;
         file = trimSlashes(file);
 
         try {
             URL fullPath = new URL(url + '/' + file);
 
-            log.debug("Requesting: " + fullPath.toString());
+            log.debug("Requesting: " + fullPath);
 
             HttpGet httpGet = new HttpGet(fullPath.toURI());
             if (StringUtils.isNotBlank(accessToken)) {
@@ -194,8 +200,8 @@ public class OpenAIRERestConnector {
                             limitMsg = limitMsg.concat(" of " + limitMax[0].getValue());
                         }
                         getGotError(
-                                new NoHttpResponseException(status.getReasonPhrase() + " with usage limit " + limitMsg),
-                                url + '/' + file);
+                            new NoHttpResponseException(status.getReasonPhrase() + " with usage limit " + limitMsg),
+                            url + '/' + file);
                     } else {
                         // 429 - Rate limit abuse
                         getGotError(new NoHttpResponseException(status.getReasonPhrase()), url + '/' + file);
@@ -208,10 +214,8 @@ public class OpenAIRERestConnector {
 
             // do not close this httpClient
             result = getResponse.getEntity().getContent();
-        } catch (MalformedURLException e1) {
+        } catch (Exception e1) {
             getGotError(e1, url + '/' + file);
-        } catch (Exception e) {
-            getGotError(e, url + '/' + file);
         }
 
         return result;
@@ -219,10 +223,7 @@ public class OpenAIRERestConnector {
 
     /**
      * Perform an OpenAIRE Project Search By Keywords
-     * 
-     * @param page
-     * @param size
-     * @param keywords
+     *
      * @return OpenAIRE Response
      */
     public Response searchProjectByKeywords(int page, int size, String... keywords) {
@@ -232,11 +233,7 @@ public class OpenAIRERestConnector {
 
     /**
      * Perform an OpenAIRE Project Search By ID and by Funder
-     * 
-     * @param projectID
-     * @param projectFunder
-     * @param page
-     * @param size
+     *
      * @return OpenAIRE Response
      */
     public Response searchProjectByIDAndFunder(String projectID, String projectFunder, int page, int size) {
@@ -246,14 +243,11 @@ public class OpenAIRERestConnector {
 
     /**
      * Perform an OpenAIRE Search request
-     * 
-     * @param path
-     * @param page
-     * @param size
+     *
      * @return OpenAIRE Response
      */
     public Response search(String path, int page, int size) {
-        String[] queryStringPagination = { "page=" + page, "size=" + size };
+        String[] queryStringPagination = {"page=" + page, "size=" + size};
 
         String queryString = path + ((path.indexOf("?") > 0) ? "&" : "?") + String.join("&", queryStringPagination);
 
@@ -287,25 +281,7 @@ public class OpenAIRERestConnector {
     }
 
     /**
-     * trim slashes from the path
-     * 
-     * @param path
-     * @return string path without trailing slashes
-     */
-    public static String trimSlashes(String path) {
-        while (path.endsWith("/")) {
-            path = path.substring(0, path.length() - 1);
-        }
-        while (path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        return path;
-    }
-
-    /**
      * stores clientId to grab the token
-     * 
-     * @param clientId
      */
     @Autowired(required = false)
     public void setClientId(String clientId) {
@@ -314,8 +290,6 @@ public class OpenAIRERestConnector {
 
     /**
      * stores tokenServiceUrl to grab the token
-     * 
-     * @param tokenServiceUrl
      */
     @Autowired(required = false)
     public void setTokenServiceUrl(String tokenServiceUrl) {
@@ -324,8 +298,6 @@ public class OpenAIRERestConnector {
 
     /**
      * stores clientSecret to grab the token
-     * 
-     * @param clientSecret
      */
     @Autowired(required = false)
     public void setClientSecret(String clientSecret) {
@@ -334,8 +306,6 @@ public class OpenAIRERestConnector {
 
     /**
      * tokenUsage true to enable the usage of an access token
-     * 
-     * @param tokenUsage
      */
     @Autowired(required = false)
     public void setTokenEnabled(boolean tokenEnabled) {

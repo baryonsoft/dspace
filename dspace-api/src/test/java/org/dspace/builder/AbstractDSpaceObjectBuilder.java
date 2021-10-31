@@ -171,7 +171,8 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      *
      * @return the builder properly configured to build the object with the additional admin permission
      */
-    protected <B extends AbstractDSpaceObjectBuilder<T>> B setAdminPermission(DSpaceObject dso, EPerson eperson) {
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B setAdminPermission(Item item,
+                                                                              DSpaceObject dso, EPerson eperson) {
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,

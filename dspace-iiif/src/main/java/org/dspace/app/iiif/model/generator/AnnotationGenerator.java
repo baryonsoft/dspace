@@ -28,7 +28,7 @@ public class AnnotationGenerator implements IIIFResource {
     public static final Motivation LINKING = new Motivation("oa:linking");
 
     private Motivation motivation;
-    private String identifier;
+    private final String identifier;
     private CanvasGenerator canvasGenerator;
     private ContentAsTextGenerator contentAsTextGenerator;
     private ExternalLinksGenerator externalLinksGenerator;

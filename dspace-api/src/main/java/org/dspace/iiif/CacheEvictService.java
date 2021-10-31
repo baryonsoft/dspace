@@ -7,6 +7,8 @@
  */
 package org.dspace.iiif;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
@@ -24,11 +26,11 @@ public class CacheEvictService {
     CacheManager cacheManager;
 
     public void evictSingleCacheValue(String cacheKey) {
-        cacheManager.getCache(CACHE_NAME).evict(cacheKey);
+        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).evict(cacheKey);
     }
 
     public void evictAllCacheValues() {
-        cacheManager.getCache(CACHE_NAME).clear();
+        Objects.requireNonNull(cacheManager.getCache(CACHE_NAME)).clear();
     }
 
 }

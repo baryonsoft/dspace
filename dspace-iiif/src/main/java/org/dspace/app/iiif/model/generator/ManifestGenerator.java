@@ -57,7 +57,7 @@ public class ManifestGenerator implements IIIFResource {
     private OtherContent related;
     private ImageContent thumbnail;
     private ContentSearchService searchService;
-    private List<OtherContent> renderings = new ArrayList<>();
+    private final List<OtherContent> renderings = new ArrayList<>();
     private final List<URI> license = new ArrayList<>();
     private final List<MetadataEntry> metadata = new ArrayList<>();
     private final List<Range> ranges = new ArrayList<>();

@@ -76,7 +76,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
     @Test
     public void notFoundTest() throws Exception {
         // Status 404
-        getClient().perform(get("/iiif/" + UUID.randomUUID().toString() + "/manifest"))
+        getClient().perform(get("/iiif/" + UUID.randomUUID() + "/manifest"))
                 .andExpect(status().is(404));
     }
 

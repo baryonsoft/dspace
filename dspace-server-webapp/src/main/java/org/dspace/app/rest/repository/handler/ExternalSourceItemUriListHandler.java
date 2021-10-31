@@ -36,10 +36,7 @@ public class ExternalSourceItemUriListHandler extends ExternalSourceEntryItemUri
     @Override
     @SuppressWarnings("rawtypes")
     public boolean supports(List<String> uriList, String method,Class clazz) {
-        if (clazz != Item.class) {
-            return false;
-        }
-        return true;
+        return clazz == Item.class;
     }
 
     @Override
@@ -51,10 +48,7 @@ public class ExternalSourceItemUriListHandler extends ExternalSourceEntryItemUri
     @Override
     public boolean validate(Context context, HttpServletRequest request, List<String> uriList)
         throws AuthorizeException {
-        if (uriList.size() > 1) {
-            return false;
-        }
-        return true;
+        return uriList.size() <= 1;
     }
 
 

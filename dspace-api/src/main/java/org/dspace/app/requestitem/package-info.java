@@ -12,9 +12,9 @@
  * in the user documentation under the rubric "Request a Copy".
  *
  * <p>This package includes several "strategy" classes which discover responsible
- * parties in various ways.  See {@link RequestItemSubmitterStrategy} and the
+ * parties in various ways.  See {@link org.dspace.app.requestitem.RequestItemSubmitterStrategy} and the
  * classes which extend it.  A strategy class must be configured and identified
- * as {@link RequestItemAuthorExtractor} for injection into code which requires
+ * as {@link org.dspace.app.requestitem.RequestItemAuthorExtractor} for injection into code which requires
  * Request a Copy services.
  */
 package org.dspace.app.requestitem;

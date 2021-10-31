@@ -9,6 +9,7 @@ package org.dspace.google;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -55,7 +56,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     // 20 is the event max set by the GA API
     private static final int GA_MAX_EVENTS = 20;
     private static final String ANALYTICS_BATCH_ENDPOINT = "https://www.google-analytics.com/batch";
-    private static Logger log = Logger.getLogger(GoogleAsyncEventListener.class);
+    private static final Logger log = Logger.getLogger(GoogleAsyncEventListener.class);
     private static String analyticsKey;
     private static CloseableHttpClient httpclient;
     private static Buffer buffer;
@@ -177,18 +178,18 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                         events.add(event);
                         if ((System.currentTimeMillis() - event.getTime()) < MAX_TIME_SINCE_EVENT) {
                             String download = "v=1" +
-                                    "&tid=" + analyticsKey +
-                                    "&cid=" + event.getCid() +
-                                    "&t=event" +
-                                    "&uip=" + URLEncoder.encode(event.getUip(), "UTF-8") +
-                                    "&ua=" + URLEncoder.encode(event.getUa(), "UTF-8") +
-                                    "&dr=" + URLEncoder.encode(event.getDr(), "UTF-8") +
-                                    "&dp=" + URLEncoder.encode(event.getDp(), "UTF-8") +
-                                    "&dt=" + URLEncoder.encode(event.getDt(), "UTF-8") +
-                                    "&qt=" + (System.currentTimeMillis() - event.getTime()) +
-                                    "&ec=bitstream" +
-                                    "&ea=download" +
-                                    "&el=item";
+                                "&tid=" + analyticsKey +
+                                "&cid=" + event.getCid() +
+                                "&t=event" +
+                                "&uip=" + URLEncoder.encode(event.getUip(), StandardCharsets.UTF_8) +
+                                "&ua=" + URLEncoder.encode(event.getUa(), StandardCharsets.UTF_8) +
+                                "&dr=" + URLEncoder.encode(event.getDr(), StandardCharsets.UTF_8) +
+                                "&dp=" + URLEncoder.encode(event.getDp(), StandardCharsets.UTF_8) +
+                                "&dt=" + URLEncoder.encode(event.getDt(), StandardCharsets.UTF_8) +
+                                "&qt=" + (System.currentTimeMillis() - event.getTime()) +
+                                "&ec=bitstream" +
+                                "&ea=download" +
+                                "&el=item";
                             if (request == null) {
                                 request = new StringBuilder(download);
                             } else {

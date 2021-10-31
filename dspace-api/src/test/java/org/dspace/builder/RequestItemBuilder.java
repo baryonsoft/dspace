@@ -115,7 +115,7 @@ public class RequestItemBuilder
     public void cleanup()
             throws Exception {
         LOG.debug("cleanup()");
-        try ( Context ctx = new Context(); ) {
+        try (Context ctx = new Context()) {
             ctx.turnOffAuthorisationSystem();
             requestItem = ctx.reloadEntity(requestItem);
             if (null != requestItem) {

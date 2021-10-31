@@ -9,7 +9,6 @@ package org.dspace.external.provider.impl;
 
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import javax.xml.bind.JAXBException;
 
 import eu.openaire.jaxb.helper.OpenAIREHandler;
@@ -28,21 +27,21 @@ import org.mockito.stubbing.Answer;
  */
 public class MockOpenAIREFundingDataProvider extends OpenAIREFundingDataProvider {
     @Override
-    public void init() throws IOException {
+    public void init() {
         OpenAIRERestConnector restConnector = Mockito.mock(OpenAIRERestConnector.class);
 
         when(restConnector.searchProjectByKeywords(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(),
-                ArgumentMatchers.startsWith("mushroom"))).thenAnswer(new Answer<Response>() {
-                    public Response answer(InvocationOnMock invocation) {
-                        try {
-                            return OpenAIREHandler
-                                    .unmarshal(this.getClass().getResourceAsStream("openaire-projects.xml"));
-                        } catch (JAXBException e) {
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
-                });
+            ArgumentMatchers.startsWith("mushroom"))).thenAnswer(new Answer<Response>() {
+            public Response answer(InvocationOnMock invocation) {
+                try {
+                    return OpenAIREHandler
+                        .unmarshal(this.getClass().getResourceAsStream("openaire-projects.xml"));
+                } catch (JAXBException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
 
         when(restConnector.searchProjectByKeywords(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(),
                 AdditionalMatchers.not(ArgumentMatchers.startsWith("mushroom")))).thenAnswer(new Answer<Response>() {

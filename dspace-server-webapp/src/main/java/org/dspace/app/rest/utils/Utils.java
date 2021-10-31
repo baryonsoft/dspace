@@ -1016,8 +1016,11 @@ public class Utils {
             // disable the security as we only need to retrieve the object to further process the authorization
             context.turnOffAuthorisationSystem();
             return (BaseObjectRest) repository.findOne(context, pk);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         } finally {
             context.restoreAuthSystemState();
         }
+        return null;
     }
 }

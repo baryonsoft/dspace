@@ -19,7 +19,7 @@ public class OpenAIRERestToken {
     /**
      * Stored access token
      */
-    private String accessToken;
+    private final String accessToken;
 
     /**
      * Stored expiration period (in seconds)
@@ -28,9 +28,7 @@ public class OpenAIRERestToken {
 
     /**
      * Stores the grabbed token
-     * 
-     * @param accessToken
-     * @param expiresIn
+     *
      */
     public OpenAIRERestToken(String accessToken, Long expiresIn) {
         this.accessToken = accessToken;
@@ -49,8 +47,7 @@ public class OpenAIRERestToken {
     /**
      * If the existing token has an expiration date and if it is at a minute of
      * expiring
-     * 
-     * @return
+     *
      */
     public boolean isValidToken() {
         if (this.accessToken == null) {

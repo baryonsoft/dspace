@@ -23,7 +23,7 @@ public class EntityTypeServiceInitializer implements Callback {
 
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(EntityTypeServiceInitializer.class);
 
-    @Autowired(required = true)
+    @Autowired()
     private EntityTypeService entityTypeService;
 
     private void initEntityTypes() {
