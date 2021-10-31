@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -61,7 +61,7 @@ public class OptimizeSelectCollection {
             }
         } else {
             //default case, run as specific user, or run all...
-            List<EPerson> people = ePersonService.findAll(context, EPerson.EMAIL);
+            List<EPerson> people = ePersonService.findAll(context, EPerson.EMAIL, 20, 0);
             for (EPerson person : people) {
                 checkSelectCollectionForUser(person);
                 peopleChecked++;

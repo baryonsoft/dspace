@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -49,7 +49,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
     @Column(name = "bitstream_format_id", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bitstreamformatregistry_seq")
     @SequenceGenerator(name = "bitstreamformatregistry_seq", sequenceName = "bitstreamformatregistry_seq",
-        allocationSize = 1, initialValue = 1)
+        allocationSize = 1)
     private Integer id;
 
     @Column(name = "short_description", length = 128, unique = true)

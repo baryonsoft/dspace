@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -24,8 +24,8 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
  */
 @Configuration
 @EnableSpringDataWebSupport
-@ComponentScan( {"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils",
-        "org.dspace.app.configuration", "org.dspace.iiif", "org.dspace.app.iiif"})
+@ComponentScan({"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils",
+    "org.dspace.app.configuration", "org.dspace.iiif", "org.dspace.app.iiif"})
 public class ApplicationConfig {
     // Allowed CORS origins ("Access-Control-Allow-Origin" header)
     // Can be overridden in DSpace configuration
@@ -95,6 +95,7 @@ public class ApplicationConfig {
     /**
      * Return whether to allow credentials (cookies) on CORS requests. This is used to set the
      * CORS "Access-Control-Allow-Credentials" header in Application class.
+     *
      * @return true or false
      */
     public boolean getCorsAllowCredentials() {

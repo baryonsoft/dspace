@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -8,6 +8,8 @@
 package org.dspace.statistics.util;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.List;
 
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -23,7 +25,7 @@ import org.xbill.DNS.Type;
 
 /**
  * XBill DNS resolver to retrieve host names for client IP addresses.
- * TODO: deal with IPv6 addresses.
+ * ` TODO: deal with IPv6 addresses.
  *
  * @author kevinvandevelde at atmire.com
  * @author ben at atmire.com
@@ -49,7 +51,8 @@ public class DnsLookup {
 
         // set the timeout, defaults to 200 milliseconds
         int timeout = configurationService.getIntProperty("usage-statistics.resolver.timeout", 200);
-        res.setTimeout(0, timeout);
+        Duration duration = Duration.ofSeconds(0, timeout * 1000L);
+        res.setTimeout(duration);
 
         Name name = ReverseMap.fromAddress(hostIp);
         int type = Type.PTR;
@@ -58,7 +61,7 @@ public class DnsLookup {
         Message query = Message.newQuery(rec);
         Message response = res.send(query);
 
-        Record[] answers = response.getSectionArray(Section.ANSWER);
+        Record[] answers = response.getSection(Section.ANSWER).toArray(new Record[0]);
         if (answers.length == 0) {
             return hostIp;
         } else {
@@ -76,18 +79,18 @@ public class DnsLookup {
     public static String forward(String hostname)
         throws IOException {
         ConfigurationService configurationService
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
         Resolver res = new ExtendedResolver();
         int timeout = configurationService.getIntProperty("usage-statistics.resolver.timeout", 200);
-        res.setTimeout(0, timeout);
+        res.setTimeout(Duration.ofMillis(timeout));
 
         Name name = Name.fromString(hostname, Name.root);
         Record rec = Record.newRecord(name, Type.A, DClass.IN);
         Message query = Message.newQuery(rec);
         Message response = res.send(query);
 
-        Record[] answers = response.getSectionArray(Section.ANSWER);
-        if (answers.length == 0) {
+        List<Record> answers = response.getSection(Section.ANSWER);
+        if (answers.size() == 0) {
             throw new IOException("Unresolvable host name (empty response)");
         }
 

@@ -42,23 +42,18 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
 
     <!-- Allow individual lines of code to be excluded from these rules, if they are annotated
          with @SuppressWarnings. See also SuppressWarningsHolder below -->
-    <module name="SuppressWarningsFilter" />
+    <module name="SuppressWarningsFilter"/>
 
     <!-- Maximum line length is 120 characters -->
     <module name="LineLength">
         <property name="fileExtensions" value="java"/>
         <property name="max" value="120"/>
         <!-- Only exceptions for packages, imports, URLs, and JavaDoc {@link} tags -->
-        <property name="ignorePattern" value="^package.*|^import.*|http://|https://|@link"/>
+        <property name="ignorePattern" value="^package.*|^import.*|https://|https://|@link"/>
     </module>
 
     <!-- Check individual Java source files for specific rules -->
     <module name="TreeWalker">
-        <!-- Highlight any TODO or FIXME comments in info messages -->
-        <module name="TodoComment">
-            <property name="severity" value="info"/>
-            <property name="format" value="(TODO)|(FIXME)"/>
-        </module>
 
         <!-- Do not report errors on any lines annotated with @SuppressWarnings -->
         <module name="SuppressWarningsHolder"/>
@@ -91,13 +86,19 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         </module>
         <!-- Requirements for Javadocs for methods -->
         <module name="JavadocMethod">
+            <!-- https://github.com/checkstyle/checkstyle/blob/master/src/main/resources/google_checks.xml -->
             <!-- All public methods MUST HAVE Javadocs -->
-            <!-- <property name="scope" value="public"/> -->
-            <!-- TODO: Above rule has been disabled because of large amount of missing public method Javadocs -->
-            <property name="scope" value="nothing"/>
+            <property name="accessModifiers" value="public"/>
+            <property name="allowedAnnotations" value="Override, Test"/>
             <!-- Allow params, throws and return tags to be optional -->
             <property name="allowMissingParamTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
+            <property name="tokens" value="METHOD_DEF, CTOR_DEF, ANNOTATION_FIELD_DEF, COMPACT_CTOR_DEF"/>
+        </module>
+        <module name="AnnotationLocation">
+            <property name="id" value="AnnotationLocationVariables"/>
+            <property name="tokens" value="VARIABLE_DEF"/>
+            <property name="allowSamelineMultipleAnnotations" value="true"/>
         </module>
 
         <!-- ##### Requirements for K&R Style braces ##### -->
@@ -110,7 +111,14 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
 
         <!-- ##### Indentation / Whitespace requirements ##### -->
         <!-- Require 4-space indentation (default value) -->
-        <module name="Indentation"/>
+        <module name="Indentation">
+            <property name="basicOffset" value="4"/>
+            <property name="braceAdjustment" value="0"/>
+            <property name="caseIndent" value="4"/>
+            <property name="throwsIndent" value="4"/>
+            <property name="lineWrappingIndentation" value="4"/>
+            <property name="arrayInitIndent" value="0"/>
+        </module>
         <!-- Whitespace should exist around all major tokens -->
         <module name="WhitespaceAround">
             <!-- However, make an exception for empty constructors, methods, types, etc. -->

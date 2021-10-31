@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -13,11 +13,10 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -36,8 +35,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @version $Revision$
  */
 public class TestLogicRunner {
-
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(TestLogicRunner.class);
 
     /**
      * Default constructor
@@ -61,9 +58,9 @@ public class TestLogicRunner {
         options.addOption("a","all", false, "Run filter over all items");
 
         // initialize parser
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
-        HelpFormatter helpformater = new HelpFormatter();
+        HelpFormatter helpFormatter = new HelpFormatter();
 
         try {
             line = parser.parse(options, argv);
@@ -73,7 +70,7 @@ public class TestLogicRunner {
         }
 
         if (line.hasOption("help")) {
-            helpformater.printHelp("\nTest the DSpace logical item filters\n", options);
+            helpFormatter.printHelp("\nTest the DSpace logical item filters\n", options);
             System.exit(0);
         }
 
@@ -134,7 +131,7 @@ public class TestLogicRunner {
                     System.out.println("Error encountered processing items: " + e.getMessage());
                 }
             } else {
-                helpformater.printHelp("\nTest the DSpace logical item filters\n", options);
+                helpFormatter.printHelp("\nTest the DSpace logical item filters\n", options);
             }
         }
 

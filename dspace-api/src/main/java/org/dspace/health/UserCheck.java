@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -39,7 +39,7 @@ public class UserCheck extends Check {
         String ret = "";
         Map<String, Integer> info = new HashMap<String, Integer>();
         try {
-            List<EPerson> epersons = ePersonService.findAll(context, EPerson.LASTNAME);
+            List<EPerson> epersons = ePersonService.findAll(context, EPerson.LASTNAME, -1, -1);
             info.put("Count", epersons.size());
             info.put("Can log in (password)", 0);
             info.put("Have email", 0);

@@ -1,11 +1,10 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
  * http://www.dspace.org/license/
  */
-
 package org.dspace.xoai.tests.integration.xoai;
 
 import static org.dspace.xoai.tests.support.XmlMatcherBuilder.xml;
@@ -22,7 +21,7 @@ import org.junit.Test;
 import org.parboiled.common.FileUtils;
 
 public class PipelineTest {
-    private static TransformerFactory factory = TransformerFactory.newInstance();
+    private static final TransformerFactory factory = TransformerFactory.newInstance();
 
     @Test
     public void pipelineTest() throws Exception {
@@ -34,8 +33,10 @@ public class PipelineTest {
 
         assertThat(output, oai_dc().withXPath("/oai_dc:dc/dc:title", equalTo("Teste")));
 
+        assert input != null;
         input.close();
         input = null;
+        assert xslt != null;
         xslt.close();
         xslt = null;
         output = null;

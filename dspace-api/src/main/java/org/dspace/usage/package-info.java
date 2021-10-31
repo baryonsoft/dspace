@@ -1,11 +1,10 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
  * http://www.dspace.org/license/
  */
-
 /**
  * Capture of "usage events".  A {@link org.dspace.usage.UsageEvent} represents
  * something like a download or viewing of a Bitstream -- that is, the

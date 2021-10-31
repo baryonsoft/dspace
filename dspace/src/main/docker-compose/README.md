@@ -106,7 +106,7 @@ The remainder of these instructions assume you are using ngrok (though other pro
    NOTE: For Windows you MUST either set the environment variable separately, or use the 'env' command provided with Git/Cygwin
    (you may already have this command if you are running Git for Windows). See https://superuser.com/a/1079563
    ```
-   env DSPACE_HOSTNAME=[subdomain].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+   env `DSPACE_HOSTNAME`=[subdomain].ngrok.io docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
    ```
 
 5. Finally, for https://samltest.id/, you need to upload your Shibboleth Metadata for the site to "trust" you.

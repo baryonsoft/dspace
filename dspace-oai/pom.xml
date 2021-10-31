@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dspace-oai</artifactId>
     <packaging>jar</packaging>
@@ -8,8 +9,8 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.2-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <version>baryonics-0.3.7-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -46,7 +47,9 @@
             </activation>
             <dependencies>
                 <dependency>
+                    <!--suppress MavenModelInspection -->
                     <groupId>com.oracle</groupId>
+                    <!--suppress MavenModelInspection -->
                     <artifactId>ojdbc6</artifactId>
                 </dependency>
             </dependencies>
@@ -228,6 +231,11 @@
             <artifactId>xml-matchers</artifactId>
             <version>0.10</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

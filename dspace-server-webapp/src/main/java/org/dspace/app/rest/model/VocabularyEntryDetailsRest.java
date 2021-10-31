@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -18,9 +18,9 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(name = VocabularyEntryDetailsRest.PARENT, method = "getParent"),
-        @LinkRest(name = VocabularyEntryDetailsRest.CHILDREN, method = "getChildren")
-        })
+    @LinkRest(name = VocabularyEntryDetailsRest.PARENT, method = "getParent"),
+    @LinkRest(name = VocabularyEntryDetailsRest.CHILDREN, method = "getChildren")
+})
 public class VocabularyEntryDetailsRest extends BaseObjectRest<String> {
     public static final String PLURAL_NAME = "vocabularyEntryDetails";
     public static final String NAME = "vocabularyEntryDetail";
@@ -35,6 +35,10 @@ public class VocabularyEntryDetailsRest extends BaseObjectRest<String> {
 
     @JsonIgnore
     private String vocabularyName;
+
+    public static String getName() {
+        return NAME;
+    }
 
     public String getDisplay() {
         return display;
@@ -58,10 +62,6 @@ public class VocabularyEntryDetailsRest extends BaseObjectRest<String> {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    public static String getName() {
-        return NAME;
     }
 
     public String getVocabularyName() {
@@ -95,11 +95,11 @@ public class VocabularyEntryDetailsRest extends BaseObjectRest<String> {
         this.selectable = selectable;
     }
 
-    public void setInHierarchicalVocabulary(boolean isInHierarchicalVocabulary) {
-        this.inHierarchicalVocabulary = isInHierarchicalVocabulary;
-    }
-
     public boolean isInHierarchicalVocabulary() {
         return inHierarchicalVocabulary;
+    }
+
+    public void setInHierarchicalVocabulary(boolean isInHierarchicalVocabulary) {
+        this.inHierarchicalVocabulary = isInHierarchicalVocabulary;
     }
 }

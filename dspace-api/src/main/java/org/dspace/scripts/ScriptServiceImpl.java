@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -8,6 +8,7 @@
 package org.dspace.scripts;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,14 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public List<ScriptConfiguration> getScriptConfigurations(Context context) {
         return serviceManager.getServicesByType(ScriptConfiguration.class).stream().filter(
-            scriptConfiguration -> scriptConfiguration.isAllowedToExecute(context)).collect(Collectors.toList());
+            scriptConfiguration -> {
+                try {
+                    return scriptConfiguration.isAllowedToExecute(context);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }).collect(Collectors.toList());
     }
 
     @Override

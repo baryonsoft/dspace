@@ -50,14 +50,24 @@ RUN ant init_installation update_configs update_code update_webapps
 FROM tomcat:8-jdk11
 ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
-EXPOSE 8080 8009
 
-ENV JAVA_OPTS=-Xmx2000m
+COPY scripts/run.sh $CATALINA_HOME/bin/run.sh
+RUN chmod +x $CATALINA_HOME/bin/run.sh
+
+ENV JAVA_OPTS="-Xmx3000m -Xms500m -Xss900k -XX:+UseContainerSupport"
 
 # Run the "server" webapp off the /server path (e.g. http://localhost:8080/server/)
-RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
+#RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
 # If you wish to run "server" webapp off the ROOT path, then comment out the above RUN, and uncomment the below RUN.
 # You also MUST update the URL in dspace/src/main/docker/local.cfg
 # Please note that server webapp should only run on one path at a time.
-#RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
-#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
+RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
+
+# Add the newrelic.jar and -javaagent parameters
+RUN mkdir -p /usr/local/tomcat/newrelic
+RUN curl -O https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
+RUN unzip newrelic-java.zip -d /usr/local/tomcat
+ADD newrelic.yml /usr/local/tomcat/newrelic/
+ENV JAVA_OPTS="$JAVA_OPTS -Dnewrelic.config.log_file_name=STDOUT"
+
+#ENTRYPOINT ["/bin/bash", "-c" , "/dspace/bin/dspace database migrate && catalina.sh run"]

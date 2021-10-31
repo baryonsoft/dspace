@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -61,10 +61,11 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     /**
      * This method sets the appropriate DSpaceRunnableHandler depending on where it was ran from and it parses
      * the arguments given to the script
+     *
      * @param args                  The arguments given to the script
      * @param dSpaceRunnableHandler The DSpaceRunnableHandler object that defines from where the script was ran
-     * @param currentUser
-     * @throws ParseException       If something goes wrong
+     * @param currentUser           The current user
+     * @throws ParseException If something goes wrong
      */
     public void initialize(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
                            EPerson currentUser) throws ParseException {
