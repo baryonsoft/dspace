@@ -11,9 +11,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
-import io.sentry.Sentry;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -113,10 +111,10 @@ public class DiscoveryRestController implements InitializingBean {
 
         if (log.isTraceEnabled()) {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
-                    + ", configuration name: " + StringUtils.trimToEmpty(configuration)
-                    + ", dsoTypes: " + String.join(", ", dsoTypes)
-                    + ", query: " + StringUtils.trimToEmpty(query)
-                    + ", filters: " + Objects.toString(searchFilters));
+                + ", configuration name: " + StringUtils.trimToEmpty(configuration)
+                + ", dsoTypes: " + String.join(", ", dsoTypes)
+                + ", query: " + StringUtils.trimToEmpty(query)
+                + ", filters: " + searchFilters);
         }
 
         SearchResultsRest searchResultsRest = discoveryRestRepository
@@ -142,17 +140,11 @@ public class DiscoveryRestController implements InitializingBean {
 
         if (log.isTraceEnabled()) {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
-                    + ", configuration name: " + StringUtils.trimToEmpty(configuration)
-                    + ", dsoTypes: " + String.join(", ", dsoTypes)
-                    + ", query: " + StringUtils.trimToEmpty(query)
-                    + ", filters: " + Objects.toString(searchFilters)
-                    + ", page: " + Objects.toString(page));
-        }
-
-        try {
-            throw new Exception("This is a test, at endpoint /discover/search/objects");
-        } catch (Exception e) {
-            Sentry.captureException(e);
+                + ", configuration name: " + StringUtils.trimToEmpty(configuration)
+                + ", dsoTypes: " + String.join(", ", dsoTypes)
+                + ", query: " + StringUtils.trimToEmpty(query)
+                + ", filters: " + searchFilters
+                + ", page: " + page);
         }
 
         //Get the Search results in JSON format
@@ -199,11 +191,11 @@ public class DiscoveryRestController implements InitializingBean {
 
         if (log.isTraceEnabled()) {
             log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
-                          + ", dsoTypes: " + String.join(", ", dsoTypes)
-                          + ", prefix: " + StringUtils.trimToEmpty(prefix)
-                          + ", query: " + StringUtils.trimToEmpty(query)
-                          + ", filters: " + Objects.toString(searchFilters)
-                          + ", page: " + Objects.toString(page));
+                + ", dsoTypes: " + String.join(", ", dsoTypes)
+                + ", prefix: " + StringUtils.trimToEmpty(prefix)
+                + ", query: " + StringUtils.trimToEmpty(query)
+                + ", filters: " + searchFilters
+                + ", page: " + page);
         }
 
         FacetResultsRest facetResultsRest = discoveryRestRepository
