@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -11,7 +11,6 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -112,10 +111,10 @@ public class DiscoveryRestController implements InitializingBean {
 
         if (log.isTraceEnabled()) {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
-                    + ", configuration name: " + StringUtils.trimToEmpty(configuration)
-                    + ", dsoTypes: " + String.join(", ", dsoTypes)
-                    + ", query: " + StringUtils.trimToEmpty(query)
-                    + ", filters: " + Objects.toString(searchFilters));
+                + ", configuration name: " + StringUtils.trimToEmpty(configuration)
+                + ", dsoTypes: " + String.join(", ", dsoTypes)
+                + ", query: " + StringUtils.trimToEmpty(query)
+                + ", filters: " + searchFilters);
         }
 
         SearchResultsRest searchResultsRest = discoveryRestRepository
@@ -141,16 +140,17 @@ public class DiscoveryRestController implements InitializingBean {
 
         if (log.isTraceEnabled()) {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
-                    + ", configuration name: " + StringUtils.trimToEmpty(configuration)
-                    + ", dsoTypes: " + String.join(", ", dsoTypes)
-                    + ", query: " + StringUtils.trimToEmpty(query)
-                    + ", filters: " + Objects.toString(searchFilters)
-                    + ", page: " + Objects.toString(page));
+                + ", configuration name: " + StringUtils.trimToEmpty(configuration)
+                + ", dsoTypes: " + String.join(", ", dsoTypes)
+                + ", query: " + StringUtils.trimToEmpty(query)
+                + ", filters: " + searchFilters
+                + ", page: " + page);
         }
 
         //Get the Search results in JSON format
         SearchResultsRest searchResultsRest = discoveryRestRepository
-            .getSearchObjects(query, dsoTypes, dsoScope, configuration, searchFilters, page, utils.obtainProjection());
+                .getSearchObjects(query, dsoTypes, dsoScope, configuration,
+                        searchFilters, page, utils.obtainProjection());
 
         //Convert the Search JSON results to paginated HAL resources
         SearchResultsResource searchResultsResource = new SearchResultsResource(searchResultsRest, utils, page);
@@ -191,11 +191,11 @@ public class DiscoveryRestController implements InitializingBean {
 
         if (log.isTraceEnabled()) {
             log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
-                          + ", dsoTypes: " + String.join(", ", dsoTypes)
-                          + ", prefix: " + StringUtils.trimToEmpty(prefix)
-                          + ", query: " + StringUtils.trimToEmpty(query)
-                          + ", filters: " + Objects.toString(searchFilters)
-                          + ", page: " + Objects.toString(page));
+                + ", dsoTypes: " + String.join(", ", dsoTypes)
+                + ", prefix: " + StringUtils.trimToEmpty(prefix)
+                + ", query: " + StringUtils.trimToEmpty(query)
+                + ", filters: " + searchFilters
+                + ", page: " + page);
         }
 
         FacetResultsRest facetResultsRest = discoveryRestRepository

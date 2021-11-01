@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -270,12 +270,12 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
 
         Collection col = CollectionBuilder.createCollection(context, rootCommunity)
                                           .withName("Collection 1")
+                                          .withEntityType("Publication")
                                           .build();
 
         Item itemA = ItemBuilder.createItem(context, col)
                                 .withTitle("Public item")
                                 .withIssueDate("2021-04-19")
-                                .withEntityType("Publication")
                                 .withAuthor("Doe, John")
                                 .withSubject("ExtraEntry")
                                 .build();
@@ -318,12 +318,12 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
 
         Collection col = CollectionBuilder.createCollection(context, rootCommunity)
                                           .withName("Collection 1")
+                                          .withEntityType("Publication")
                                           .build();
 
         Item itemA = ItemBuilder.createItem(context, col)
                                 .withTitle("Public item")
                                 .withIssueDate("2021-04-19")
-                                .withEntityType("Publication")
                                 .withAuthor("Doe, John")
                                 .withSubject("ExtraEntry")
                                 .build();

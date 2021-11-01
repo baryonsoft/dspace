@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -201,13 +201,13 @@ public class RequestItemRepositoryIT
     /**
      * Test of createAndReturn method, with an authenticated user.
      *
-     * @throws java.sql.SQLException passed through.
+     * @throws java.sql.SQLException                   passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
-     * @throws java.io.IOException passed through.
+     * @throws java.io.IOException                     passed through.
      */
     @Test
     public void testCreateAndReturnAuthenticated()
-            throws SQLException, AuthorizeException, IOException, Exception {
+        throws Exception {
         System.out.println("createAndReturn (authenticated)");
 
         // Fake up a request in REST form.
@@ -253,13 +253,13 @@ public class RequestItemRepositoryIT
      * Test of createAndReturn method, with an UNauthenticated user.
      * This should succeed:  anyone can file a request.
      *
-     * @throws java.sql.SQLException passed through.
+     * @throws java.sql.SQLException                   passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
-     * @throws java.io.IOException passed through.
+     * @throws java.io.IOException                     passed through.
      */
     @Test
     public void testCreateAndReturnNotAuthenticated()
-            throws SQLException, AuthorizeException, IOException, Exception {
+        throws Exception {
         System.out.println("createAndReturn (not authenticated)");
 
         // Fake up a request in REST form.
@@ -303,13 +303,13 @@ public class RequestItemRepositoryIT
     /**
      * Test of createAndReturn method, with various errors.
      *
-     * @throws java.sql.SQLException passed through.
+     * @throws java.sql.SQLException                   passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
-     * @throws java.io.IOException passed through.
+     * @throws java.io.IOException                     passed through.
      */
     @Test
     public void testCreateAndReturnBadRequest()
-            throws SQLException, AuthorizeException, IOException, Exception {
+        throws Exception {
         System.out.println("createAndReturn (bad requests)");
 
         // Fake up a request in REST form.

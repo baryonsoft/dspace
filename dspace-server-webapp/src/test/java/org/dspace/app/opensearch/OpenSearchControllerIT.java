@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -36,7 +36,7 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
     private ConfigurationService configurationService;
 
     @Before
-    public void init() throws Exception {
+    public void init() {
         //enable OpenSearch by configuration
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         configurationService.setProperty("websvc.opensearch.enable", true);
@@ -197,37 +197,41 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
         ;
     }
 
+    @SuppressWarnings("CheckStyle")
     @Test
     public void serviceDocumentTest() throws Exception {
         //When we call the root endpoint
         getClient().perform(get("/opensearch/service"))
-                   //The status has to be 200 OK
-                   .andExpect(status().isOk())
-                   // and the contentType has to be an opensearchdescription
-                   .andExpect(content().contentType("application/opensearchdescription+xml;charset=UTF-8"))
-                   // and there need to be some values taken from the test configuration
-                   .andExpect(xpath("OpenSearchDescription/ShortName").string("DSpace"))
-                   .andExpect(xpath("OpenSearchDescription/LongName").string("DSpace at My University"))
-                   .andExpect(xpath("OpenSearchDescription/Description")
-                       .string("DSpace at My University DSpace repository")
-        )
+            //The status has to be 200 OK
+            .andExpect(status().isOk())
+            // and the contentType has to be an opensearchdescription
+            .andExpect(content().contentType("application/opensearchdescription+xml;charset=UTF-8"))
+            // and there need to be some values taken from the test configuration
+            .andExpect(xpath("OpenSearchDescription/ShortName").string("DSpace"))
+            .andExpect(xpath("OpenSearchDescription/LongName").string("Baryonics Database"))
+            .andExpect(xpath("OpenSearchDescription/Description")
+                .string("Baryonics Database DSpace repository")
+            )
         ;
         /* Expected response for the service document is:
-            <?xml version="1.0" encoding="UTF-8"?>
-            <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
-                <ShortName>DSpace</ShortName>
-                <LongName>DSpace at My University</LongName>
-                <Description>DSpace at My University DSpace repository</Description>
-                <InputEncoding>UTF-8</InputEncoding>
-                <OutputEncoding>UTF-8</OutputEncoding>
-                <Query role="example" searchTerms="photosyntesis" />
-                <Tags>IR DSpace</Tags>
-                <Contact>dspace-help@myu.edu</Contact>
-                <Image height="16" width="16" type="image/vnd.microsoft.icon">http://www.dspace.org/images/favicon.ico</Image>
-                <Url type="text/html" template="http://localhost:8080/simple-search?query={searchTerms}" />
-                <Url type="application/atom+xml; charset=UTF-8" template="http://localhost:8080/open-search/?query={searchTerms}&amp;start={startIndex?}&amp;rpp={count?}&amp;format=atom" />
-                <Url type="application/rss+xml; charset=UTF-8" template="http://localhost:8080/open-search/?query={searchTerms}&amp;start={startIndex?}&amp;rpp={count?}&amp;format=rss" />
-            </OpenSearchDescription>
+        <?xml version="1.0" encoding="UTF-8"?>
+        <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+            <ShortName>DSpace</ShortName>
+            <LongName>Baryonics Database</LongName>
+            <Description>Baryonics Database DSpace repository</Description>
+            <InputEncoding>UTF-8</InputEncoding>
+            <OutputEncoding>UTF-8</OutputEncoding>
+            <Query role="example" searchTerms="photosyntesis" />
+            <Tags>IR DSpace</Tags>
+            <Contact>dspace-help@myu.edu</Contact>
+            <Image height="16" width="16" type="image/vnd.microsoft.icon">
+            http://www.dspace.org/images/favicon.ico</Image>
+            <Url type="text/html" template="http://localhost:8080/simple-search?query={searchTerms}" />
+            <Url type="application/atom+xml; charset=UTF-8" template="http://localhost:8080/open-search/?query=
+            {searchTerms}&amp;start={startIndex?}&amp;rpp={count?}&amp;format=atom" />
+            <Url type="application/rss+xml; charset=UTF-8" template="http://localhost:8080/open-search/?query=
+            {searchTerms}&amp;start={startIndex?}&amp;rpp={count?}&amp;format=rss" />
+        </OpenSearchDescription>
         */
     }
 }

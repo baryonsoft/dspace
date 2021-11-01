@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -32,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.OpenAIRERestConnector;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -42,12 +42,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author paulo-graca
  *
  */
-public class OpenAIREFundingDataProvider implements ExternalDataProvider {
+public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
 
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenAIREFundingDataProvider.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenAIREFundingDataProvider.class);
 
     /**
      * GrantAgreement prefix
@@ -80,6 +80,50 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
         return sourceIdentifier;
     }
 
+    /**
+     * This method returns an URI based on OpenAIRE 3.0 guidelines
+     * https://guidelines.openaire.eu/en/latest/literature/field_projectid.html that
+     * can be used as an ID if is there any missing part, that part it will be
+     * replaced by the character '+'
+     *
+     * @return String with an URI like: info:eu-repo/grantAgreement/EC/FP7/244909
+     */
+    private static String generateProjectURI(Project project) {
+        ProjectHelper projectHelper = new ProjectHelper(project.getCodeOrTitleOrAcronym());
+
+        String funderShortName = "+";
+        String fundingName = "+";
+        String code = "+";
+        String jurisdiction = "+";
+
+        Optional<FundingTreeType> fundingTree = projectHelper.getFundingTreeTypes().stream().findFirst();
+        if (fundingTree.isPresent()) {
+            if (fundingTree.get().getFunder() != null) {
+                if (fundingTree.get().getFunder().getShortname() != null) {
+                    funderShortName = encodeValue(fundingTree.get().getFunder().getShortname());
+                }
+                if (fundingTree.get().getFunder().getJurisdiction() != null) {
+                    jurisdiction = encodeValue(fundingTree.get().getFunder().getJurisdiction());
+                }
+            }
+            FundingHelper fundingHelper = new FundingHelper(
+                fundingTree.get().getFundingLevel2OrFundingLevel1OrFundingLevel0());
+            Optional<FundingType> funding = fundingHelper.getFirstAvailableFunding().stream().findFirst();
+
+            if (funding.isPresent()) {
+                fundingName = encodeValue(funding.get().getName());
+            }
+
+        }
+
+        Optional<String> optCode = projectHelper.getCodes().stream().findFirst();
+        if (optCode.isPresent()) {
+            code = encodeValue(optCode.get());
+        }
+
+        return String.format("%s/%s/%s/%s/%s", PREFIX, funderShortName, fundingName, code, jurisdiction);
+    }
+
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
 
@@ -96,10 +140,10 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
             if (response.getHeader() != null && Integer.parseInt(response.getHeader().getTotal()) > 0) {
                 Project project = response.getResults().getResult().get(0).getMetadata().getEntity().getProject();
                 ExternalDataObject externalDataObject = new OpenAIREFundingDataProvider
-                        .ExternalDataObjectBuilder(project)
-                        .setId(generateProjectURI(project))
-                        .setSource(sourceIdentifier)
-                        .build();
+                    .ExternalDataObjectBuilder(project)
+                    .setId(generateProjectURI(project))
+                    .setSource(sourceIdentifier)
+                    .build();
                 return Optional.of(externalDataObject);
             }
         } catch (NumberFormatException e) {
@@ -107,6 +151,20 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public boolean supports(String source) {
+        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
+    }
+
+    @Override
+    public int getNumberOfResults(String query) {
+        // escaping query
+        String encodedQuery = encodeValue(query);
+
+        Response projectResponse = connector.searchProjectByKeywords(0, 0, encodedQuery);
+        return Integer.parseInt(projectResponse.getHeader().getTotal());
     }
 
     @Override
@@ -129,7 +187,7 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
             return Collections.emptyList();
         }
 
-        List<Project> projects = new ArrayList<Project>();
+        List<Project> projects = new ArrayList<>();
         for (Result result : projectResponse.getResults().getResult()) {
 
             if (result.getMetadata() != null && result.getMetadata().getEntity() != null
@@ -142,39 +200,14 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
         if (projects.size() > 0) {
             return projects.stream()
-                    .map(project -> new OpenAIREFundingDataProvider
-                            .ExternalDataObjectBuilder(project)
-                            .setId(generateProjectURI(project))
-                            .setSource(sourceIdentifier)
-                            .build())
-                    .collect(Collectors.toList());
+                .map(project -> new OpenAIREFundingDataProvider
+                    .ExternalDataObjectBuilder(project)
+                    .setId(generateProjectURI(project))
+                    .setSource(sourceIdentifier)
+                    .build())
+                .collect(Collectors.toList());
         }
         return Collections.emptyList();
-    }
-
-    @Override
-    public boolean supports(String source) {
-        return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
-    }
-
-    @Override
-    public int getNumberOfResults(String query) {
-        // escaping query
-        String encodedQuery = encodeValue(query);
-
-        Response projectResponse = connector.searchProjectByKeywords(0, 0, encodedQuery);
-        return Integer.parseInt(projectResponse.getHeader().getTotal());
-    }
-
-    /**
-     * Generic setter for the sourceIdentifier
-     * 
-     * @param sourceIdentifier The sourceIdentifier to be set on this
-     *                         OpenAIREFunderDataProvider
-     */
-    @Autowired(required = true)
-    public void setSourceIdentifier(String sourceIdentifier) {
-        this.sourceIdentifier = sourceIdentifier;
     }
 
     public OpenAIRERestConnector getConnector() {
@@ -183,10 +216,8 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
     /**
      * Generic setter for OpenAIRERestConnector
-     * 
-     * @param connector
      */
-    @Autowired(required = true)
+    @Autowired()
     public void setConnector(OpenAIRERestConnector connector) {
         this.connector = connector;
     }
@@ -205,7 +236,6 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
     /**
      * Validates if the project has the correct format
      * 
-     * @param projectURI
      * @return true if the URI is valid
      */
     private static boolean isValidProjectURI(String projectURI) {
@@ -213,49 +243,14 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
     }
 
     /**
-     * This method returns an URI based on OpenAIRE 3.0 guidelines
-     * https://guidelines.openaire.eu/en/latest/literature/field_projectid.html that
-     * can be used as an ID if is there any missing part, that part it will be
-     * replaced by the character '+'
-     * 
-     * @param project
-     * @return String with an URI like: info:eu-repo/grantAgreement/EC/FP7/244909
+     * Generic setter for the sourceIdentifier
+     *
+     * @param sourceIdentifier The sourceIdentifier to be set on this
+     *                         OpenAIREFunderDataProvider
      */
-    private static String generateProjectURI(Project project) {
-        ProjectHelper projectHelper = new ProjectHelper(project.getCodeOrTitleOrAcronym());
-
-        String prefix = PREFIX;
-        String funderShortName = "+";
-        String fundingName = "+";
-        String code = "+";
-        String jurisdiction = "+";
-
-        Optional<FundingTreeType> fundingTree = projectHelper.getFundingTreeTypes().stream().findFirst();
-        if (!fundingTree.isEmpty()) {
-            if (fundingTree.get().getFunder() != null) {
-                if (fundingTree.get().getFunder().getShortname() != null) {
-                    funderShortName = encodeValue(fundingTree.get().getFunder().getShortname());
-                }
-                if (fundingTree.get().getFunder().getJurisdiction() != null) {
-                    jurisdiction = encodeValue(fundingTree.get().getFunder().getJurisdiction());
-                }
-            }
-            FundingHelper fundingHelper = new FundingHelper(
-                    fundingTree.get().getFundingLevel2OrFundingLevel1OrFundingLevel0());
-            Optional<FundingType> funding = fundingHelper.getFirstAvailableFunding().stream().findFirst();
-
-            if (!funding.isEmpty()) {
-                fundingName = encodeValue(funding.get().getName());
-            }
-
-        }
-
-        Optional<String> optCode = projectHelper.getCodes().stream().findFirst();
-        if (!optCode.isEmpty()) {
-            code = encodeValue(optCode.get());
-        }
-
-        return String.format("%s/%s/%s/%s/%s", prefix, funderShortName, fundingName, code, jurisdiction);
+    @Autowired()
+    public void setSourceIdentifier(String sourceIdentifier) {
+        this.sourceIdentifier = sourceIdentifier;
     }
 
     private static String encodeValue(String value) {
@@ -329,7 +324,6 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
         /**
          * Set the external data source
          * 
-         * @param source
          * @return ExternalDataObjectBuilder
          */
         public ExternalDataObjectBuilder setSource(String source) {
@@ -339,19 +333,14 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
         /**
          * Set the external data display name
-         * 
-         * @param displayName
-         * @return ExternalDataObjectBuilder
          */
-        public ExternalDataObjectBuilder setDisplayValue(String displayName) {
+        public void setDisplayValue(String displayName) {
             this.externalDataObject.setDisplayValue(displayName);
-            return this;
         }
 
         /**
          * Set the external data value
          * 
-         * @param value
          * @return ExternalDataObjectBuilder
          */
         public ExternalDataObjectBuilder setValue(String value) {
@@ -362,7 +351,6 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
         /**
          * Set the external data id
          * 
-         * @param id
          * @return ExternalDataObjectBuilder
          */
         public ExternalDataObjectBuilder setId(String id) {
@@ -376,8 +364,9 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
         /**
          * Add metadata dc.identifier
-         * 
-         * @param metadata identifier
+         *
+         * @param identifier identifier
+         *
          * @return ExternalDataObjectBuilder
          */
         public ExternalDataObjectBuilder addIdentifier(String identifier) {
@@ -387,100 +376,85 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
         /**
          * Add metadata project.funder.name
-         * 
-         * @param metadata funderName
-         * @return ExternalDataObjectBuilder
+         *
+         * @param funderName funderName
          */
-        public ExternalDataObjectBuilder addFunderName(String funderName) {
+        public void addFunderName(String funderName) {
             this.externalDataObject.addMetadata(new MetadataValueDTO("project", "funder", "name", null, funderName));
-            return this;
         }
 
         /**
          * Add metadata project.funder.identifier
-         * 
-         * @param metadata funderId
-         * @return ExternalDataObjectBuilder
+         *
+         * @param funderID funderId
          */
-        public ExternalDataObjectBuilder addFunderID(String funderID) {
+        public void addFunderID(String funderID) {
             this.externalDataObject
-                    .addMetadata(new MetadataValueDTO("project", "funder", "identifier", null, funderID));
-            return this;
+                .addMetadata(new MetadataValueDTO("project", "funder", "identifier", null, funderID));
         }
 
         /**
          * Add metadata dc.title
-         * 
-         * @param metadata awardTitle
-         * @return ExternalDataObjectBuilder
+         *
+         * @param awardTitle awardTitle
          */
-        public ExternalDataObjectBuilder addAwardTitle(String awardTitle) {
+        public void addAwardTitle(String awardTitle) {
             this.externalDataObject.addMetadata(new MetadataValueDTO("dc", "title", null, null, awardTitle));
-            return this;
         }
 
         /**
          * Add metadata oaire.fundingStream
-         * 
-         * @param metadata fundingStream
-         * @return ExternalDataObjectBuilder
+         *
+         * @param fundingStream fundingStream
          */
-        public ExternalDataObjectBuilder addFundingStream(String fundingStream) {
+        public void addFundingStream(String fundingStream) {
             this.externalDataObject
-                    .addMetadata(new MetadataValueDTO("oaire", "fundingStream", null, null, fundingStream));
-            return this;
+                .addMetadata(new MetadataValueDTO("oaire", "fundingStream", null, null, fundingStream));
         }
 
         /**
          * Add metadata oaire.awardNumber
-         * 
-         * @param metadata awardNumber
-         * @return ExternalDataObjectBuilder
+         *
+         * @param awardNumber awardNumber
          */
-        public ExternalDataObjectBuilder addAwardNumber(String awardNumber) {
+        public void addAwardNumber(String awardNumber) {
             this.externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardNumber", null, null, awardNumber));
-            return this;
         }
 
         /**
          * Add metadata oaire.awardURI
-         * 
-         * @param metadata websiteUrl
-         * @return ExternalDataObjectBuilder
+         *
+         * @param websiteUrl websiteUrl
          */
-        public ExternalDataObjectBuilder addAwardURI(String websiteUrl) {
+        public void addAwardURI(String websiteUrl) {
             this.externalDataObject.addMetadata(new MetadataValueDTO("oaire", "awardURI", null, null, websiteUrl));
-            return this;
         }
 
         /**
          * Add metadata dc.title.alternative
-         * 
-         * @param metadata fundingItemAcronym
-         * @return ExternalDataObjectBuilder
+         *
+         * @param fundingItemAcronym fundingItemAcronym
          */
-        public ExternalDataObjectBuilder addFundingItemAcronym(String fundingItemAcronym) {
+        public void addFundingItemAcronym(String fundingItemAcronym) {
             this.externalDataObject
-                    .addMetadata(new MetadataValueDTO("dc", "title", "alternative", null, fundingItemAcronym));
-            return this;
+                .addMetadata(new MetadataValueDTO("dc", "title", "alternative", null, fundingItemAcronym));
         }
 
         /**
          * Add metadata dc.coverage.spatial
-         * 
-         * @param metadata funderJuristiction
-         * @return ExternalDataObjectBuilder
+         *
+         * @param funderJuristiction funderJuristiction
          */
-        public ExternalDataObjectBuilder addFunderJuristiction(String funderJuristiction) {
+        public void addFunderJuristiction(String funderJuristiction) {
             this.externalDataObject
-                    .addMetadata(new MetadataValueDTO("dc", "coverage", "spatial", null, funderJuristiction));
-            return this;
+                .addMetadata(new MetadataValueDTO("dc", "coverage", "spatial", null, funderJuristiction));
         }
 
         /**
          * Add metadata dc.description
-         * 
-         * @param metadata description
+         *
+         * @param description description
+         *
          * @return ExternalDataObjectBuilder
          */
         public ExternalDataObjectBuilder addDescription(String description) {
@@ -490,13 +464,11 @@ public class OpenAIREFundingDataProvider implements ExternalDataProvider {
 
         /**
          * Add metadata dc.subject
-         * 
-         * @param metadata subject
-         * @return ExternalDataObjectBuilder
+         *
+         * @param subject subject
          */
-        public ExternalDataObjectBuilder addSubject(String subject) {
+        public void addSubject(String subject) {
             this.externalDataObject.addMetadata(new MetadataValueDTO("dc", "subject", null, null, subject));
-            return this;
         }
 
         /**

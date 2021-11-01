@@ -1,11 +1,10 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
  * http://www.dspace.org/license/
  */
-
 package org.dspace.workflow;
 
 import java.io.IOException;
@@ -33,7 +32,7 @@ import org.xml.sax.SAXException;
  * This mapping is configured in {@code [DSpace]/config/workflow-curation.xml}.
  * Meant to be used as a singleton injected by a DI container such as Spring.
  *
- * <p>Adapted from {@link org.dspace.curate.WorkflowCuratorServiceImpl}.
+ * <p>Adapted from {@link org.dspace.curate.XmlWorkflowCuratorServiceImpl}.
  *
  * @author mwood
  */
@@ -69,7 +68,7 @@ public class CurationTaskConfig {
         } else if (collectionTasksetMap.containsKey(DEFAULT_TASKSET_NAME)) {
             return collectionTasksetMap.get(DEFAULT_TASKSET_NAME);
         } else {
-            return new TaskSet("", Collections.EMPTY_LIST);
+            return new TaskSet("", Collections.emptyList());
         }
     }
 
@@ -126,9 +125,8 @@ public class CurationTaskConfig {
                         } else if (thing instanceof NotifyType) {
                             NotifyType notify = (NotifyType) thing;
                             stepTask.addContact(notify.getOn().value(), notify.getValue());
-                        } else {
-                            // SNH this branch is forbidden by the schema.
-                        }
+                        }  // SNH this branch is forbidden by the schema.
+
                     }
                     flowstep.addTask(stepTask);
                 }

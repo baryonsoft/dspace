@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -40,12 +40,13 @@ public class BitstreamResourcePolicyUtils {
      * Based on the given access condition, find the resource policy to apply on the given bitstream
      * This function applies the resource policies.
      *
-     * @param context               The relevant DSpace Context.
-     * @param uploadConfigs         The configured UploadConfigurations
-     * @param b                     The applicable bitstream whose policies should be determined
-     * @param newAccessCondition    The access condition containing the details for the desired policies
-     * @throws SQLException         If a database error occurs
-     * @throws AuthorizeException   If the user is not authorized
+     * @param context             The relevant DSpace Context.
+     * @param uploadConfigs       The configured UploadConfigurations
+     * @param b                   The applicable bitstream whose policies should be determined
+     * @param newAccessConditions The access condition containing the details for the desired policies
+     *
+     * @throws SQLException       If a database error occurs
+     * @throws AuthorizeException If the user is not authorized
      */
     public static void findApplyResourcePolicy(Context context, Iterator<UploadConfiguration> uploadConfigs,
                                          Bitstream b, List<UploadBitstreamAccessConditionDTO> newAccessConditions)
@@ -69,15 +70,16 @@ public class BitstreamResourcePolicyUtils {
      * This function applies the resource policies.
      * The description, start date and end date are applied as well
      *
-     * @param context               The relevant DSpace Context.
-     * @param uploadConfigs         The configured UploadConfigurations
-     * @param b                     The applicable bitstream whose policies should be determined
-     * @param name                  The name of the access condition matching the desired policies
-     * @param description           An optional description for the policies
-     * @param startDate             An optional start date for the policies
-     * @param endDate               An optional end date for the policies
-     * @throws SQLException         If a database error occurs
-     * @throws AuthorizeException   If the user is not authorized
+     * @param context             The relevant DSpace Context.
+     * @param uploadConfiguration The configured UploadConfigurations
+     * @param b                   The applicable bitstream whose policies should be determined
+     * @param name                The name of the access condition matching the desired policies
+     * @param description         An optional description for the policies
+     * @param startDate           An optional start date for the policies
+     * @param endDate             An optional end date for the policies
+     *
+     * @throws SQLException       If a database error occurs
+     * @throws AuthorizeException If the user is not authorized
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
                                                Bitstream b, String name, String description,

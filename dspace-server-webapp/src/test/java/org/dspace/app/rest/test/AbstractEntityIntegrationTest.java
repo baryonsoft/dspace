@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -44,7 +44,7 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
     public void setUp() throws Exception {
         super.setUp();
 
-        if (entityTypeService.findAll(context).size() > 0) {
+        if (entityTypeService.findAll(context).size() > 1) {
             //Don't initialize the setup more than once
             return;
         }

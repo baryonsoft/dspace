@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -13,12 +13,15 @@ import java.io.InputStream;
 import java.util.Map;
 
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -58,6 +61,7 @@ public class S3BitStoreService implements BitStoreService {
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
+    private String endpoint;
 
     /**
      * container for all the assets
@@ -72,7 +76,7 @@ public class S3BitStoreService implements BitStoreService {
     /**
      * S3 service
      */
-    private AmazonS3 s3Service = null;
+    private AmazonS3 s3Client = null;
 
     private static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -88,13 +92,23 @@ public class S3BitStoreService implements BitStoreService {
      */
     @Override
     public void init() throws IOException {
-        if (StringUtils.isBlank(getAwsAccessKey()) || StringUtils.isBlank(getAwsSecretKey())) {
-            log.warn("Empty S3 access or secret");
+        if (StringUtils.isBlank(getAwsAccessKey()) ||
+                StringUtils.isBlank(getAwsSecretKey()) || StringUtils.isBlank(getEndpoint())) {
+            log.warn("Empty S3 access, secret or endpoint.");
         }
 
         // init client
-        AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
-        s3Service = new AmazonS3Client(awsCredentials);
+        AWSCredentials credentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
+        ClientConfiguration clientConfiguration = new ClientConfiguration();
+        clientConfiguration.setSignerOverride("AWSS3V4SignerType");
+        s3Client = AmazonS3ClientBuilder
+                .standard()
+                .withEndpointConfiguration(
+                        new AwsClientBuilder.EndpointConfiguration(getEndpoint(), Regions.US_EAST_1.name()))
+                .withPathStyleAccessEnabled(true)
+                .withClientConfiguration(clientConfiguration)
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .build();
 
         // bucket name
         if (StringUtils.isEmpty(bucketName)) {
@@ -105,8 +119,8 @@ public class S3BitStoreService implements BitStoreService {
         }
 
         try {
-            if (!s3Service.doesBucketExist(bucketName)) {
-                s3Service.createBucket(bucketName);
+            if (!s3Client.doesBucketExistV2(bucketName)) {
+                s3Client.createBucket(bucketName);
                 log.info("Creating new S3 Bucket: " + bucketName);
             }
         } catch (AmazonClientException e) {
@@ -119,7 +133,7 @@ public class S3BitStoreService implements BitStoreService {
             try {
                 Regions regions = Regions.fromName(awsRegionName);
                 Region region = Region.getRegion(regions);
-                s3Service.setRegion(region);
+                s3Client.setRegion(region);
                 log.info("S3 Region set to: " + region.getName());
             } catch (IllegalArgumentException e) {
                 log.warn("Invalid aws_region: " + awsRegionName);
@@ -152,7 +166,7 @@ public class S3BitStoreService implements BitStoreService {
     public InputStream get(Bitstream bitstream) throws IOException {
         String key = getFullKey(bitstream.getInternalId());
         try {
-            S3Object object = s3Service.getObject(new GetObjectRequest(bucketName, key));
+            S3Object object = s3Client.getObject(new GetObjectRequest(bucketName, key));
             return (object != null) ? object.getObjectContent() : null;
         } catch (AmazonClientException e) {
             log.error("get(" + key + ")", e);
@@ -181,7 +195,7 @@ public class S3BitStoreService implements BitStoreService {
             long contentLength = scratchFile.length();
 
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, scratchFile);
-            PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
+            PutObjectResult putObjectResult = s3Client.putObject(putObjectRequest);
 
             bitstream.setSizeBytes(contentLength);
             bitstream.setChecksum(putObjectResult.getETag());
@@ -216,7 +230,7 @@ public class S3BitStoreService implements BitStoreService {
     public Map about(Bitstream bitstream, Map attrs) throws IOException {
         String key = getFullKey(bitstream.getInternalId());
         try {
-            ObjectMetadata objectMetadata = s3Service.getObjectMetadata(bucketName, key);
+            ObjectMetadata objectMetadata = s3Client.getObjectMetadata(bucketName, key);
 
             if (objectMetadata != null) {
                 if (attrs.containsKey("size_bytes")) {
@@ -252,7 +266,7 @@ public class S3BitStoreService implements BitStoreService {
     public void remove(Bitstream bitstream) throws IOException {
         String key = getFullKey(bitstream.getInternalId());
         try {
-            s3Service.deleteObject(bucketName, key);
+            s3Client.deleteObject(bucketName, key);
         } catch (AmazonClientException e) {
             log.error("remove(" + key + ")", e);
             throw new IOException(e);
@@ -277,45 +291,6 @@ public class S3BitStoreService implements BitStoreService {
         return awsAccessKey;
     }
 
-    @Autowired(required = true)
-    public void setAwsAccessKey(String awsAccessKey) {
-        this.awsAccessKey = awsAccessKey;
-    }
-
-    public String getAwsSecretKey() {
-        return awsSecretKey;
-    }
-
-    @Autowired(required = true)
-    public void setAwsSecretKey(String awsSecretKey) {
-        this.awsSecretKey = awsSecretKey;
-    }
-
-    public String getAwsRegionName() {
-        return awsRegionName;
-    }
-
-    public void setAwsRegionName(String awsRegionName) {
-        this.awsRegionName = awsRegionName;
-    }
-
-    @Autowired(required = true)
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
-
-    public String getSubfolder() {
-        return subfolder;
-    }
-
-    public void setSubfolder(String subfolder) {
-        this.subfolder = subfolder;
-    }
-
     /**
      * Contains a command-line testing tool. Expects arguments:
      * -a accessKey -s secretKey -f assetFileName
@@ -330,6 +305,7 @@ public class S3BitStoreService implements BitStoreService {
         String assetFile = null;
         String accessKey = null;
         String secretKey = null;
+        String endpoint = null;
 
         for (int i = 0; i < args.length; i += 2) {
             if (args[i].startsWith("-a")) {
@@ -338,29 +314,39 @@ public class S3BitStoreService implements BitStoreService {
                 secretKey = args[i + 1];
             } else if (args[i].startsWith("-f")) {
                 assetFile = args[i + 1];
+            } else if (args[i].startsWith("-r")) {
+                endpoint = args[i + 1];
             }
         }
 
-        if (accessKey == null || secretKey == null || assetFile == null) {
+        if (accessKey == null || secretKey == null || assetFile == null || endpoint == null) {
             System.out.println("Missing arguments - exiting");
             return;
         }
         S3BitStoreService store = new S3BitStoreService();
 
-        AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        ClientConfiguration clientConfiguration = new ClientConfiguration();
 
-        store.s3Service = new AmazonS3Client(awsCredentials);
+        store.s3Client = AmazonS3ClientBuilder
+            .standard()
+            .withEndpointConfiguration(
+                new AwsClientBuilder.EndpointConfiguration(endpoint, Regions.US_EAST_1.name()))
+            .withPathStyleAccessEnabled(true)
+            .withClientConfiguration(clientConfiguration)
+            .withCredentials(new AWSStaticCredentialsProvider(credentials))
+            .build();
 
         //Todo configurable region
         Region usEast1 = Region.getRegion(Regions.US_EAST_1);
-        store.s3Service.setRegion(usEast1);
+        store.s3Client.setRegion(usEast1);
 
         // get hostname of DSpace UI to use to name bucket
         String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
         //Bucketname should be lowercase
         store.bucketName = "dspace-asset-" + hostname + ".s3test";
-        store.s3Service.createBucket(store.bucketName);
-/* Broken in DSpace 6 TODO Refactor
+        store.s3Client.createBucket(store.bucketName);
+        /* Broken in DSpace 6 TODO Refactor
         // time everything, todo, swtich to caliper
         long start = System.currentTimeMillis();
         // Case 1: store a file
@@ -412,5 +398,52 @@ public class S3BitStoreService implements BitStoreService {
         // should get nothing back now - will throw exception
         store.get(id);
 */
+    }
+
+    public String getAwsSecretKey() {
+        return awsSecretKey;
+    }
+
+    @Autowired()
+    public void setAwsSecretKey(String awsSecretKey) {
+        this.awsSecretKey = awsSecretKey;
+    }
+
+    @Autowired()
+    public void setAwsAccessKey(String awsAccessKey) {
+        this.awsAccessKey = awsAccessKey;
+    }
+
+    public String getAwsRegionName() {
+        return awsRegionName;
+    }
+
+    public void setAwsRegionName(String awsRegionName) {
+        this.awsRegionName = awsRegionName;
+    }
+
+    public String getSubfolder() {
+        return subfolder;
+    }
+
+    public void setSubfolder(String subfolder) {
+        this.subfolder = subfolder;
+    }
+
+    @Autowired()
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
     }
 }

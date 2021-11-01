@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -48,6 +48,14 @@ public class RelationshipMatcher {
             hasJsonPath("$._embedded.relationshipType",
                         RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType))
         );
+    }
+
+    public static Matcher<? super Object> matchRelationshipValues(Relationship relationship) {
+        return allOf(
+                hasJsonPath("$._links.leftItem.href", containsString(relationship.getLeftItem().getID().toString())),
+                hasJsonPath("$._links.rightItem.href", containsString(relationship.getRightItem().getID().toString())),
+                hasJsonPath("$.leftPlace", is(relationship.getLeftPlace())),
+                hasJsonPath("$.rightPlace", is(relationship.getRightPlace())));
     }
 
     /**

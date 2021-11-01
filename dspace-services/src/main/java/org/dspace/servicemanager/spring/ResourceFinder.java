@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -32,7 +32,7 @@ import org.springframework.core.io.Resource;
  */
 public class ResourceFinder {
 
-    private static Logger log = LoggerFactory.getLogger(ResourceFinder.class);
+    private static final Logger log = LoggerFactory.getLogger(ResourceFinder.class);
 
     public static final String relativePath = DSpaceConfigurationService.DSPACE + "/";
     public static final String environmentPathVariable = DSpaceConfigurationService.DSPACE_HOME;
@@ -43,7 +43,7 @@ public class ResourceFinder {
     private ResourceFinder() { }
 
     private static List<Resource> makeResources(List<String> paths) {
-        List<Resource> rs = new ArrayList<Resource>();
+        List<Resource> rs = new ArrayList<>();
         if (paths != null && !paths.isEmpty()) {
             for (String path : paths) {
                 try {
@@ -184,7 +184,7 @@ public class ResourceFinder {
 
     public static File getFile(String path) {
         Resource r = getResource(path);
-        File f = null;
+        File f;
         try {
             f = r.getFile();
         } catch (IOException e) {
@@ -195,7 +195,7 @@ public class ResourceFinder {
 
     public static InputStream getInputStream(String path) {
         Resource r = getResource(path);
-        InputStream is = null;
+        InputStream is;
         try {
             is = r.getInputStream();
         } catch (IOException e) {
@@ -248,4 +248,7 @@ public class ResourceFinder {
         return catalina;
     }
 
+    public static ResourceFinder getResourceFromPaths(String s) {
+        return null;
+    }
 }

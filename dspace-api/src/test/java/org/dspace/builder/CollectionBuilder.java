@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -98,6 +98,10 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
      */
     public CollectionBuilder withName(final String name) {
         return setMetadataSingleValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, name);
+    }
+
+    public CollectionBuilder withEntityType(final String entityType) {
+        return setMetadataSingleValue(collection, "dspace", "entity", "type", entityType);
     }
 
     /**

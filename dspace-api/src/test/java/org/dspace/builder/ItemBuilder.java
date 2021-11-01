@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -44,6 +44,26 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return builder.create(context, col);
     }
 
+    /**
+     * Delete the Test Item referred to by the given UUID
+     *
+     * @param uuid UUID of Test Item to delete
+     */
+    public static void deleteItem(UUID uuid) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Item item = itemService.find(c, uuid);
+            if (item != null) {
+                try {
+                    itemService.delete(c, item);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
+        }
+    }
+
     private ItemBuilder create(final Context context, final Collection col) {
         this.context = context;
 
@@ -63,7 +83,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withIssueDate(final String issueDate) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(),
-                                "date", "issued", new DCDate(issueDate).toString());
+            "date", "issued", new DCDate(issueDate).toString());
     }
 
     public ItemBuilder withIdentifierOther(final String identifierOther) {
@@ -73,9 +93,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     public ItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
+
     public ItemBuilder withAuthor(final String authorName, final String authority, final int confidence) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author",
-                                null, authorName, authority, confidence);
+            null, authorName, authority, confidence);
     }
 
     public ItemBuilder withPersonIdentifierFirstName(final String personIdentifierFirstName) {
@@ -92,11 +113,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withSubject(final String subject, final String authority, final int confidence) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "subject", null, null,
-                                subject, authority, confidence);
-    }
-
-    public ItemBuilder withEntityType(final String entityType) {
-        return addMetadataValue(item, "dspace", "entity", "type", entityType);
+            subject, authority, confidence);
     }
 
     public ItemBuilder withType(final String type) {
@@ -115,8 +132,36 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "provenance", provenanceData);
     }
 
+    public ItemBuilder enableIIIF() {
+        return addMetadataValue(item, "dspace", "iiif", "enabled", "true");
+    }
+
+    public ItemBuilder disableIIIF() {
+        return addMetadataValue(item, "dspace", "iiif", "enabled", "false");
+    }
+
+    public ItemBuilder enableIIIFSearch() {
+        return addMetadataValue(item, "iiif", "search", "enabled", "true");
+    }
+
+    public ItemBuilder withIIIFViewingHint(String hint) {
+        return addMetadataValue(item, "iiif", "viewing", "hint", hint);
+    }
+
+    public ItemBuilder withIIIFCanvasNaming(String naming) {
+        return addMetadataValue(item, "iiif", "canvas", "naming", naming);
+    }
+
+    public ItemBuilder withIIIFCanvasWidth(int i) {
+        return addMetadataValue(item, "iiif", "image", "width", String.valueOf(i));
+    }
+
+    public ItemBuilder withIIIFCanvasHeight(int i) {
+        return addMetadataValue(item, "iiif", "image", "height", String.valueOf(i));
+    }
+
     public ItemBuilder withMetadata(final String schema, final String element, final String qualifier,
-        final String value) {
+                                    final String value) {
         return addMetadataValue(item, schema, element, qualifier, value);
     }
 
@@ -126,7 +171,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     /**
-     * Withdrawn the item under build. Please note that an user need to be loggedin the context to avoid NPE during the
+     * Withdrawn the item under build. Please note that a user need to be logged in the context to avoid NPE during the
      * creation of the provenance metadata
      *
      * @return the ItemBuilder
@@ -148,15 +193,13 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     /**
      * Create an admin group for the collection with the specified members
      *
-     * @param members epersons to add to the admin group
+     * @param ePerson epersons to add to the admin group
+     *
      * @return this builder
-     * @throws SQLException
-     * @throws AuthorizeException
      */
-    public ItemBuilder withAdminUser(EPerson ePerson) throws SQLException, AuthorizeException {
+    public ItemBuilder withAdminUser(EPerson ePerson) {
         return setAdminPermission(item, ePerson, null);
     }
-
 
     @Override
     public Item build() {
@@ -164,7 +207,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             installItemService.installItem(context, workspaceItem);
             itemService.update(context, item);
 
-            //Check if we need to make this item private. This has to be done after item install.
+            //Check if we need to make this item private. This has to be done after item installation.
             if (readerGroup != null) {
                 setOnlyReadPermission(workspaceItem.getItem(), readerGroup, null);
             }
@@ -184,15 +227,15 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     @Override
     public void cleanup() throws Exception {
-       try (Context c = new Context()) {
+        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             item = c.reloadEntity(item);
             if (item != null) {
-                 delete(c, item);
-                 c.complete();
+                delete(c, item);
+                c.complete();
             }
-       }
+        }
     }
 
     @Override
@@ -200,24 +243,4 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return itemService;
     }
 
-    /**
-     * Delete the Test Item referred to by the given UUID
-     * @param uuid UUID of Test Item to delete
-     * @throws SQLException
-     * @throws IOException
-     */
-    public static void deleteItem(UUID uuid) throws SQLException, IOException {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            Item item = itemService.find(c, uuid);
-            if (item != null) {
-                try {
-                    itemService.delete(c, item);
-                } catch (AuthorizeException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            c.complete();
-        }
-    }
 }

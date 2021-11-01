@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -148,7 +147,7 @@ public class ExtractorOfAInprogressSubmissionInformations {
     }
 
     private Context getContext(HttpServletRequest request) {
-        ServletRequest currentRequest = requestService.getCurrentRequest().getServletRequest();
+        HttpServletRequest currentRequest = requestService.getCurrentRequest().getHttpServletRequest();
         return Objects.nonNull(request) ? ContextUtil.obtainContext(request)
                                         : ContextUtil.obtainContext(currentRequest);
     }

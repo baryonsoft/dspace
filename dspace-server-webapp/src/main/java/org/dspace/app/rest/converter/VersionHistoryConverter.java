@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -67,7 +67,7 @@ public class VersionHistoryConverter implements DSpaceConverter<VersionHistory, 
     private Context getContext() {
         Request currentRequest = requestService.getCurrentRequest();
         if (currentRequest != null) {
-            return ContextUtil.obtainContext(currentRequest.getServletRequest());
+            return ContextUtil.obtainContext(currentRequest.getHttpServletRequest());
         }
         return null;
     }

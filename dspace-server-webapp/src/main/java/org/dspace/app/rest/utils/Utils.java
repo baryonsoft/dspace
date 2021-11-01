@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -1016,8 +1016,11 @@ public class Utils {
             // disable the security as we only need to retrieve the object to further process the authorization
             context.turnOffAuthorisationSystem();
             return (BaseObjectRest) repository.findOne(context, pk);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         } finally {
             context.restoreAuthSystemState();
         }
+        return null;
     }
 }

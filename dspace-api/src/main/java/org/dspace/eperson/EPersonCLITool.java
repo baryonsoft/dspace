@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -451,7 +451,7 @@ public class EPersonCLITool {
         // wild or regex match user/netid
         // select details (pseudo-format string)
         try {
-            for (EPerson person : ePersonService.findAll(context, EPerson.EMAIL)) {
+            for (EPerson person : ePersonService.findAll(context, EPerson.EMAIL, 20, 0)) {
                 System.out.printf("%s\t%s/%s\t%s, %s\n",
                                   person.getID().toString(),
                                   person.getEmail(),

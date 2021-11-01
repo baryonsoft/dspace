@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -6,6 +6,8 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.scripts.configuration;
+
+import java.sql.SQLException;
 
 import org.apache.commons.cli.Options;
 import org.dspace.core.Context;
@@ -70,14 +72,17 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
      * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this IndexDiscoveryScriptConfiguration
      */
     public abstract void setDspaceRunnableClass(Class<T> dspaceRunnableClass);
+
     /**
      * This method will return if the script is allowed to execute in the given context. This is by default set
      * to the currentUser in the context being an admin, however this can be overwritten by each script individually
      * if different rules apply
-     * @param context   The relevant DSpace context
-     * @return          A boolean indicating whether the script is allowed to execute or not
+     *
+     * @param context The relevant DSpace context
+     *
+     * @return A boolean indicating whether the script is allowed to execute or not
      */
-    public abstract boolean isAllowedToExecute(Context context);
+    public abstract boolean isAllowedToExecute(Context context) throws SQLException;
 
     /**
      * The getter for the options of the Script

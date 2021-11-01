@@ -99,7 +99,7 @@
         <field name="lastModifyDate">2013-10-07 22:10:48.309</field>
     </element>
     <element name="repository">
-        <field name="name">DSpace at My University</field>
+        <field name="name">Baryonics Database</field>
         <field name="mail">dspace-help@myu.edu</field>
     </element>
     <element name="license">

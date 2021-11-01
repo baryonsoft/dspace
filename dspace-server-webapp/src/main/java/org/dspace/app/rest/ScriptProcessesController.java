@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -66,7 +66,7 @@ public class ScriptProcessesController {
         if (log.isTraceEnabled()) {
             log.trace("Starting Process for Script with name: " + scriptName);
         }
-        Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getServletRequest());
+        Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getHttpServletRequest());
         ProcessRest processRest = scriptRestRepository.startProcess(context, scriptName, files);
         ProcessResource processResource = converter.toResource(processRest);
         context.complete();

@@ -1,6 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.dspace</groupId>
     <artifactId>dspace-server-webapp</artifactId>
     <packaging>war</packaging>
     <name>DSpace Server Webapp</name>
@@ -15,8 +15,8 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <version>baryonics-0.4.1</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -93,11 +93,41 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
+                            <!--suppress GroovyAssignabilityCheck -->
                             <source>
-                                project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
-                                log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir']);
+                                project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/')
+                                log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir'])
                             </source>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Testing Environment setup: This plugin unzips the
+                 'testEnvironment.zip' file (created by dspace-parent POM), into
+                 the 'target/testing/' folder, to essentially create a test
+                 install of DSpace, against which Tests can be run. -->
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>org.dspace</groupId>
+                            <artifactId>dspace-parent</artifactId>
+                            <version>${project.version}</version>
+                            <type>zip</type>
+                            <classifier>testEnvironment</classifier>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>setupTestEnvironment</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -153,9 +183,11 @@
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
                                 <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
+                                <!--suppress UnresolvedMavenProperty -->
                                 <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
                             </systemPropertyVariables>
                         </configuration>
@@ -212,9 +244,11 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
+                                <!--suppress UnresolvedMavenProperty -->
                                 <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
+                                <!--suppress UnresolvedMavenProperty -->
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
                             </systemPropertyVariables>
                         </configuration>
@@ -283,7 +317,7 @@
         <dependency>
             <groupId>com.flipkart.zjsonpatch</groupId>
             <artifactId>zjsonpatch</artifactId>
-            <version>0.4.6</version>
+            <version>0.4.11</version>
         </dependency>
 
         <!-- The HAL Browser -->
@@ -299,7 +333,7 @@
         <dependency>
             <groupId>org.webjars.bowergithub.jquery</groupId>
             <artifactId>jquery-dist</artifactId>
-            <version>3.5.1</version>
+            <version>3.6.0</version>
         </dependency>
         <!-- Pull in current version of Toastr (toastrjs.com) via WebJars
              Made available at: webjars/toastr/build/toastr.min.js -->
@@ -315,7 +349,7 @@
         <dependency>
             <groupId>org.webjars.bowergithub.twbs</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>4.5.2</version>
+            <version>5.1.3</version>
         </dependency>
 
 
@@ -362,6 +396,11 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-iiif</artifactId>
         </dependency>
 
         <!-- DSpace modules to deploy (this modules are all optional, but add features/endpoints to webapp) -->
@@ -483,6 +522,25 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
+             Caching dependencies for iiif endpoint. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.cache/cache-api -->
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>3.9.7</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-cell</artifactId>
@@ -529,6 +587,23 @@
             <version>2.0.7</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry-spring-boot-starter</artifactId>
+            <version>5.3.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

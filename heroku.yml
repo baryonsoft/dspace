@@ -1,0 +1,11 @@
+build:
+  docker:
+    web: Dockerfile
+
+release:
+  image: web
+  command:
+    - /dspace/bin/dspace database migrate
+
+run:
+  web: $CATALINA_HOME/bin/run.sh $PORT

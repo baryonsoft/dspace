@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -12,11 +12,22 @@ import org.dspace.app.rest.RestResourceController;
 /**
  * This class serves as a REST representation for an External Source
  */
+@LinksRest(links = {
+    @LinkRest(
+        name = ExternalSourceRest.ENTITY_TYPES,
+        method = "getSupportedEntityTypes"
+    )
+})
 public class ExternalSourceRest extends BaseObjectRest<String> {
 
     public static final String NAME = "externalsource";
     public static final String PLURAL_NAME = "externalsources";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
+    public static final String ENTITY_TYPES = "entityTypes";
+    private static final long serialVersionUID = 6951711935287912124L;
+    private String id;
+    private String name;
+    private boolean hierarchical;
 
     @Override
     public String getCategory() {
@@ -33,12 +44,9 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
         return NAME;
     }
 
-    private String id;
-    private String name;
-    private boolean hierarchical;
-
     /**
      * Generic getter for the id
+     *
      * @return the id value of this ExternalSourceRest
      */
     public String getId() {
@@ -47,7 +55,8 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
 
     /**
      * Generic setter for the id
-     * @param id   The id to be set on this ExternalSourceRest
+     *
+     * @param id The id to be set on this ExternalSourceRest
      */
     public void setId(String id) {
         this.id = id;
@@ -55,6 +64,7 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
 
     /**
      * Generic getter for the name
+     *
      * @return the name value of this ExternalSourceRest
      */
     public String getName() {
@@ -63,7 +73,8 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
 
     /**
      * Generic setter for the name
-     * @param name   The name to be set on this ExternalSourceRest
+     *
+     * @param name The name to be set on this ExternalSourceRest
      */
     public void setName(String name) {
         this.name = name;
@@ -71,6 +82,7 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
 
     /**
      * Generic getter for the hierarchical
+     *
      * @return the hierarchical value of this ExternalSourceRest
      */
     public boolean isHierarchical() {
@@ -79,7 +91,8 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
 
     /**
      * Generic setter for the hierarchical
-     * @param hierarchical   The hierarchical to be set on this ExternalSourceRest
+     *
+     * @param hierarchical The hierarchical to be set on this ExternalSourceRest
      */
     public void setHierarchical(boolean hierarchical) {
         this.hierarchical = hierarchical;

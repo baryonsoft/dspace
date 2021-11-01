@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -39,7 +39,7 @@ public class OrcidRestConnector {
     }
 
     public InputStream get(String path, String accessToken) {
-        HttpResponse getResponse = null;
+        HttpResponse getResponse;
         InputStream result = null;
         path = trimSlashes(path);
 

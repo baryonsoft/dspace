@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.dspace</groupId>
     <artifactId>dspace-services</artifactId>
     <packaging>jar</packaging>
     <name>DSpace Services Framework :: API and Implementation</name>
@@ -9,7 +9,8 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.1-SNAPSHOT</version>
+        <version>baryonics-0.4.1</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -52,8 +53,8 @@
                                 </goals>
                                 <configuration>
                                     <source>
-                                        project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
-                                        log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir']);
+                                        project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/')
+                                        log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir'])
                                     </source>
                                 </configuration>
                             </execution>
@@ -69,6 +70,7 @@
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <!-- For "dspace-services" we don't need a full test environment, we just need
                                      a valid "config-definition.xml" which exists in target/test-classes/ -->
+                                <!--suppress UnresolvedMavenProperty -->
                                 <dspace.dir>${agnostic.build.dir}/test-classes/</dspace.dir>
                             </systemPropertyVariables>
                         </configuration>
@@ -158,6 +160,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
             <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>
