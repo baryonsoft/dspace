@@ -58,6 +58,7 @@ public class ScriptLauncher {
      * Execute the DSpace script launcher
      *
      * @param args Any parameters required to be passed to the scripts it executes
+     *
      * @throws IOException           if IO error
      * @throws FileNotFoundException if file doesn't exist
      */
@@ -111,10 +112,12 @@ public class ScriptLauncher {
      * This method will take the arguments from a commandline input and it'll find the script that the first argument
      * refers to and it'll execute this script.
      * It can return a 1 or a 0 depending on whether the script failed or passed respectively
+     *
      * @param args                  The arguments for the script and the script as first one in the array
      * @param commandConfigs        The Document
      * @param dSpaceRunnableHandler The DSpaceRunnableHandler for this execution
      * @param kernelImpl            The relevant DSpaceKernelImpl
+     *
      * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
     public static int handleScript(String[] args, Document commandConfigs,
@@ -137,9 +140,11 @@ public class ScriptLauncher {
 
     /**
      * This method will simply execute the script
+     *
      * @param args                  The arguments of the script with the script name as first place in the array
      * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
      * @param script                The script to be executed
+     *
      * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
     private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
@@ -162,8 +167,8 @@ public class ScriptLauncher {
     /**
      * Recognize and execute a single command.
      *
-     * @param commandConfigs  Document
-     * @param args the command line arguments given
+     * @param commandConfigs Document
+     * @param args           the command line arguments given
      */
     protected static int runOneCommand(Document commandConfigs, String[] args, DSpaceKernelImpl kernelImpl) {
         String request = args[0];
@@ -188,7 +193,7 @@ public class ScriptLauncher {
         List<Element> steps = command.getChildren("step");
         for (Element step : steps) {
             // Instantiate the class
-            Class target = null;
+            Class target;
 
             // Is it the special case 'dsrun' where the user provides the class name?
             String className;
@@ -203,8 +208,8 @@ public class ScriptLauncher {
             }
             try {
                 target = Class.forName(className,
-                                       true,
-                                       Thread.currentThread().getContextClassLoader());
+                    true,
+                    Thread.currentThread().getContextClassLoader());
             } catch (ClassNotFoundException e) {
                 System.err.println("Error in launcher.xml: Invalid class name: " + className);
                 return 1;
@@ -214,11 +219,8 @@ public class ScriptLauncher {
             // Set <passargs>false</passargs> if the arguments should not be passed on
             String[] useargs = args.clone();
             Class[] argTypes = {useargs.getClass()};
-            boolean passargs = true;
-            if ((step.getAttribute("passuserargs") != null) &&
-                ("false".equalsIgnoreCase(step.getAttribute("passuserargs").getValue()))) {
-                passargs = false;
-            }
+            boolean passargs = (step.getAttribute("passuserargs") == null) ||
+                (!"false".equalsIgnoreCase(step.getAttribute("passuserargs").getValue()));
             if ((args.length == 1) || (("dsrun".equals(request)) && (args.length == 2)) || (!passargs)) {
                 useargs = new String[0];
             } else {
@@ -229,9 +231,7 @@ public class ScriptLauncher {
                     x = 2;
                 }
                 String[] argsnew = new String[useargs.length - x];
-                for (int i = x; i < useargs.length; i++) {
-                    argsnew[i - x] = useargs[i];
-                }
+                System.arraycopy(useargs, x, argsnew, 0, useargs.length - x);
                 useargs = argsnew;
             }
 
@@ -323,6 +323,7 @@ public class ScriptLauncher {
 
     /**
      * Display the commands that are defined in launcher.xml and/or the script service.
+     *
      * @param commandConfigs configs as Document
      */
     private static void display(Document commandConfigs) {
@@ -356,7 +357,8 @@ public class ScriptLauncher {
 
     /**
      * Display a single command using a fixed format. Used by {@link #display}.
-     * @param name the name that can be used to invoke the command
+     *
+     * @param name        the name that can be used to invoke the command
      * @param description the description of the command
      */
     private static void displayCommand(String name, String description) {
@@ -365,7 +367,9 @@ public class ScriptLauncher {
 
     /**
      * Get a sorted collection of the commands that are specified in launcher.xml. Used by {@link #display}.
+     *
      * @param commandConfigs the contexts of launcher.xml
+     *
      * @return sorted collection of commands
      */
     private static Collection<Element> getLauncherCommands(Document commandConfigs) {
@@ -385,6 +389,7 @@ public class ScriptLauncher {
 
     /**
      * Get a sorted collection of the commands that are defined as beans. Used by {@link #display}.
+     *
      * @return sorted collection of commands
      */
     private static Collection<ScriptConfiguration> getServiceCommands() {

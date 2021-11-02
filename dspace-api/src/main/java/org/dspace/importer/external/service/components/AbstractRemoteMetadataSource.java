@@ -135,7 +135,7 @@ public abstract class AbstractRemoteMetadataSource {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractRemoteMetadataSource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractRemoteMetadataSource.class);
 
     /**
      * Command pattern implementation. the callable.call method will be retried

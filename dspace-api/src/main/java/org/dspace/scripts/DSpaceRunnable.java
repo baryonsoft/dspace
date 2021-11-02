@@ -27,7 +27,6 @@ import org.dspace.scripts.handler.DSpaceRunnableHandler;
  * fetch the information that it needs from the {@link ScriptConfiguration} provided through the diamond operators.
  * This will be the dspaceRunnableClass for the {@link ScriptConfiguration} beans. Specifically created for each
  * script
- * @param <T>
  */
 public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements Runnable {
 
@@ -35,21 +34,20 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      * The CommandLine object for the script that'll hold the information
      */
     protected CommandLine commandLine;
-
+    /**
+     * The handler that deals with this script. This handler can currently either be a RestDSpaceRunnableHandler or
+     * a CommandlineDSpaceRunnableHandler depending from where the script is called
+     */
+    protected DSpaceRunnableHandler handler;
     /**
      * This EPerson identifier variable is the UUID of the EPerson that's running the script
      */
     private UUID epersonIdentifier;
 
     /**
-     * The handler that deals with this script. This handler can currently either be a RestDSpaceRunnableHandler or
-     *  a CommandlineDSpaceRunnableHandler depending from where the script is called
-     */
-    protected DSpaceRunnableHandler handler;
-
-    /**
      * This method will return the Configuration that the implementing DSpaceRunnable uses
-     * @return  The {@link ScriptConfiguration} that this implementing DspaceRunnable uses
+     *
+     * @return The {@link ScriptConfiguration} that this implementing DspaceRunnable uses
      */
     public abstract T getScriptConfiguration();
 
@@ -59,12 +57,13 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     }
 
     /**
-     * This method sets the appropriate DSpaceRunnableHandler depending on where it was ran from and it parses
+     * This method sets the appropriate DSpaceRunnableHandler depending on where it was run from, and it parses
      * the arguments given to the script
      *
      * @param args                  The arguments given to the script
      * @param dSpaceRunnableHandler The DSpaceRunnableHandler object that defines from where the script was ran
      * @param currentUser           The current user
+     *
      * @throws ParseException If something goes wrong
      */
     public void initialize(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
@@ -79,8 +78,10 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     /**
      * This method will take the primitive array of String objects that represent the parameters given to the String
      * and it'll parse these into a CommandLine object that can be used by the script to retrieve the data
-     * @param args              The primitive array of Strings representing the parameters
-     * @throws ParseException   If something goes wrong
+     *
+     * @param args The primitive array of Strings representing the parameters
+     *
+     * @throws ParseException If something goes wrong
      */
     private void parse(String[] args) throws ParseException {
         commandLine = new DefaultParser().parse(getScriptConfiguration().getOptions(), args);
@@ -90,7 +91,8 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     /**
      * This method has to be included in every script and handles the setup of the script by parsing the CommandLine
      * and setting the variables
-     * @throws ParseException   If something goes wrong
+     *
+     * @throws ParseException If something goes wrong
      */
     public abstract void setup() throws ParseException;
 
@@ -112,7 +114,8 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     /**
      * This method has to be included in every script and this will be the main execution block for the script that'll
      * contain all the logic needed
-     * @throws Exception    If something goes wrong
+     *
+     * @throws Exception If something goes wrong
      */
     public abstract void internalRun() throws Exception;
 
@@ -127,7 +130,8 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     /**
      * This method will traverse all the options and it'll grab options defined as an InputStream type to then save
      * the filename specified by that option in a list of Strings that'll be returned in the end
-     * @return  The list of Strings representing filenames from the options given to the script
+     *
+     * @return The list of Strings representing filenames from the options given to the script
      */
     public List<String> getFileNamesFromInputStreamOptions() {
         List<String> fileNames = new ArrayList<>();
@@ -145,6 +149,7 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     /**
      * Generic getter for the epersonIdentifier
      * This EPerson identifier variable is the uuid of the eperson that's running the script
+     *
      * @return the epersonIdentifier value of this DSpaceRunnable
      */
     public UUID getEpersonIdentifier() {
@@ -154,7 +159,8 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     /**
      * Generic setter for the epersonIdentifier.
      * This EPerson identifier variable is the UUID of the EPerson that's running the script.
-     * @param epersonIdentifier   The epersonIdentifier to be set on this DSpaceRunnable
+     *
+     * @param epersonIdentifier The epersonIdentifier to be set on this DSpaceRunnable
      */
     public void setEpersonIdentifier(UUID epersonIdentifier) {
         this.epersonIdentifier = epersonIdentifier;

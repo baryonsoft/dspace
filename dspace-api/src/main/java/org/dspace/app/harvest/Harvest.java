@@ -138,15 +138,15 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
-            handler.logInfo("PING OAI server: Harvest -g -a oai_source -i oai_set_id");
-            handler.logInfo(
-                "SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a oai_source -i " +
-                    "oai_set_id -m metadata_format");
-            handler.logInfo("RUN harvest once: Harvest -r -e eperson -c collection");
-            handler.logInfo("START harvest scheduler: Harvest -S");
-            handler.logInfo("RESET all harvest status: Harvest -R");
-            handler.logInfo("PURGE a collection of items and settings: Harvest -p -e eperson -c collection");
-            handler.logInfo("PURGE all harvestable collections: Harvest -P -e eperson");
+            handler.logInfo("Examples:");
+            handler.logInfo("   PING OAI server: Harvest -g -a oai_source -i oai_set_id");
+            handler.logInfo("   SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a " +
+                "oai_source -i oai_set_id -m metadata_format");
+            handler.logInfo("   RUN harvest once: Harvest -r -e eperson -c collection");
+            handler.logInfo("   START harvest scheduler: Harvest -S");
+            handler.logInfo("   RESET all harvest status: Harvest -R");
+            handler.logInfo("   PURGE a collection of items and settings: Harvest -p -e eperson -c collection");
+            handler.logInfo("   PURGE all harvestable collections: Harvest -P -e eperson");
 
             return;
         }

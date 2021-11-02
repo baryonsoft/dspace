@@ -88,19 +88,27 @@ import org.xml.sax.SAXException;
 public class OAIHarvester {
 
 
-    /**
-     * log4j category
-     */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OAIHarvester.class);
-
-    private static final Namespace ATOM_NS = Namespace.getNamespace("http://www.w3.org/2005/Atom");
-    private static final Namespace ORE_NS = Namespace.getNamespace("http://www.openarchives.org/ore/terms/");
-    private static final Namespace OAI_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
-
     public static final String OAI_ADDRESS_ERROR = "invalidAddress";
     public static final String OAI_SET_ERROR = "noSuchSet";
     public static final String OAI_DMD_ERROR = "metadataNotSupported";
     public static final String OAI_ORE_ERROR = "oreNotSupported";
+    /**
+     * log4j category
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(OAIHarvester.class);
+    private static final Namespace ATOM_NS = Namespace.getNamespace("http://www.w3.org/2005/Atom");
+    private static final Namespace ORE_NS = Namespace.getNamespace("http://www.openarchives.org/ore/terms/");
+    private static final Namespace OAI_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
+    // DOMbuilder class for the DOM -> JDOM conversions
+    private static final DOMBuilder db = new DOMBuilder();
+    // Namespace used by the ORE serialization format
+    // Set in dspace.cfg as oai.harvester.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}
+    private final Namespace ORESerialNS;
+    private final String ORESerialKey;
+    // Namespace of the descriptive metadata that should be harvested in addition to the ORE
+    // Set in dspace.cfg as oai.harvester.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}
+    private final Namespace metadataNS;
+    private final String metadataKey;
     protected BitstreamService bitstreamService;
     protected BitstreamFormatService bitstreamFormatService;
     protected BundleService bundleService;
@@ -113,27 +121,11 @@ public class OAIHarvester {
     protected WorkspaceItemService workspaceItemService;
     protected PluginService pluginService;
     protected ConfigurationService configurationService;
-
-
     //  The collection this harvester instance is dealing with
     Collection targetCollection;
     HarvestedCollection harvestRow;
-
     // our context
     Context ourContext;
-
-    // Namespace used by the ORE serialization format
-    // Set in dspace.cfg as oai.harvester.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}
-    private Namespace ORESerialNS;
-    private String ORESerialKey;
-
-    // Namespace of the descriptive metadata that should be harvested in addition to the ORE
-    // Set in dspace.cfg as oai.harvester.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}
-    private Namespace metadataNS;
-    private String metadataKey;
-
-    // DOMbuilder class for the DOM -> JDOM conversions
-    private static DOMBuilder db = new DOMBuilder();
     // The point at which this thread should terminate itself
 
     /* Initialize the harvester with a collection object */
@@ -191,8 +183,8 @@ public class OAIHarvester {
      * @return Namespace of the supported ORE format. Returns null if not found.
      */
     public static Namespace getORENamespace() {
-        String ORESerializationString = null;
-        String ORESeialKey = null;
+        String ORESerializationString;
+        String ORESeialKey;
         String oreString = "oai.harvester.oreSerializationFormat";
 
         List<String> keys = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys(oreString);
@@ -212,11 +204,10 @@ public class OAIHarvester {
     /**
      * Cycle through the options and find the metadata namespace matching the provided key.
      *
-     * @param metadataKey
      * @return Namespace of the designated metadata format. Returns null of not found.
      */
     public static Namespace getDMDNamespace(String metadataKey) {
-        String metadataString = null;
+        String metadataString;
         String metaString = "oai.harvester.metadataformats";
 
         List<String> keys = DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys(metaString);
@@ -237,6 +228,81 @@ public class OAIHarvester {
         return null;
     }
 
+    /**
+     * Query the OAI-PMH server for its mapping of the supplied namespace and metadata prefix.
+     * For example for a typical OAI-PMH server a query "http://www.openarchives.org/OAI/2.0/oai_dc/" would return
+     * "oai_dc".
+     *
+     * @param oaiSource   the address of the OAI-PMH provider
+     * @param MDNamespace the namespace that we are trying to resolve to the metadataPrefix
+     *
+     * @return metadataPrefix the OAI-PMH provider has assigned to the supplied namespace
+     *
+     * @throws IOException                  A general class of exceptions produced by failed or interrupted I/O
+     *                                      operations.
+     * @throws ParserConfigurationException XML parsing error
+     * @throws SAXException                 if XML processing error
+     * @throws TransformerException         if XML transformer error
+     * @throws ConnectException             if it could not connect to OAI server
+     */
+    public static String oaiResolveNamespaceToPrefix(String oaiSource, String MDNamespace)
+        throws IOException, ParserConfigurationException, SAXException, TransformerException, ConnectException {
+        String metaPrefix = null;
+
+        // Query the OAI server for the metadata
+        ListMetadataFormats lmf = new ListMetadataFormats(oaiSource);
+
+        Document lmfResponse = db.build(lmf.getDocument());
+        List<Element> mdFormats = lmfResponse.getRootElement().getChild("ListMetadataFormats", OAI_NS)
+            .getChildren("metadataFormat", OAI_NS);
+
+        for (Element mdFormat : mdFormats) {
+            if (MDNamespace.equals(mdFormat.getChildText("metadataNamespace", OAI_NS))) {
+                metaPrefix = mdFormat.getChildText("metadataPrefix", OAI_NS);
+                break;
+            }
+        }
+
+        return metaPrefix;
+    }
+
+    /**
+     * Return all available metadata formats
+     *
+     * @return a list containing a map for each supported  metadata format
+     */
+    public static List<Map<String, String>> getAvailableMetadataFormats() {
+        List<Map<String, String>> configs = new ArrayList<>();
+        String metaString = "oai.harvester.metadataformats.";
+        Enumeration<String> pe = Collections.enumeration(
+            DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getPropertyKeys("oai.harvester.metadataformats")
+        );
+        while (pe.hasMoreElements()) {
+            String key = pe.nextElement();
+            String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
+
+            String id = key.substring(metaString.length());
+            String label;
+            String namespace = "";
+
+            if (metadataString.indexOf(',') != -1) {
+                label = metadataString.substring(metadataString.indexOf(',') + 2);
+                namespace = metadataString.substring(0, metadataString.indexOf(','));
+            } else {
+                label = id + "(" + metadataString + ")";
+            }
+
+            Map<String, String> config = new HashMap<>();
+            config.put("id", id);
+            config.put("label", label);
+            config.put("namespace", namespace);
+
+            configs.add(config);
+        }
+
+        return configs;
+    }
 
     /**
      * Performs a harvest cycle on this collection. This will query the remote OAI-PMH provider, check for updates
@@ -277,7 +343,7 @@ public class OAIHarvester {
         try {
             // obtain the desired descriptive metadata format and verify that the OAI server actually provides it
             // do the same thing for ORE, which should be encoded in Atom and carry its namespace
-            String descMDPrefix = null;
+            String descMDPrefix;
             String OREPrefix;
             try {
                 dateGranularity = oaiGetDateGranularity(oaiSource);
@@ -288,10 +354,7 @@ public class OAIHarvester {
 
                 descMDPrefix = oaiResolveNamespaceToPrefix(oaiSource, metadataNS.getURI());
                 OREPrefix = oaiResolveNamespaceToPrefix(oaiSource, ORESerialNS.getURI());
-            } catch (FileNotFoundException fe) {
-                log.error("The OAI server did not respond.");
-                throw new HarvestingException("The OAI server did not respond.", fe);
-            } catch (ConnectException fe) {
+            } catch (FileNotFoundException | ConnectException fe) {
                 log.error("The OAI server did not respond.");
                 throw new HarvestingException("The OAI server did not respond.", fe);
             }
@@ -307,8 +370,8 @@ public class OAIHarvester {
                             .getURI());
             }
 
-            Document oaiResponse = null;
-            Element root = null;
+            Document oaiResponse;
+            Element root;
             String resumptionToken;
 
             // set the status indicating the collection is currently being processed
@@ -331,24 +394,22 @@ public class OAIHarvester {
 
             // main loop to keep requesting more objects until we're done
             List<Element> records;
-            Set<String> errorSet = new HashSet<String>();
+            Set<String> errorSet = new HashSet<>();
 
             ListRecords listRecords = new ListRecords(oaiSource, fromDate, toDate, oaiSetId, descMDPrefix);
             log.debug(
                 "Harvesting request parameters: listRecords " + oaiSource + " " + fromDate + " " + toDate + " " +
                     oaiSetId + " " + descMDPrefix);
-            if (listRecords != null) {
-                log.info("HTTP Request: " + listRecords.getRequestURL());
-            }
+            log.info("HTTP Request: " + listRecords.getRequestURL());
 
             while (listRecords != null) {
-                records = new ArrayList<Element>();
+                records = new ArrayList<>();
                 oaiResponse = db.build(listRecords.getDocument());
 
                 if (listRecords.getErrors() != null && listRecords.getErrors().getLength() > 0) {
                     for (int i = 0; i < listRecords.getErrors().getLength(); i++) {
                         String errorCode = listRecords.getErrors().item(i).getAttributes().getNamedItem("code")
-                                                      .getTextContent();
+                            .getTextContent();
                         errorSet.add(errorCode);
                     }
                     if (errorSet.contains("noRecordsMatch")) {
@@ -366,7 +427,7 @@ public class OAIHarvester {
                     records.addAll(root.getChild("ListRecords", OAI_NS).getChildren("record", OAI_NS));
 
                     Element resumptionElement = root.getChild("ListRecords", OAI_NS)
-                                                    .getChild("resumptionToken", OAI_NS);
+                        .getChild("resumptionToken", OAI_NS);
                     if (resumptionElement != null && resumptionElement.getAttribute("completeListSize") != null) {
                         String value = resumptionElement.getAttribute("completeListSize").getValue();
                         if (StringUtils.isNotBlank(value)) {
@@ -376,7 +437,7 @@ public class OAIHarvester {
                 }
 
                 // Process the obtained records
-                if (records != null && records.size() > 0) {
+                if (records.size() > 0) {
                     log.info("Found " + records.size() + " records to process");
                     for (Element record : records) {
                         // check for STOP interrupt from the scheduler
@@ -411,8 +472,8 @@ public class OAIHarvester {
                     collectionService.update(ourContext, targetCollection);
 
                     harvestRow.setHarvestMessage(String
-                                                     .format("Collection is currently being harvested (item %d of %d)",
-                                                             currentRecord, totalListSize));
+                        .format("Collection is currently being harvested (item %d of %d)",
+                            currentRecord, totalListSize));
                     harvestedCollectionService.update(ourContext, harvestRow);
                 } finally {
                     //In case of an exception, make sure to restore our authentication state to the previous state
@@ -439,7 +500,8 @@ public class OAIHarvester {
             harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             harvestedCollectionService.update(ourContext, harvestRow);
             alertAdmin(HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
-            log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause(), ex);
+            log.error("Error occurred while generating an OAI response: " + ex.getMessage() +
+                " " + ex.getCause(), ex);
             ourContext.complete();
             return;
         } finally {
@@ -482,6 +544,7 @@ public class OAIHarvester {
      *                      collections set up to harvest content.
      * @param currentRecord current record number to log
      * @param totalListSize The total number of records that this Harvest contains
+     *
      * @throws SQLException                 An exception that provides information on a database access error or
      *                                      other errors.
      * @throws AuthorizeException           Exception indicating the current user of the context does not have
@@ -508,8 +571,9 @@ public class OAIHarvester {
         // look up the item corresponding to the OAI identifier
         Item item = harvestedItemService.getItemByOAIId(ourContext, itemOaiID, targetCollection);
 
-        // Make sure the item hasn't been deleted in the mean time
-        if (header.getAttribute("status") != null && header.getAttribute("status").getValue().equals("deleted")) {
+        // Make sure the item hasn't been deleted in the meantime
+        if (header.getAttribute("status") != null &&
+            header.getAttribute("status").getValue().equals("deleted")) {
             log.info("Item " + itemOaiID + " has been marked as deleted on the OAI server.");
             if (item != null) {
                 collectionService.removeItem(ourContext, targetCollection, item);
@@ -549,11 +613,14 @@ public class OAIHarvester {
             // attempt
             Date OAIDatestamp = Utils.parseISO8601Date(header.getChildText("datestamp", OAI_NS));
             Date itemLastHarvest = hi.getHarvestDate();
-            if (itemLastHarvest != null && OAIDatestamp.before(itemLastHarvest)) {
-                log.info("Item " + item
-                    .getHandle() + " was harvested more recently than the last update time reported by the OAI " +
-                             "server; skipping.");
-                return;
+            if (itemLastHarvest != null) {
+                assert OAIDatestamp != null;
+                if (OAIDatestamp.before(itemLastHarvest)) {
+                    log.info("Item " + item
+                        .getHandle() + " was harvested more recently than the last update time reported by the OAI " +
+                        "server; skipping.");
+                    return;
+                }
             }
 
             // Otherwise, clear and re-import the metadata and bitstreams
@@ -572,6 +639,7 @@ public class OAIHarvester {
                 for (Bundle bundle : allBundles) {
                     itemService.removeBundle(ourContext, item, bundle);
                 }
+                assert ORExwalk != null;
                 ORExwalk.ingest(ourContext, item, oreREM, true);
             }
         } else {
@@ -591,6 +659,7 @@ public class OAIHarvester {
             }
 
             if (harvestRow.getHarvestType() == 3) {
+                assert ORExwalk != null;
                 ORExwalk.ingest(ourContext, item, oreREM, true);
             }
 
@@ -619,9 +688,9 @@ public class OAIHarvester {
 
         // Now create the special ORE bundle and drop the ORE document in it
         if (harvestRow.getHarvestType() == 2 || harvestRow.getHarvestType() == 3) {
-            Bundle OREBundle = null;
+            Bundle OREBundle;
             List<Bundle> OREBundles = itemService.getBundles(item, "ORE");
-            Bitstream OREBitstream = null;
+            Bitstream OREBitstream;
 
             if (OREBundles.size() > 0) {
                 OREBundle = OREBundles.get(0);
@@ -657,13 +726,14 @@ public class OAIHarvester {
         String provenanceMsg = "Item created via OAI harvest from source: "
             + this.harvestRow.getOaiSource() + " on " + new DCDate(hi.getHarvestDate())
             + " (GMT).  Item's OAI Record identifier: " + hi.getOaiID();
-        itemService.addMetadata(ourContext, item, "dc", "description", "provenance", "en", provenanceMsg);
+        itemService.addMetadata(ourContext, item, "dc", "description",
+            "provenance", "en", provenanceMsg);
 
         itemService.update(ourContext, item);
         harvestedItemService.update(ourContext, hi);
         long timeTaken = new Date().getTime() - timeStart.getTime();
         log.info(String.format("Item %s (%s) has been ingested (item %d of %d). The whole process took: %d ms.",
-                               item.getHandle(), item.getID(), currentRecord, totalListSize, timeTaken));
+            item.getHandle(), item.getID(), currentRecord, totalListSize, timeTaken));
 
         //Clear the context cache
         ourContext.uncacheEntity(wi);
@@ -674,7 +744,6 @@ public class OAIHarvester {
         ourContext.restoreAuthSystemState();
     }
 
-
     /**
      * Scan an item's metadata, looking for the value "identifier.*". If it meets the parameters that identify it as
      * valid handle
@@ -683,6 +752,7 @@ public class OAIHarvester {
      * minting a new one.
      *
      * @param item a newly created, but not yet installed, DSpace Item
+     *
      * @return null or the handle to be used.
      */
     protected String extractHandle(Item item) {
@@ -698,7 +768,7 @@ public class OAIHarvester {
 
         List<MetadataValue> values = itemService.getMetadata(item, "dc", "identifier", Item.ANY, Item.ANY);
 
-        if (values.size() > 0 && acceptedHandleServers != null) {
+        if (values.size() > 0) {
             for (MetadataValue value : values) {
                 //     0   1       2         3   4
                 //   http://hdl.handle.net/1234/12
@@ -723,16 +793,16 @@ public class OAIHarvester {
         return null;
     }
 
-
     /**
      * Process a date, converting it to RFC3339 format, setting the timezone to UTC and subtracting time padding
      * from the config file.
      *
      * @param date source Date
+     *
      * @return a string in the format 'yyyy-mm-ddThh:mm:ssZ' and converted to UTC timezone
      */
     private String processDate(Date date) {
-        Integer timePad = configurationService.getIntProperty("oai.harvester.timePadding");
+        int timePad = configurationService.getIntProperty("oai.harvester.timePadding");
 
         if (timePad == 0) {
             timePad = 120;
@@ -747,6 +817,7 @@ public class OAIHarvester {
      *
      * @param date       source Date
      * @param secondsPad number of seconds to subtract from the date
+     *
      * @return a string in the format 'yyyy-mm-ddThh:mm:ssZ' and converted to UTC timezone
      */
     private String processDate(Date date, int secondsPad) {
@@ -761,7 +832,6 @@ public class OAIHarvester {
 
         return formatter.format(date);
     }
-
 
     /**
      * Query OAI-PMH server for the granularity of its datestamps.
@@ -778,45 +848,7 @@ public class OAIHarvester {
     }
 
     /**
-     * Query the OAI-PMH server for its mapping of the supplied namespace and metadata prefix.
-     * For example for a typical OAI-PMH server a query "http://www.openarchives.org/OAI/2.0/oai_dc/" would return
-     * "oai_dc".
-     *
-     * @param oaiSource   the address of the OAI-PMH provider
-     * @param MDNamespace the namespace that we are trying to resolve to the metadataPrefix
-     * @return metadataPrefix the OAI-PMH provider has assigned to the supplied namespace
-     * @throws IOException                  A general class of exceptions produced by failed or interrupted I/O
-     *                                      operations.
-     * @throws ParserConfigurationException XML parsing error
-     * @throws SAXException                 if XML processing error
-     * @throws TransformerException         if XML transformer error
-     * @throws ConnectException             if could not connect to OAI server
-     */
-    public static String oaiResolveNamespaceToPrefix(String oaiSource, String MDNamespace)
-        throws IOException, ParserConfigurationException, SAXException, TransformerException, ConnectException {
-        String metaPrefix = null;
-
-        // Query the OAI server for the metadata
-        ListMetadataFormats lmf = new ListMetadataFormats(oaiSource);
-
-        if (lmf != null) {
-            Document lmfResponse = db.build(lmf.getDocument());
-            List<Element> mdFormats = lmfResponse.getRootElement().getChild("ListMetadataFormats", OAI_NS)
-                                                 .getChildren("metadataFormat", OAI_NS);
-
-            for (Element mdFormat : mdFormats) {
-                if (MDNamespace.equals(mdFormat.getChildText("metadataNamespace", OAI_NS))) {
-                    metaPrefix = mdFormat.getChildText("metadataPrefix", OAI_NS);
-                    break;
-                }
-            }
-        }
-
-        return metaPrefix;
-    }
-
-    /**
-     * Generate and send an email to the administrator. Prompted by errors encountered during harvesting.
+     * Generate and email the administrator. Prompted by errors encountered during harvesting.
      *
      * @param status the current status of the collection, usually HarvestedCollection.STATUS_OAI_ERROR or
      *               HarvestedCollection.STATUS_UNKNOWN_ERROR
@@ -856,14 +888,15 @@ public class OAIHarvester {
 
     }
 
-
     /**
      * Query the OAI-PMH provider for a specific metadata record.
      *
      * @param oaiSource      the address of the OAI-PMH provider
      * @param itemOaiId      the OAI identifier of the target item
      * @param metadataPrefix the OAI metadataPrefix of the desired metadata
+     *
      * @return list of JDOM elements corresponding to the metadata entries in the located record.
+     *
      * @throws IOException                  A general class of exceptions produced by failed or interrupted I/O
      *                                      operations.
      * @throws ParserConfigurationException XML parsing error
@@ -874,15 +907,15 @@ public class OAIHarvester {
     protected List<Element> getMDrecord(String oaiSource, String itemOaiId, String metadataPrefix)
         throws IOException, ParserConfigurationException, SAXException, TransformerException, HarvestingException {
         GetRecord getRecord = new GetRecord(oaiSource, itemOaiId, metadataPrefix);
-        Set<String> errorSet = new HashSet<String>();
+        Set<String> errorSet = new HashSet<>();
         // If the metadata is not available for this item, can the whole thing
-        if (getRecord != null && getRecord.getErrors() != null && getRecord.getErrors().getLength() > 0) {
+        if (getRecord.getErrors() != null && getRecord.getErrors().getLength() > 0) {
             for (int i = 0; i < getRecord.getErrors().getLength(); i++) {
                 String errorCode = getRecord.getErrors().item(i).getAttributes().getNamedItem("code").getTextContent();
                 errorSet.add(errorCode);
             }
             throw new HarvestingException(
-                "OAI server returned the following errors during getDescMD execution: " + errorSet.toString());
+                "OAI server returned the following errors during getDescMD execution: " + errorSet);
         }
 
         Document record = db.build(getRecord.getDocument());
@@ -890,7 +923,6 @@ public class OAIHarvester {
 
         return root.getChild("GetRecord", OAI_NS).getChild("record", OAI_NS).getChild("metadata", OAI_NS).getChildren();
     }
-
 
     /**
      * Verify OAI settings for the current collection
@@ -903,43 +935,5 @@ public class OAIHarvester {
         String metaPrefix = harvestRow.getHarvestMetadataConfig();
 
         return harvestedCollectionService.verifyOAIharvester(oaiSource, oaiSetId, metaPrefix, true);
-    }
-
-    /**
-     * Return all available metadata formats
-     *
-     * @return a list containing a map for each supported  metadata format
-     */
-    public static List<Map<String,String>> getAvailableMetadataFormats() {
-        List<Map<String,String>> configs = new ArrayList<>();
-        String metaString = "oai.harvester.metadataformats.";
-        Enumeration pe = Collections.enumeration(
-            DSpaceServicesFactory.getInstance().getConfigurationService()
-                                 .getPropertyKeys("oai.harvester.metadataformats")
-        );
-        while (pe.hasMoreElements()) {
-            String key = (String) pe.nextElement();
-            String metadataString = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key);
-
-            String id = key.substring(metaString.length());
-            String label;
-            String namespace = "";
-
-            if (metadataString.indexOf(',') != -1) {
-                label = metadataString.substring(metadataString.indexOf(',') + 2);
-                namespace = metadataString.substring(0, metadataString.indexOf(','));
-            } else {
-                label = id + "(" + metadataString + ")";
-            }
-
-            Map<String,String> config = new HashMap<>();
-            config.put("id", id);
-            config.put("label", label);
-            config.put("namespace", namespace);
-
-            configs.add(config);
-        }
-
-        return configs;
     }
 }
