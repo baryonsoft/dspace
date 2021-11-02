@@ -25,6 +25,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public abstract class DSpaceItem implements Item {
+    private static String _prefix = null;
+
     private static List<Element> filter(List<Element> input, String name) {
         return Lists.newArrayList(Collections2.filter(input, new MetadataNamePredicate(name)));
     }
@@ -53,24 +55,10 @@ public abstract class DSpaceItem implements Item {
         return elems;
     }
 
-
-    private List<String> getMetadata(String schema, String element) {
-        List<Element> metadata = this.getMetadata().getMetadata().getElement();
-        return values(filter(flat(filter(metadata, schema)), element));
-    }
-
-    private List<String> getMetadata(String schema, String element, String qualifier) {
-        List<Element> metadata = this.getMetadata().getMetadata().getElement();
-        return values(filter(flat(filter(flat(filter(metadata, schema)), element)), qualifier));
-    }
-
-
-    private static String _prefix = null;
-
     public static String buildIdentifier(String handle) {
         if (_prefix == null) {
             ConfigurationService configurationService
-                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
             _prefix = configurationService.getProperty("oai.identifier.prefix");
         }
         return "oai:" + _prefix + ":" + handle;
@@ -83,6 +71,16 @@ public abstract class DSpaceItem implements Item {
         } else {
             return null; // Contract
         }
+    }
+
+    private List<String> getMetadata(String schema, String element) {
+        List<Element> metadata = this.getMetadata().getMetadata().getElement();
+        return values(filter(flat(filter(metadata, schema)), element));
+    }
+
+    private List<String> getMetadata(String schema, String element, String qualifier) {
+        List<Element> metadata = this.getMetadata().getMetadata().getElement();
+        return values(filter(flat(filter(flat(filter(metadata, schema)), element)), qualifier));
     }
 
     public List<String> getMetadata(String field) {
@@ -122,7 +120,7 @@ public abstract class DSpaceItem implements Item {
             } else if (name.equals(org.dspace.content.Item.ANY)) {
                 return true;
             } else {
-                return (name.toLowerCase().equals(arg0.getName().toLowerCase()));
+                return (name.equalsIgnoreCase(arg0.getName()));
             }
         }
     }
