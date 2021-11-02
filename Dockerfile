@@ -51,6 +51,8 @@ FROM tomcat:8-jdk11
 ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 
+RUN apt update && apt install cron vim -y
+
 COPY scripts/run.sh $CATALINA_HOME/bin/run.sh
 RUN chmod +x $CATALINA_HOME/bin/run.sh
 
