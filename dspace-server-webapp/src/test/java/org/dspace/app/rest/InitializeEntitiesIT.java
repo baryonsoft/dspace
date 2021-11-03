@@ -82,7 +82,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
             relationshipTypeService.delete(context, relationshipType);
         }
 
-        for (EntityType entityType: entityTypeList) {
+        for (EntityType entityType : entityTypeList) {
             entityTypeService.delete(context, entityType);
         }
         context.restoreAuthSystemState();
@@ -92,7 +92,6 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
 
     /**
      * Verifies that the initialize-entities script ran properly and that the objects are created properly
-     * @throws Exception
      */
     @Test
     public void getAllRelationshipTypesTest() throws Exception {
@@ -101,30 +100,30 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/relationshiptypes")
                 .param("projection", "full"))
 
-                //We expect a 200 OK status
-                .andExpect(status().isOk())
-                //10 relationship types should be created
-                .andExpect(jsonPath("$.page.totalElements", is(10)))
-                //There needs to be a self link to this endpoint
-                .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
-                //We have 10 relationship types, they need to all be present in the embedded section
-                .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(0)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(1)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(2)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(3)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(4)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(5)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(6)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(7)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(8)),
-                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)))
-                ));
+            //We expect a 200 OK status
+            .andExpect(status().isOk())
+            //10 relationship types should be created
+            .andExpect(jsonPath("$.page.totalElements", is(10)))
+            //There needs to be a self link to this endpoint
+            .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
+            //We have 10 relationship types, they need to all be present in the embedded section
+            .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(0)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(1)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(2)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(3)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(4)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(5)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(6)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(7)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(8)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)))
+            ));
 
         //Verify the left min cardinality of the first relationship type (isAuthorOfPublication) is 0
         getClient().perform(get("/api/core/relationshiptypes/" + relationshipTypes.get(0).getID()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leftMinCardinality", is(0)));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.leftMinCardinality", is(0)));
     }
 
     /**
@@ -145,36 +144,36 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
         // File and thus by running the script, the RelationshipType object in the Database should be the same as our
         // alteredRelationshipType object that we just created.
         // It's important to note that this object will not alter anything in the Database, this object is merely
-        // made for the comparison between the REST response and we expect to have happened through the script
+        // made for the comparison between the REST response, and we expect to have happened through the script
         RelationshipType alteredRelationshipType = relationshipTypes.get(0);
         alteredRelationshipType.setLeftMinCardinality(10);
         getClient().perform(get("/api/core/relationshiptypes")
-                   .param("projection", "full"))
+                .param("projection", "full"))
 
-                   //We expect a 200 OK status
-                   .andExpect(status().isOk())
-                   //10 relationship types should remain present (no duplicates created)
-                   .andExpect(jsonPath("$.page.totalElements", is(10)))
-                   //There needs to be a self link to this endpoint
-                   .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
-                   //We have 10 relationship types, they need to all be present in the embedded section
-                   //Verify the left min cardinality of the isAuthorOfPublication has been updated to 10
-                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(alteredRelationshipType),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(1)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(2)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(3)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(4)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(5)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(6)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(7)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(8)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)))
-                   ));
+            //We expect a 200 OK status
+            .andExpect(status().isOk())
+            //10 relationship types should remain present (no duplicates created)
+            .andExpect(jsonPath("$.page.totalElements", is(10)))
+            //There needs to be a self link to this endpoint
+            .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
+            //We have 10 relationship types, they need to all be present in the embedded section
+            //Verify the left min cardinality of the isAuthorOfPublication has been updated to 10
+            .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(alteredRelationshipType),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(1)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(2)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(3)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(4)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(5)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(6)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(7)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(8)),
+                RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)))
+            ));
 
         //Verify the left min cardinality of the first relationship type (isAuthorOfPublication) has been updated to 10
         getClient().perform(get("/api/core/relationshiptypes/" + relationshipTypes.get(0).getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.leftMinCardinality", is(10)));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.leftMinCardinality", is(10)));
     }
 }
