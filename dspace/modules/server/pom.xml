@@ -15,7 +15,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>baryonics-0.4.1</version>
+        <version>baryonics-0.4.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -246,6 +246,7 @@
 
                     <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
+                        <!--suppress MavenModelInspection -->
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>

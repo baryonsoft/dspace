@@ -5,7 +5,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>baryonics-0.4.1</version>
+    <version>baryonics-0.4.2</version>
     <name>DSpace Parent Project</name>
     <description>
         Baryonics is a comprehensive bibliographic database that powers BaryonBib.
@@ -207,7 +207,7 @@
                         <!-- Whether to skip unit tests or not -->
                         <skipTests>${skipUnitTests}</skipTests>
                         <!--
-                        Enable to debug Maven Surefire tests in remote proces
+                        Enable to debug Maven Surefire tests in remote process
                         <debugForkedProcess>true</debugForkedProcess>
                         -->
                     </configuration>
@@ -292,7 +292,7 @@
                         <dependency>
                             <groupId>com.github.spotbugs</groupId>
                             <artifactId>spotbugs</artifactId>
-                            <version>4.4.2.2</version>
+                            <version>4.4.2</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -786,7 +786,7 @@
                                         <!-- H2 Database claims this license, but for our purposes it's MPL: http://www.h2database.com -->
                                         <licenseMerge>Mozilla Public License|MPL 2.0, and EPL 1.0</licenseMerge>
                                         <!-- "concurrent.concurrent" claims this license, but is actually Public Domain: http://mvnrepository.com/artifact/concurrent/concurrent/ -->
-                                        <licenseMerge>Public Domain|Public domain, Sun Microsoystems</licenseMerge>
+                                        <licenseMerge>Public Domain|Public domain, Sun Microsystems</licenseMerge>
                                         <!-- WTFPL is essentially Public Domain: http://www.wtfpl.net/ ;) -->
                                         <licenseMerge>Public Domain|WTFPL</licenseMerge>
                                     </licenseMerges>
@@ -914,14 +914,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>baryonics-0.4.1</version>
+                       <version>baryonics-0.4.2</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>baryonics-0.4.1</version>
+                       <version>baryonics-0.4.2</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -1036,7 +1036,7 @@
                         </executions>
                     </plugin>
                     <!-- Sign any new releases via GPG.
-                         NOTE: you may optionall specify the "gpg.passphrase" in your settings.xml -->
+                         NOTE: you may optional specify the "gpg.passphrase" in your settings.xml -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
@@ -1068,69 +1068,69 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>baryonics-0.4.1</version>
+                <version>baryonics-0.4.2</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
