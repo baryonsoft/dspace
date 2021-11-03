@@ -43,6 +43,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility functions for DSpace.
@@ -329,7 +331,7 @@ public final class Utils {
      *
      * @return Date object, or null if there is a problem translating.
      */
-    public static synchronized Date parseISO8601Date(String s) {
+    public static synchronized @Nullable Date parseISO8601Date(@NotNull String s) {
         // attempt to normalize the timezone to something we can parse;
         // SimpleDateFormat can't handle "Z"
         char tzSign = s.charAt(s.length() - 6);

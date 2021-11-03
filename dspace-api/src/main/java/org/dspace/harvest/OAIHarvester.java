@@ -75,6 +75,7 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
+import org.jetbrains.annotations.NotNull;
 import org.xml.sax.SAXException;
 
 
@@ -558,7 +559,8 @@ public class OAIHarvester {
      * @throws SAXException                 if XML processing error
      * @throws TransformerException         if XML transformer error
      */
-    protected void processRecord(Element record, String OREPrefix, final long currentRecord, long totalListSize)
+    protected void processRecord(@NotNull Element record, String OREPrefix, final long currentRecord,
+                                 long totalListSize)
         throws SQLException, AuthorizeException, IOException, CrosswalkException, HarvestingException,
         ParserConfigurationException, SAXException, TransformerException {
         WorkspaceItem wi = null;
