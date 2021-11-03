@@ -16,9 +16,8 @@ import org.junit.Test;
 /**
  * This integration test verify that the {@link AuthorizeConfiguration} works
  * properly with the configuration reloading
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class AuthorizeConfigIT extends AbstractIntegrationTest {
 
@@ -33,7 +32,7 @@ public class AuthorizeConfigIT extends AbstractIntegrationTest {
         // in our extra configuration file for test, disable some feature
         appendToLocalConfiguration(
             "core.authorization.community-admin.group = false\n" +
-            "core.authorization.community-admin.delete-subelement = false\n");
+                "core.authorization.community-admin.delete-subelement = false\n");
         // verify that the two changed one are reflected in the AuthorizationConfiguration
         assertFalse(AuthorizeConfiguration.canCommunityAdminPerformGroupCreation());
         assertFalse(AuthorizeConfiguration.canCommunityAdminPerformSubelementDeletion());
@@ -43,7 +42,7 @@ public class AuthorizeConfigIT extends AbstractIntegrationTest {
 
         // add other configuration to switch off also the third
         appendToLocalConfiguration(
-                "core.authorization.community-admin.create-subelement = false\n");
+            "core.authorization.community-admin.create-subelement = false\n");
 
         assertFalse(AuthorizeConfiguration.canCommunityAdminPerformSubelementCreation());
         assertFalse(AuthorizeConfiguration.canCommunityAdminPerformGroupCreation());
