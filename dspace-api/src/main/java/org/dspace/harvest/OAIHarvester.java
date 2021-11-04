@@ -76,6 +76,7 @@ import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xml.sax.SAXException;
 
 
@@ -98,7 +99,9 @@ public class OAIHarvester {
      */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(OAIHarvester.class);
     private static final Namespace ATOM_NS = Namespace.getNamespace("http://www.w3.org/2005/Atom");
+    @SuppressWarnings("HttpUrlsUsage")
     private static final Namespace ORE_NS = Namespace.getNamespace("http://www.openarchives.org/ore/terms/");
+    @SuppressWarnings("HttpUrlsUsage")
     private static final Namespace OAI_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
     // DOMbuilder class for the DOM -> JDOM conversions
     private static final DOMBuilder db = new DOMBuilder();
@@ -130,7 +133,9 @@ public class OAIHarvester {
     // The point at which this thread should terminate itself
 
     /* Initialize the harvester with a collection object */
-    public OAIHarvester(Context c, DSpaceObject dso, HarvestedCollection hc) throws HarvestingException, SQLException {
+    public OAIHarvester(Context c, @NotNull DSpaceObject dso, HarvestedCollection hc)
+        throws HarvestingException, SQLException {
+
         bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
         bundleService = ContentServiceFactory.getInstance().getBundleService();
@@ -207,7 +212,7 @@ public class OAIHarvester {
      *
      * @return Namespace of the designated metadata format. Returns null of not found.
      */
-    public static Namespace getDMDNamespace(String metadataKey) {
+    public static @Nullable Namespace getDMDNamespace(String metadataKey) {
         String metadataString;
         String metaString = "oai.harvester.metadataformats";
 

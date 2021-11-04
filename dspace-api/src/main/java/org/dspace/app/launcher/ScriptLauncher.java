@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
@@ -32,6 +30,7 @@ import org.dspace.services.RequestService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A DSpace script launcher.
@@ -40,8 +39,6 @@ import org.jdom.input.SAXBuilder;
  * @author Mark Diggory
  */
 public class ScriptLauncher {
-
-    private static final Logger log = LogManager.getLogger();
 
     /**
      * The service manager kernel
@@ -120,7 +117,7 @@ public class ScriptLauncher {
      *
      * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
-    public static int handleScript(String[] args, Document commandConfigs,
+    public static int handleScript(String @NotNull [] args, Document commandConfigs,
                                    DSpaceRunnableHandler dSpaceRunnableHandler,
                                    DSpaceKernelImpl kernelImpl) throws InstantiationException, IllegalAccessException {
         int status;
@@ -148,7 +145,7 @@ public class ScriptLauncher {
      * @return A 1 or 0 depending on whether the script failed or passed respectively
      */
     private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
-                                     DSpaceRunnable script) {
+                                     @NotNull DSpaceRunnable script) {
         try {
             script.initialize(args, dSpaceRunnableHandler, null);
             script.run();
