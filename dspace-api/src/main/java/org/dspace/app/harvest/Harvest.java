@@ -399,6 +399,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             for (HarvestedCollection harvestedCollection : harvestedCollections) {
                 //hc.setHarvestResult(null,"");
                 harvestedCollection.setHarvestStartTime(null);
+                harvestedCollection.setLastHarvested(null);
                 harvestedCollection.setHarvestStatus(HarvestedCollection.STATUS_READY);
                 harvestedCollectionService.update(context, harvestedCollection);
             }
