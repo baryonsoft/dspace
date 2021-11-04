@@ -43,6 +43,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,35 +106,13 @@ public final class Utils {
     }
 
     /**
-     * Return an MD5 checksum for data in hex format.
-     *
-     * @param data The data to checksum.
-     *
-     * @return MD5 checksum for the data in hex format.
-     */
-    public static String getMD5(String data) {
-        return getMD5(data.getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
-     * Return an MD5 checksum for data in hex format.
-     *
-     * @param data The data to checksum.
-     *
-     * @return MD5 checksum for the data in hex format.
-     */
-    public static String getMD5(byte[] data) {
-        return toHex(getMD5Bytes(data));
-    }
-
-    /**
      * Return an MD5 checksum for data as a byte array.
      *
      * @param data The data to checksum.
      *
      * @return MD5 checksum for the data as a byte array.
      */
-    public static byte[] getMD5Bytes(byte[] data) {
+    public static byte @Nullable [] getMD5Bytes(byte[] data) {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
 
@@ -220,7 +199,7 @@ public final class Utils {
      *
      * @throws IOException if IO error
      */
-    public static void copy(final InputStream input, final OutputStream output)
+    public static void copy(final @NotNull InputStream input, final OutputStream output)
         throws IOException {
         final int BUFFER_SIZE = 1024 * 4;
         final byte[] buffer = new byte[BUFFER_SIZE];
@@ -288,7 +267,7 @@ public final class Utils {
      *
      * @throws ParseException if the duration is of incorrect format
      */
-    public static long parseDuration(String duration) throws ParseException {
+    public static long parseDuration(@NotNull String duration) throws ParseException {
         Matcher m = DURATION_PATTERN.matcher(duration.trim());
         if (!m.matches()) {
             throw new ParseException("'" + duration
@@ -351,9 +330,7 @@ public final class Utils {
                 lastError = e;
             }
         }
-        if (lastError != null) {
-            log.error("Error parsing date:", lastError);
-        }
+        log.error("Error parsing date:", lastError);
         return null;
     }
 
@@ -367,7 +344,7 @@ public final class Utils {
      *
      * @return String containing formatted date.
      */
-    public static synchronized String formatISO8601Date(Date d) {
+    public static synchronized @NotNull String formatISO8601Date(Date d) {
         String result;
         outCal.setTime(d);
         if (outCal.get(Calendar.MILLISECOND) == 0) {
@@ -379,7 +356,8 @@ public final class Utils {
         return result.substring(0, rl - 2) + ":" + result.substring(rl - 2);
     }
 
-    public static <E> java.util.Collection<E> emptyIfNull(java.util.Collection<E> collection) {
+    @Contract(value = "!null -> param1", pure = true)
+    public static <E> java.util.@NotNull Collection<E> emptyIfNull(java.util.Collection<E> collection) {
         return collection == null ? Collections.emptyList() : collection;
     }
 
@@ -396,7 +374,7 @@ public final class Utils {
      *
      * @return array of tokens
      */
-    public static String[] tokenize(String metadata) {
+    public static String[] tokenize(@NotNull String metadata) {
         String separator = metadata.contains("_") ? "_" : ".";
         StringTokenizer dcf = new StringTokenizer(metadata, separator);
 
@@ -418,7 +396,7 @@ public final class Utils {
      *
      * @return metadata field key
      */
-    public static String standardize(String schema, String element, String qualifier, String separator) {
+    public static @NotNull String standardize(String schema, String element, String qualifier, String separator) {
         if (StringUtils.isBlank(qualifier)) {
             return schema + separator + element;
         } else {
@@ -433,7 +411,7 @@ public final class Utils {
      *
      * @return baseurl (without any context path) or null (if URL was invalid)
      */
-    public static String getBaseUrl(String urlString) {
+    public static @Nullable String getBaseUrl(String urlString) {
         try {
             URL url = new URL(urlString);
             String baseUrl = url.getProtocol() + "://" + url.getHost();
@@ -453,7 +431,7 @@ public final class Utils {
      *
      * @return hostname (without any www.) or null (if URI was invalid)
      */
-    public static String getHostName(String uriString) {
+    public static @Nullable String getHostName(String uriString) {
         try {
             URI uri = new URI(uriString);
             String hostname = uri.getHost();
@@ -461,7 +439,7 @@ public final class Utils {
             if (hostname != null) {
                 return hostname.startsWith("www.") ? hostname.substring(4) : hostname;
             }
-            return hostname;
+            return null;
         } catch (URISyntaxException e) {
             return null;
         }
@@ -476,7 +454,7 @@ public final class Utils {
      *
      * @return IP address(es) in a String array (or null if not found)
      */
-    public static String[] getIPAddresses(String uriString) {
+    public static String @Nullable [] getIPAddresses(String uriString) {
         String[] ipAddresses = null;
 
         // First, get the hostname

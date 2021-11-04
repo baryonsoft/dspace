@@ -7,6 +7,9 @@
  */
 package org.dspace.core;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Simple lightweight "framework" for managing plugins.
  * <p>
@@ -16,7 +19,7 @@ package org.dspace.core;
  * <p>
  * Unfortunately, this has to be an <code>abstract class</code> because
  * an <code>interface</code> may not have static methods.  The
- * <code>pluginAliases</code> method is static so it can be invoked
+ * <code>pluginAliases</code> method is static, so it can be invoked
  * without creating an instance, and thus let the aliases live in the
  * class itself so there is no need for name mapping in a separate
  * configuration file.
@@ -48,7 +51,8 @@ public abstract class SelfNamedPlugin implements NameAwarePlugin {
      *
      * @return array of names of this plugin
      */
-    public static String[] getPluginNames() {
+    @Contract(pure = true)
+    public static String @Nullable [] getPluginNames() {
         return null;
     }
 

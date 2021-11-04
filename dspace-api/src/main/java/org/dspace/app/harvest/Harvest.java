@@ -138,7 +138,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
-            handler.logInfo("Examples:");
+            handler.logInfo("\nExamples:");
             handler.logInfo("   PING OAI server: Harvest -g -a oai_source -i oai_set_id");
             handler.logInfo("   SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a " +
                 "oai_source -i oai_set_id -m metadata_format");

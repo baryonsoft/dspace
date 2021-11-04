@@ -17,6 +17,7 @@ import java.util.UUID;
  * The default Hibernate implementation offers up a class that implements all these methods.
  *
  * @param <T> type which is accessed by this DAO, for example Item.
+ *
  * @author kevinvandevelde at atmire.com
  */
 public interface GenericDAO<T> {
@@ -25,38 +26,42 @@ public interface GenericDAO<T> {
      *
      * @param context current DSpace context.
      * @param t       type to be created.
+     *
      * @return entity tracking the created instance.
-     * @throws SQLException
      */
-    public T create(Context context, T t) throws SQLException;
+    T create(Context context, T t) throws SQLException;
 
     /**
      * Persist this instance in the database.
      *
      * @param context current DSpace context.
      * @param t       type created here.
+     *
      * @throws SQLException passed through.
      */
-    public void save(Context context, T t) throws SQLException;
+    void save(Context context, T t) throws SQLException;
 
     /**
      * Remove an instance from the database.
      *
      * @param context current DSpace context.
      * @param t       type of the instance to be removed.
+     *
      * @throws SQLException passed through.
      */
-    public void delete(Context context, T t) throws SQLException;
+    void delete(Context context, T t) throws SQLException;
 
     /**
      * Fetch all persisted instances of a given object type.
      *
      * @param context The relevant DSpace Context.
      * @param clazz   the desired type.
+     *
      * @return list of DAOs of the same type as clazz
+     *
      * @throws SQLException if database error
      */
-    public List<T> findAll(Context context, Class<T> clazz) throws SQLException;
+    List<T> findAll(Context context, Class<T> clazz) throws SQLException;
 
     /**
      * Fetch all persisted instances of a given object type.
@@ -65,7 +70,9 @@ public interface GenericDAO<T> {
      * @param clazz   the desired type.
      * @param limit   paging limit
      * @param offset  paging offset
+     *
      * @return list of DAOs of the same type as clazz
+     *
      * @throws SQLException if database error
      */
     List<T> findAll(Context context, Class<T> clazz, Integer limit, Integer offset) throws SQLException;
@@ -75,10 +82,12 @@ public interface GenericDAO<T> {
      *
      * @param context The relevant DSpace Context.
      * @param query   JPQL query string
+     *
      * @return a DAO specified by the query string
+     *
      * @throws SQLException if database error
      */
-    public T findUnique(Context context, String query) throws SQLException;
+    T findUnique(Context context, String query) throws SQLException;
 
     /**
      * Fetch the entity identified by its legacy database identifier.
@@ -86,10 +95,12 @@ public interface GenericDAO<T> {
      * @param context current DSpace context.
      * @param clazz   class of entity to be found.
      * @param id      legacy database record ID.
+     *
      * @return the found entity.
+     *
      * @throws SQLException passed through.
      */
-    public T findByID(Context context, Class clazz, int id) throws SQLException;
+    T findByID(Context context, Class clazz, int id) throws SQLException;
 
     /**
      * Fetch the entity identified by its UUID primary key.
@@ -97,18 +108,20 @@ public interface GenericDAO<T> {
      * @param context current DSpace context.
      * @param clazz   class of entity to be found.
      * @param id      primary key of the database record.
+     *
      * @return the found entity.
-     * @throws SQLException
      */
-    public T findByID(Context context, Class clazz, UUID id) throws SQLException;
+    T findByID(Context context, Class clazz, UUID id) throws SQLException;
 
     /**
      * Execute a JPQL query and return a collection of results.
      *
      * @param context The relevant DSpace Context.
      * @param query   JPQL query string
+     *
      * @return list of DAOs specified by the query string
+     *
      * @throws SQLException if database error
      */
-    public List<T> findMany(Context context, String query) throws SQLException;
+    List<T> findMany(Context context, String query) throws SQLException;
 }
