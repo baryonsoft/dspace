@@ -32,7 +32,7 @@ public class HarvestThread extends Thread {
         HarvestServiceFactory.getInstance().getHarvestedCollectionService();
 
 
-    protected HarvestThread(UUID collectionId) throws SQLException {
+    protected HarvestThread(UUID collectionId) {
         this.collectionId = collectionId;
     }
 
@@ -54,14 +54,14 @@ public class HarvestThread extends Thread {
 
                 dso = hc.getCollection();
                 OAIHarvester harvester = new OAIHarvester(context, dso, hc);
-                harvester.runHarvest();
+                harvester.runHarvest(-1);
             } catch (RuntimeException e) {
-                log.error("Runtime exception in thread: " + this.toString());
+                log.error("Runtime exception in thread: " + this);
                 log.error(e.getMessage() + " " + e.getCause());
                 hc.setHarvestMessage("Runtime error occured while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             } catch (Exception ex) {
-                log.error("General exception in thread: " + this.toString());
+                log.error("General exception in thread: " + this);
                 log.error(ex.getMessage() + " " + ex.getCause());
                 hc.setHarvestMessage("Error occured while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
@@ -70,9 +70,6 @@ public class HarvestThread extends Thread {
                     harvestedCollectionService.update(context, hc);
                     context.restoreAuthSystemState();
                     context.complete();
-                } catch (RuntimeException e) {
-                    log.error("Unexpected exception while recovering from a harvesting error: " + e.getMessage(), e);
-                    context.abort();
                 } catch (Exception e) {
                     log.error("Unexpected exception while recovering from a harvesting error: " + e.getMessage(), e);
                     context.abort();
@@ -86,6 +83,7 @@ public class HarvestThread extends Thread {
             log.error(e.getMessage(), e);
         }
 
+        assert hc != null;
         log.info("Thread for collection " + hc.getCollection().getID() + " completes.");
     }
 }

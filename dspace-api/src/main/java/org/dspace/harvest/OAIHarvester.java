@@ -315,12 +315,14 @@ public class OAIHarvester {
      * since last
      * harvest, and ingest the returned items.
      *
+     * @param recentDays the number of days to look back for updates, -1 for all updates
+     *
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public void runHarvest() throws SQLException, IOException, AuthorizeException {
+    public void runHarvest(int recentDays) throws SQLException, IOException, AuthorizeException {
         Context.Mode originalMode = ourContext.getCurrentMode();
         ourContext.setMode(Context.Mode.BATCH_EDIT);
 
@@ -334,6 +336,9 @@ public class OAIHarvester {
         }
 
         String fromDate = harvestRow.getHarvestDate() == null ? null : processDate(harvestRow.getHarvestDate());
+        if (recentDays > 0) {
+            fromDate = processDate(new Date(System.currentTimeMillis() - ((long) recentDays * 24 * 60 * 60 * 1000)));
+        }
 
         long totalListSize = 0;
         long currentRecord = 0;

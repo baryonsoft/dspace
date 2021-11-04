@@ -378,7 +378,9 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         try {
             // Harvest will not work for an anonymous user
             handler.logInfo("Harvest started... ");
-            harvester.runHarvest();
+            int recentDays =
+                commandLine.hasOption("recent") ? Integer.parseInt(commandLine.getOptionValue("recent")) : -1;
+            harvester.runHarvest(recentDays);
             context.complete();
         } catch (SQLException | AuthorizeException | IOException e) {
             throw new IllegalStateException("Failed to run harvester", e);
