@@ -54,7 +54,7 @@ public class HarvestThread extends Thread {
 
                 dso = hc.getCollection();
                 OAIHarvester harvester = new OAIHarvester(context, dso, hc);
-                harvester.runHarvest(-1);
+                harvester.runHarvest(-1, false);
             } catch (RuntimeException e) {
                 log.error("Runtime exception in thread: " + this);
                 log.error(e.getMessage() + " " + e.getCause());
