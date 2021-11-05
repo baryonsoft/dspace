@@ -112,10 +112,9 @@ public final class ProviderHolder<T> {
         T otherProvider = other.getProvider();
         if (provider == null || otherProvider == null) {
             return false;
-        } else if (provider.equals(otherProvider)) {
-            return true;
+        } else {
+            return provider.equals(otherProvider);
         }
-        return false;
     }
 
     @Override

@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -248,7 +250,8 @@ public class ResourceFinder {
         return catalina;
     }
 
-    public static ResourceFinder getResourceFromPaths(String s) {
+    @Contract(pure = true)
+    public static @Nullable ResourceFinder getResourceFromPaths(String s) {
         return null;
     }
 }

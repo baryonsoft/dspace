@@ -7,7 +7,6 @@
  */
 package org.dspace.utils.servlet;
 
-import java.io.IOException;
 import javax.annotation.Priority;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -65,14 +64,14 @@ public final class DSpaceWebappServletFilter implements Filter {
      * .FilterChain)
      */
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-        throws IOException, ServletException {
+        throws ServletException {
         // now do some DSpace stuff
         //try {
         DSpaceKernel kernel = getKernel();
 
         // establish the request service startup
         RequestService requestService = kernel.getServiceManager()
-                                              .getServiceByName(RequestService.class.getName(), RequestService.class);
+            .getServiceByName(RequestService.class.getName(), RequestService.class);
         if (requestService == null) {
             throw new IllegalStateException("Could not get the DSpace RequestService to start the request transaction");
         }

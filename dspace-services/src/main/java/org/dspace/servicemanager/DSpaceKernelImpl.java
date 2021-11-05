@@ -15,9 +15,7 @@ import javax.management.AttributeNotFoundException;
 import javax.management.Descriptor;
 import javax.management.DynamicMBean;
 import javax.management.InvalidAttributeValueException;
-import javax.management.MBeanException;
 import javax.management.MBeanInfo;
-import javax.management.ReflectionException;
 import javax.management.modelmbean.DescriptorSupport;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
 import javax.management.modelmbean.ModelMBeanInfoSupport;
@@ -50,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceKernelImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(DSpaceKernelImpl.class);
 
     /**
      * Creates a DSpace Kernel, does not do any checks though.
@@ -58,7 +56,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
      *
      * @param name the name for the kernel
      */
-    protected DSpaceKernelImpl(String name) {
+    DSpaceKernelImpl(String name) {
         this.mBeanName = DSpaceKernelManager.checkName(name);
     }
 
@@ -70,7 +68,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
 
     private Thread shutdownHook;
 
-    protected void registerShutdownHook() {
+    void registerShutdownHook() {
         if (this.shutdownHook == null) {
             synchronized (lock) {
                 // No shutdown hook registered yet
@@ -240,7 +238,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
     /**
      * Called from within the shutdown thread.
      */
-    protected void doDestroy() {
+    void doDestroy() {
         if (!this.destroyed) {
             destroy();
         }
@@ -287,25 +285,24 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
         return loadTime;
     }
 
-    public Object invoke(String actionName, Object[] params, String[] signature)
-        throws MBeanException, ReflectionException {
+    public Object invoke(String actionName, Object[] params, String[] signature) {
         return this;
     }
 
     public MBeanInfo getMBeanInfo() {
-        Descriptor lastLoadDateDesc = new DescriptorSupport(new String[] {"name=LastLoadDate",
+        Descriptor lastLoadDateDesc = new DescriptorSupport("name=LastLoadDate",
             "descriptorType=attribute", "default=0", "displayName=Last Load Date",
-            "getMethod=getLastLoadDate"});
-        Descriptor lastLoadTimeDesc = new DescriptorSupport(new String[] {"name=LastLoadTime",
+            "getMethod=getLastLoadDate");
+        Descriptor lastLoadTimeDesc = new DescriptorSupport("name=LastLoadTime",
             "descriptorType=attribute", "default=0", "displayName=Last Load Time",
-            "getMethod=getLoadTime"});
+            "getMethod=getLoadTime");
 
         ModelMBeanAttributeInfo[] mmbai = new ModelMBeanAttributeInfo[2];
         mmbai[0] = new ModelMBeanAttributeInfo("LastLoadDate", "java.util.Date", "Last Load Date",
-                                               true, false, false, lastLoadDateDesc);
+            true, false, false, lastLoadDateDesc);
 
         mmbai[1] = new ModelMBeanAttributeInfo("LastLoadTime", "java.lang.Long", "Last Load Time",
-                                               true, false, false, lastLoadTimeDesc);
+            true, false, false, lastLoadTimeDesc);
 
         ModelMBeanOperationInfo[] mmboi = new ModelMBeanOperationInfo[7];
 
@@ -320,7 +317,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
     }
 
     public Object getAttribute(String attribute)
-        throws AttributeNotFoundException, MBeanException, ReflectionException {
+        throws AttributeNotFoundException {
         if ("LastLoadDate".equals(attribute)) {
             return getLastLoadDate();
         } else if ("LastLoadTime".equals(attribute)) {
@@ -334,8 +331,8 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
         return null;
     }
 
-    public void setAttribute(Attribute attribute) throws AttributeNotFoundException,
-        InvalidAttributeValueException, MBeanException, ReflectionException {
+    public void setAttribute(Attribute attribute) throws
+        InvalidAttributeValueException {
         throw new InvalidAttributeValueException("Cannot set attribute: " + attribute);
     }
 

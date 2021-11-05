@@ -19,21 +19,27 @@ import java.util.Map;
 public class Event implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * The event scopes to send events to.
-     */
-    public static enum Scope {
-        LOCAL, CLUSTER, EXTERNAL
-    }
-
-    ;
+    private boolean modify;
 
     private String id;
     private String name;
     private String userId;
     private String resourceReference;
     private Scope[] scopes;
-    private boolean modify = false;
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Scope scope : scopes) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(scope);
+        }
+        return id + ":name=" + name + ":user=" + userId + ":resRef=" + resourceReference + ":mod=" + modify +
+            ":scopes=" + sb;
+    }
+
     private Map<String, String> properties;
 
     /**
@@ -193,17 +199,11 @@ public class Event implements Serializable {
         this.scopes = (scopes == null ? null : scopes.clone());
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < scopes.length; i++) {
-            if (sb.length() > 0) {
-                sb.append(",");
-            }
-            sb.append(scopes[i]);
-        }
-        return id + ":name=" + name + ":user=" + userId + ":resRef=" + resourceReference + ":mod=" + modify +
-            ":scopes=" + sb;
+    /**
+     * The event scopes to send events to.
+     */
+    public enum Scope {
+        LOCAL, CLUSTER, EXTERNAL
     }
 
 }

@@ -25,7 +25,7 @@ public interface CachingService {
      * anything.
      * This is here to ensure we use the right name.
      */
-    public static final String REQUEST_CACHE = "dsRequestCache";
+    String REQUEST_CACHE = "dsRequestCache";
 
     /**
      * Gets all the caches that the service knows about.
@@ -34,7 +34,7 @@ public interface CachingService {
      *
      * @return a list of all the caches which the caching service knows about
      */
-    public List<Cache> getCaches();
+    List<Cache> getCaches();
 
     /**
      * Construct a Cache with the given name OR retrieve the one that
@@ -52,9 +52,10 @@ public interface CachingService {
      *
      * @param cacheName   the unique name for this cache (e.g. org.dspace.user.UserCache)
      * @param cacheConfig defines the configuration for this cache
+     *
      * @return a cache which can be used to store objects
      */
-    public Cache getCache(String cacheName, CacheConfig cacheConfig);
+    Cache getCache(String cacheName, CacheConfig cacheConfig);
 
     /**
      * Flushes and destroys the cache with this name.
@@ -62,7 +63,7 @@ public interface CachingService {
      *
      * @param cacheName the unique name for this cache (e.g. org.dspace.user.UserCache)
      */
-    public void destroyCache(String cacheName);
+    void destroyCache(String cacheName);
 
     /**
      * Get a status report of cache usage which is suitable for log or
@@ -70,9 +71,10 @@ public interface CachingService {
      *
      * @param cacheName (optional) the unique name for this cache (e.g. org.dspace.user.UserCache)
      *                  OR null for status of all caches
+     *
      * @return a string representing the current status of the specified cache or all caches
      */
-    public String getStatus(String cacheName);
+    String getStatus(String cacheName);
 
     /**
      * Clears all caches.
@@ -80,13 +82,13 @@ public interface CachingService {
      *
      * @throws SecurityException if the current user does not have super user permissions
      */
-    public void resetCaches();
+    void resetCaches();
 
     /**
      * Unbinds all request caches.  Destroys the caches completely.
      * You should not call this unless you know what you are doing;
      * it is handled automatically by the system.
      */
-    public void unbindRequestCaches();
+    void unbindRequestCaches();
 
 }

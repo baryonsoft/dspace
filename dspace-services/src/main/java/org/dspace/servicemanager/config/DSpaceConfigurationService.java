@@ -339,15 +339,11 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      */
     @Override
     public boolean hasProperty(String name) {
-        if (getConfiguration().containsKey(name)) {
-            return true;
-        } else {
-            return false;
-        }
+        return getConfiguration().containsKey(name);
     }
 
     @Override
-    public synchronized boolean addPropertyValue(String name, Object value) {
+    public synchronized void addPropertyValue(String name, Object value) {
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null for setting configuration");
         }
@@ -356,14 +352,13 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         }
 
         // If the value is a type of String, trim any leading/trailing spaces before saving it.
-        if (String.class.isInstance(value)) {
+        if (value instanceof String) {
             value = ((String) value).trim();
         }
 
         Configuration configuration = getConfiguration();
         boolean isNew = !configuration.containsKey(name);
         configuration.addProperty(name, value);
-        return isNew;
     }
 
     /* (non-Javadoc)
@@ -372,7 +367,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     @Override
     public synchronized boolean setProperty(String name, Object value) {
         // If the value is a type of String, trim any leading/trailing spaces before saving it.
-        if (value != null && String.class.isInstance(value)) {
+        if (value instanceof String) {
             value = ((String) value).trim();
         }
 
@@ -427,7 +422,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         }
 
         // Return an array of updated keys
-        return changed.toArray(new String[changed.size()]);
+        return changed.toArray(new String[0]);
     }
 
     /**
@@ -535,7 +530,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         // Finally, set any dynamic, default properties
         setDynamicProperties();
 
-        log.info("Started up configuration service and loaded settings: " + toString());
+        log.info("Started up configuration service and loaded settings: " + this);
     }
 
     /**
@@ -559,7 +554,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         } catch (ConfigurationException ce) {
             log.error("Unable to reload configurations based on definition at " + this.configDefinition, ce);
         }
-        log.info("Reloaded configuration service: " + toString());
+        log.info("Reloaded configuration service: " + this);
     }
 
     /**
@@ -606,7 +601,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * @param providedHome provided home directory (may be null)
      * @return full path to DSpace home
      */
-    protected String getDSpaceHome(String providedHome) {
+    String getDSpaceHome(String providedHome) {
         // See if valid home specified as system property (most trusted)
         String sysProperty = System.getProperty(DSPACE_HOME);
         if (isValidDSpaceHome(sysProperty)) {
@@ -662,9 +657,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * in order to make it a valid DSpace home directory
      *
      * @param path path to validate
+     *
      * @return true if path seems valid, false otherwise
      */
-    protected boolean isValidDSpaceHome(String path) {
+    boolean isValidDSpaceHome(String path) {
         // If null path, return false immediately
         if (path == null) {
             return false;
@@ -675,11 +671,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         File configDefFile = new File(configDefinition);
 
         // Check if the required config exists
-        if (configDefFile.exists()) {
-            return true;
-        } else {
-            return false;
-        }
+        return configDefFile.exists();
     }
 
     /**
@@ -687,7 +679,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      *
      * @return the path to the servlet container home OR null if it cannot be found
      */
-    protected String getCatalina() {
+    String getCatalina() {
         String catalina = System.getProperty("catalina.base");
         if (catalina == null) {
             catalina = System.getProperty("catalina.home");
@@ -746,7 +738,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         } else {
             // If none of the above works, try to convert the value to the required type
             SimpleTypeConverter converter = new SimpleTypeConverter();
-            return (T) converter.convertIfNecessary(getConfiguration().getProperty(name), type);
+            return converter.convertIfNecessary(getConfiguration().getProperty(name), type);
         }
     }
 }

@@ -18,7 +18,7 @@ import org.dspace.services.model.Request;
 
 public final class InternalRequestImpl extends AbstractRequestImpl implements Request {
 
-    private Map<String, Object> attributes = new HashMap<String, Object>();
+    private final Map<String, Object> attributes = new HashMap<>();
 
     public InternalRequestImpl() {
     }

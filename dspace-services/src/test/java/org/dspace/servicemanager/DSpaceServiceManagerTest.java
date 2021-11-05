@@ -33,7 +33,7 @@ import org.junit.Test;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceServiceManagerTest {
-    public static String SPRING_TEST_CONFIG_FILE = "spring/spring-test-services.xml";
+    public static final String SPRING_TEST_CONFIG_FILE = "spring/spring-test-services.xml";
 
     DSpaceServiceManager dsm;
     DSpaceConfigurationService configurationService;
@@ -94,7 +94,7 @@ public class DSpaceServiceManagerTest {
         assertEquals("AZ", service);
 
         try {
-            dsm.registerService("fakey", (Object) null);
+            dsm.registerService("fakey", null);
             fail("should have thrown exception");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());
@@ -120,7 +120,7 @@ public class DSpaceServiceManagerTest {
 
 
         try {
-            dsm.registerService("fakey", (Class<?>) null);
+            dsm.registerService("fakey", null);
             fail("should have thrown exception");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());

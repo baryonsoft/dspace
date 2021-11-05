@@ -13,17 +13,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public interface Request {
-    public String getRequestId();
+    String getRequestId();
 
-    public Object getAttribute(String name);
+    Object getAttribute(String name);
 
-    public void setAttribute(String name, Object o);
+    void setAttribute(String name, Object o);
 
-    public ServletRequest getServletRequest();
+    ServletRequest getServletRequest();
 
-    public HttpServletRequest getHttpServletRequest();
+    HttpServletRequest getHttpServletRequest();
 
-    public ServletResponse getServletResponse();
+    ServletResponse getServletResponse();
 
-    public HttpServletResponse getHttpServletResponse();
+    HttpServletResponse getHttpServletResponse();
 }

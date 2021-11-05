@@ -23,7 +23,7 @@ import org.dspace.kernel.mixins.OrderedService;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class OrderedServiceComparator implements Comparator<Object>, Serializable {
-    public static final long serialVersionUID = 1l;
+    public static final long serialVersionUID = 1L;
 
     /*
      * (non-Javadoc)

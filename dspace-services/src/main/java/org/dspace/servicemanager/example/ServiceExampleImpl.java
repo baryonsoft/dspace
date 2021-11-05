@@ -22,7 +22,7 @@ public final class ServiceExampleImpl implements ServiceExample {
 
     private ConcreteExample concreteExample;
 
-    @Autowired(required = true) // Spring
+    @Autowired() // Spring
     public void setConcreteExample(ConcreteExample concreteExample) {
         this.concreteExample = concreteExample;
     }

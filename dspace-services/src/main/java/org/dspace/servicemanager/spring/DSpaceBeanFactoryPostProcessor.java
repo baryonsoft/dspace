@@ -23,18 +23,16 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  */
 public final class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-    private ServiceManagerSystem serviceManager;
-    private DSpaceConfigurationService configurationService;
-    private boolean testMode = false;
+    private final ServiceManagerSystem serviceManager;
+    private final DSpaceConfigurationService configurationService;
 
     public DSpaceBeanFactoryPostProcessor(ServiceManagerSystem serviceManager,
-            DSpaceConfigurationService configurationService, boolean testMode) {
+                                          DSpaceConfigurationService configurationService) {
         if (configurationService == null) {
             throw new IllegalArgumentException("Configuration service cannot be null");
         }
         this.serviceManager = serviceManager;
         this.configurationService = configurationService;
-        this.testMode = testMode;
     }
 
     /* (non-Javadoc)

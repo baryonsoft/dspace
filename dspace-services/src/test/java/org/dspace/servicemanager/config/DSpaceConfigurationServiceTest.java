@@ -295,7 +295,7 @@ public class DSpaceConfigurationServiceTest {
         assertEquals("itemC", array[2]);
         Integer number = configurationService.getPropertyAsType("sample.number", Integer.class);
         assertNotNull(number);
-        assertEquals(new Integer(123), number);
+        assertEquals(Integer.valueOf(123), number);
 
         Boolean bool = configurationService.getPropertyAsType("sample.boolean", Boolean.class);
         assertNotNull(bool);
@@ -306,11 +306,10 @@ public class DSpaceConfigurationServiceTest {
         assertEquals(Boolean.FALSE, bool2);
 
         boolean bool3 = configurationService.getPropertyAsType("INVALID.PROPERTY", boolean.class);
-        assertNotNull(bool3);
         assertEquals(false, bool3);
 
         assertEquals(123, (int) configurationService.getPropertyAsType("sample.number", int.class));
-        assertEquals(true, (boolean) configurationService.getPropertyAsType("sample.boolean", boolean.class));
+        assertEquals(true, configurationService.getPropertyAsType("sample.boolean", boolean.class));
 
         prop = configurationService.getPropertyAsType("XXXXX", String.class);
         assertNull(prop);
@@ -333,9 +332,9 @@ public class DSpaceConfigurationServiceTest {
         assertEquals("itemB", array[1]);
         assertEquals("itemC", array[2]);
 
-        Integer number = configurationService.getPropertyAsType("sample.number", new Integer(12345));
+        Integer number = configurationService.getPropertyAsType("sample.number", 12345);
         assertNotNull(number);
-        assertEquals(new Integer(123), number);
+        assertEquals(Integer.valueOf(123), number);
 
         Boolean bool = configurationService.getPropertyAsType("sample.boolean", Boolean.FALSE);
         assertNotNull(bool);

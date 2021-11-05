@@ -58,10 +58,12 @@ public interface ConfigurationService {
      * @param <T>  class type
      * @param name the property name
      * @param type the type to return the property as
+     *
      * @return the property value OR null if none is found
+     *
      * @throws UnsupportedOperationException if the type cannot be converted to the requested type
      */
-    public <T> T getPropertyAsType(String name, Class<T> type);
+    <T> T getPropertyAsType(String name, Class<T> type);
 
     /**
      * Get a configuration property (setting) from the system, or return
@@ -70,10 +72,12 @@ public interface ConfigurationService {
      * @param <T>          class type
      * @param name         the property name
      * @param defaultValue the value to return if this name is not found
+     *
      * @return the property value OR null if none is found
+     *
      * @throws IllegalArgumentException if the defaultValue type does not match the type of the property by name
      */
-    public <T> T getPropertyAsType(String name, T defaultValue);
+    <T> T getPropertyAsType(String name, T defaultValue);
 
     /**
      * Get a configuration property (setting) from the system, or return
@@ -84,19 +88,21 @@ public interface ConfigurationService {
      * @param defaultValue         the value to return if this name is not found
      * @param setDefaultIfNotFound if this is true and the config value
      *                             is not found then the default value will be set in the
-     *                             configuration store assuming it is not null.  Otherwise the
+     *                             configuration store assuming it is not null.  Otherwise, the
      *                             default value is just returned but not set.
+     *
      * @return the property value OR null if none is found
+     *
      * @throws IllegalArgumentException if the defaultValue type does not match the type of the property by name
      */
-    public <T> T getPropertyAsType(String name, T defaultValue, boolean setDefaultIfNotFound);
+    <T> T getPropertyAsType(String name, T defaultValue, boolean setDefaultIfNotFound);
 
     /**
      * Get keys all currently known configuration settings
      *
      * @return all the configuration keys as a List
      */
-    public List<String> getPropertyKeys();
+    List<String> getPropertyKeys();
 
     /**
      * Get keys all currently known configuration settings, which
@@ -105,18 +111,20 @@ public interface ConfigurationService {
      * For example, passing in "db" would return the keys "db.url", "db.username", etc.
      *
      * @param prefix prefix of key
+     *
      * @return all the configuration keys as a List
      */
-    public List<String> getPropertyKeys(String prefix);
+    List<String> getPropertyKeys(String prefix);
 
     /**
      * Convenience method - get a configuration property (setting) from
      * the system as a String.
      *
      * @param name the property name
+     *
      * @return the property value OR null if none is found
      */
-    public String getProperty(String name);
+    String getProperty(String name);
 
     /**
      * Convenience method - get a configuration property (setting) from
@@ -124,18 +132,20 @@ public interface ConfigurationService {
      *
      * @param name         the property name
      * @param defaultValue default value if property not found
+     *
      * @return the property value OR default value if not found
      */
-    public String getProperty(String name, String defaultValue);
+    String getProperty(String name, String defaultValue);
 
     /**
      * Convenience method - get a configuration property (setting) from
      * the system as a String Array.
      *
      * @param name the property name
+     *
      * @return the String Array value
      */
-    public String[] getArrayProperty(String name);
+    String[] getArrayProperty(String name);
 
     /**
      * Convenience method - get a configuration property (setting) from
@@ -143,18 +153,20 @@ public interface ConfigurationService {
      *
      * @param name         the property name
      * @param defaultValue the default value if property not found
+     *
      * @return the String Array value or default value if not found
      */
-    public String[] getArrayProperty(String name, String[] defaultValue);
+    String[] getArrayProperty(String name, String[] defaultValue);
 
     /**
      * Convenience method - get a configuration property (setting) from
      * the system as a boolean value.
      *
      * @param name the property name
+     *
      * @return the boolean property value (true/false)
      */
-    public boolean getBooleanProperty(String name);
+    boolean getBooleanProperty(String name);
 
     /**
      * Convenience method - get a configuration property (setting) from
@@ -162,18 +174,20 @@ public interface ConfigurationService {
      *
      * @param name         the property name
      * @param defaultValue the default value if property not found
+     *
      * @return the boolean property value (true/false) or default value if not found
      */
-    public boolean getBooleanProperty(String name, boolean defaultValue);
+    boolean getBooleanProperty(String name, boolean defaultValue);
 
     /**
      * Convenience method - get a configuration property (setting) from
      * the system as an int value.
      *
      * @param name the property name
+     *
      * @return the integer property value
      */
-    public int getIntProperty(String name);
+    int getIntProperty(String name);
 
     /**
      * Convenience method - get a configuration property (setting) from
@@ -181,18 +195,20 @@ public interface ConfigurationService {
      *
      * @param name         the property name
      * @param defaultValue the default value if property not found
+     *
      * @return the integer property value or default value if not found
      */
-    public int getIntProperty(String name, int defaultValue);
+    int getIntProperty(String name, int defaultValue);
 
     /**
      * Convenience method - get a configuration property (setting) from
      * the system as a long value.
      *
      * @param name the property name
+     *
      * @return the long property value
      */
-    public long getLongProperty(String name);
+    long getLongProperty(String name);
 
     /**
      * Convenience method - get a configuration property (setting) from
@@ -200,18 +216,20 @@ public interface ConfigurationService {
      *
      * @param name         the property name
      * @param defaultValue the default value if property not found
+     *
      * @return the long property value or default value if not found
      */
-    public long getLongProperty(String name, long defaultValue);
+    long getLongProperty(String name, long defaultValue);
 
     /**
      * Convenience method - get a configuration property (setting) from
      * the system as its stored object
      *
      * @param name the property name
+     *
      * @return the property value OR null if none is found
      */
-    public Object getPropertyValue(String name);
+    Object getPropertyValue(String name);
 
     /**
      * Convenience method - get all configuration properties (settings)
@@ -219,7 +237,7 @@ public interface ConfigurationService {
      *
      * @return all the configuration properties in a properties object (name to value)
      */
-    public Properties getProperties();
+    Properties getProperties();
 
     /**
      * Convenience method - get entire configuration (settings)
@@ -227,25 +245,26 @@ public interface ConfigurationService {
      *
      * @return Configuration object representing the system configuration
      */
-    public Configuration getConfiguration();
+    Configuration getConfiguration();
 
     /**
      * Return whether a property exists within the configuration
      *
      * @param name the property name
+     *
      * @return true if property exists, false if not
      */
-    public boolean hasProperty(String name);
+    boolean hasProperty(String name);
 
     /**
      * Add a value to a configuration property.
      *
-     * @param name the property name.  May not be null.
+     * @param name  the property name.  May not be null.
      * @param value the property value.  May not be null.
-     * @return true if a new property was created.
+     *
      * @throws IllegalArgumentException if the name or value is null.
      */
-    public boolean addPropertyValue(String name, Object value);
+    void addPropertyValue(String name, Object value);
 
     /**
      * Set a configuration property (setting) in the system.
@@ -254,18 +273,20 @@ public interface ConfigurationService {
      *
      * @param name  the property name
      * @param value the property value (set this to null to clear out the property)
+     *
      * @return true if the property is new or changed from the existing value, false if it is the same
+     *
      * @throws IllegalArgumentException      if the name is null
      * @throws UnsupportedOperationException if the type cannot be converted to something that is understandable by
-     * the system as a configuration property value
+     *                                       the system as a configuration property value
      */
-    public boolean setProperty(String name, Object value);
+    boolean setProperty(String name, Object value);
 
     /**
      * Reload the configuration from the DSpace configuration files.
      * <P>
      * Uses the initialized ConfigurationService to reload all configurations.
      */
-    public void reloadConfig();
+    void reloadConfig();
 
 }
