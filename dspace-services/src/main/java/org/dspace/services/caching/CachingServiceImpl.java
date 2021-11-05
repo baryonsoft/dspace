@@ -95,10 +95,10 @@ public final class CachingServiceImpl
      *
      * @return the stats of this cache as a string
      */
-    private static @NotNull String generateCacheStats(Ehcache cache) {
+    private static @NotNull String generateCacheStats(@NotNull Ehcache cache) {
         StringBuilder sb = new StringBuilder();
         sb.append(cache.getName()).append(":");
-        // this will make this costly but it is important to get accurate settings
+        // this will make this costly, but it is important to get accurate settings
         cache.setStatisticsAccuracy(Statistics.STATISTICS_ACCURACY_GUARANTEED);
         Statistics stats = cache.getStatistics();
         final long memSize = cache.getMemoryStoreSize();
@@ -293,7 +293,7 @@ public final class CachingServiceImpl
      * @see org.dspace.services.CachingService#getCaches()
      */
     @Override
-    public List<Cache> getCaches() {
+    public @NotNull List<Cache> getCaches() {
         List<Cache> caches = new ArrayList<>(this.cacheRecord.values());
 //        TODO implement reporting on request caches?
 //        caches.addAll(this.requestMap.values());
@@ -305,7 +305,7 @@ public final class CachingServiceImpl
      * @see org.dspace.services.CachingService#getStatus(java.lang.String)
      */
     @Override
-    public String getStatus(String cacheName) {
+    public @NotNull String getStatus(String cacheName) {
         final StringBuilder sb = new StringBuilder();
 
         if (cacheName == null || "".equals(cacheName)) {
@@ -371,7 +371,7 @@ public final class CachingServiceImpl
         }
 
         System.runFinalization(); // force the JVM to try to clean up any remaining objects
-        // DO NOT CALL System.gc() here or I will have you shot -AZ
+        // DO NOT CALL System.gc() here, or I will have you shot -AZ
 
         log.info("doReset(): Memory Recovery to: " + Runtime.getRuntime().freeMemory());
     }
@@ -379,9 +379,9 @@ public final class CachingServiceImpl
     /**
      * Return all caches from the CacheManager.
      *
-     * @return the list of all known ehcaches
+     * @return the list of all known ChCaches
      */
-    private List<Ehcache> getAllEhCaches() {
+    private @NotNull List<Ehcache> getAllEhCaches() {
         log.debug("getAllCaches()");
 
         final String[] cacheNames = cacheManager.getCacheNames();
@@ -504,7 +504,7 @@ public final class CachingServiceImpl
         public static final long serialVersionUID = 1L;
 
         @Override
-        public int compare(Cache o1, Cache o2) {
+        public int compare(@NotNull Cache o1, @NotNull Cache o2) {
             return o1.getName().compareTo(o2.getName());
         }
     }

@@ -29,6 +29,7 @@ import org.dspace.services.model.RequestInterceptor.RequestInterruptionException
 import org.dspace.services.sessions.model.HttpRequestImpl;
 import org.dspace.services.sessions.model.InternalRequestImpl;
 import org.dspace.utils.servicemanager.OrderedServiceComparator;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +48,8 @@ public final class StatelessRequestServiceImpl implements RequestService {
 
     private static final Logger log = LoggerFactory.getLogger(StatelessRequestServiceImpl.class);
 
-    private ConfigurationService configurationService;
-
-    @Autowired(required = true)
+    @Autowired()
     public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
     }
 
     /**
@@ -125,7 +123,7 @@ public final class StatelessRequestServiceImpl implements RequestService {
      */
     @Override
     public String endRequest(Exception failure) {
-        String requestId = null;
+        String requestId;
         try {
             requestId = getCurrentRequestId();
             if (StringUtils.isEmpty(requestId)) {
@@ -173,7 +171,7 @@ public final class StatelessRequestServiceImpl implements RequestService {
     private List<RequestInterceptor> getInterceptors(boolean reverse) {
         ArrayList<RequestInterceptor> l = new ArrayList<>(this.interceptorsMap.values());
         OrderedServiceComparator comparator = new OrderedServiceComparator();
-        Collections.sort(l, comparator);
+        l.sort(comparator);
         if (reverse) {
             Collections.reverse(l);
         }
@@ -248,7 +246,7 @@ public final class StatelessRequestServiceImpl implements RequestService {
      * Class to hold the current request. Uses Map keyed on current thread id.
      */
     private class RequestHolder {
-        Map<Long, Request> requestMap = new ConcurrentHashMap<>();
+        final Map<Long, Request> requestMap = new ConcurrentHashMap<>();
 
         Request getCurrent() {
             return requestMap.get(Thread.currentThread().getId());
@@ -262,7 +260,7 @@ public final class StatelessRequestServiceImpl implements RequestService {
             requestMap.remove(Thread.currentThread().getId());
         }
 
-        Request get(String requestId) {
+        @Nullable Request get(String requestId) {
             if (!StringUtils.isEmpty(requestId)) {
                 for (Request req : requestMap.values()) {
                     if (req != null && requestId.equals(req.getRequestId())) {

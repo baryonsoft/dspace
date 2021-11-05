@@ -7,9 +7,9 @@
  */
 package org.dspace.services.caching.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
@@ -26,16 +26,11 @@ import org.dspace.services.model.CacheConfig.CacheScope;
  */
 public final class EhcacheCache implements Cache {
 
-    protected Ehcache cache;
-
-    public Ehcache getCache() {
-        return cache;
-    }
-
-    protected CacheConfig cacheConfig;
+    private final Ehcache cache;
+    private final CacheConfig cacheConfig;
 
     public EhcacheCache(Ehcache cache, CacheConfig cacheConfig) {
-        // setup the cache
+        // set up the cache
         if (cache == null) {
             throw new NullPointerException("Cache must be set and cannot be null");
         } else {
@@ -45,11 +40,11 @@ public final class EhcacheCache implements Cache {
             }
         }
         this.cache = cache;
-        if (cacheConfig != null) {
-            this.cacheConfig = cacheConfig;
-        } else {
-            this.cacheConfig = new CacheConfig(CacheScope.INSTANCE);
-        }
+        this.cacheConfig = Objects.requireNonNullElseGet(cacheConfig, () -> new CacheConfig(CacheScope.INSTANCE));
+    }
+
+    public Ehcache getCache() {
+        return cache;
     }
 
     /* (non-Javadoc)
@@ -60,7 +55,7 @@ public final class EhcacheCache implements Cache {
     }
 
     /* (non-Javadoc)
-     * @see org.sakaiproject.caching.Cache#clear()
+     * @see org.subproject.caching.Cache#clear()
      */
     public void clear() {
         cache.removeAll();
@@ -85,14 +80,14 @@ public final class EhcacheCache implements Cache {
             throw new IllegalArgumentException("key cannot be null");
         }
 
-        return (Serializable) getCachePayload(key, false);
+        return getCachePayload(key, false);
     }
 
     /* (non-Javadoc)
      * @see org.dspace.services.model.Cache#getKeys()
      */
     public List<String> getKeys() {
-        ArrayList<String> keys = new ArrayList<String>();
+        ArrayList<String> keys = new ArrayList<>();
         List<?> eKeys = cache.getKeys();
         for (Object object : eKeys) {
             if (object != null) {
@@ -110,7 +105,7 @@ public final class EhcacheCache implements Cache {
             throw new IllegalArgumentException("key cannot be null");
         }
 
-        return (Serializable) getCachePayload(key, true);
+        return getCachePayload(key, true);
     }
 
     /* (non-Javadoc)
@@ -137,11 +132,11 @@ public final class EhcacheCache implements Cache {
     /* (non-Javadoc)
      * @see org.sakaiproject.caching.Cache#remove(java.lang.String)
      */
-    public boolean remove(String key) {
+    public void remove(String key) {
         if (key == null) {
             throw new IllegalArgumentException("key cannot be null");
         }
-        return cache.remove(key);
+        cache.remove(key);
     }
 
     /* (non-Javadoc)
@@ -155,6 +150,7 @@ public final class EhcacheCache implements Cache {
      * Retrieve a payload from the cache for this key if one can be found.
      *
      * @param key the key for this cache element
+     *
      * @return the payload or null if none found
      */
     private Object getCachePayload(String key, boolean quiet) {
@@ -168,6 +164,7 @@ public final class EhcacheCache implements Cache {
         if (e != null) {
             // attempt to get the serialized value first
             if (e.isSerializable()) {
+                //noinspection deprecation
                 payload = e.getValue();
             } else {
                 // not serializable so get the object value

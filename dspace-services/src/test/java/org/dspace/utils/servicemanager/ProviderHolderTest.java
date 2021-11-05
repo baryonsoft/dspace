@@ -28,7 +28,7 @@ public class ProviderHolderTest {
 
     @Test
     public void testHolder() {
-        ProviderHolder<Thing> holder = new ProviderHolder<Thing>();
+        ProviderHolder<Thing> holder = new ProviderHolder<>();
         assertNull(holder.getProvider());
 
         Thing t = new Thing();
@@ -38,13 +38,13 @@ public class ProviderHolderTest {
         assertNotNull(t2);
         assertEquals(t, t2);
 
-        //trash the references
+        //rubbish the references
         t = t2 = null;
     }
 
     @Test
     public void testHolderRelease() {
-        ProviderHolder<Thing> holder = new ProviderHolder<Thing>();
+        ProviderHolder<Thing> holder = new ProviderHolder<>();
         Thing t = new Thing();
         holder.setProvider(t);
 
@@ -88,12 +88,12 @@ public class ProviderHolderTest {
     @Test
     public void testHolderHashEqualsString() {
         ProviderHolder<Thing> holder = new ProviderHolder<Thing>();
-        assertNotNull(holder.hashCode());
+        holder.hashCode();
         assertFalse(holder.equals(null));
         assertNotNull(holder.toString());
 
         holder.setProvider(new Thing());
-        assertNotNull(holder.hashCode());
+        holder.hashCode();
         assertFalse(holder.equals(null));
         assertNotNull(holder.toString());
 

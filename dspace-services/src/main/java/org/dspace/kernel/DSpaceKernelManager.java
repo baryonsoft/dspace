@@ -32,11 +32,11 @@ import org.slf4j.LoggerFactory;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class DSpaceKernelManager {
-    private static Logger log = LoggerFactory.getLogger(DSpaceKernelManager.class);
+    private static final Logger log = LoggerFactory.getLogger(DSpaceKernelManager.class);
 
     private static DSpaceKernel defaultKernel = null;
 
-    private static Map<String, DSpaceKernel> namedKernelMap = new HashMap<String, DSpaceKernel>();
+    private static final Map<String, DSpaceKernel> namedKernelMap = new HashMap<String, DSpaceKernel>();
 
 
     public static DSpaceKernel getDefaultKernel() {
@@ -48,9 +48,9 @@ public final class DSpaceKernelManager {
     }
 
     /**
-     * A lock on the kernel to handle multiple threads getting the first item.
+     * Static initialized random default Kernel name
      */
-    private Object lock = new Object();
+    private static final String defaultKernelName = UUID.randomUUID().toString();
 
     /**
      * Get the kernel.  This will be a single instance for the JVM, but
@@ -124,9 +124,9 @@ public final class DSpaceKernelManager {
     }
 
     /**
-     * Static initialized random default Kernel name
+     * A lock on the kernel to handle multiple threads getting the first item.
      */
-    private static String defaultKernelName = UUID.randomUUID().toString();
+    private final Object lock = new Object();
 
     /**
      * Ensure that we have a name suitable for an mbean.
@@ -182,23 +182,19 @@ public final class DSpaceKernelManager {
      * Unregister an MBean if possible
      *
      * @param mBeanName the bean name to use
-     * @return true if the MBean was unregistered, false otherwise
      */
-    public static boolean unregisterMBean(String mBeanName) {
+    public static void unregisterMBean(String mBeanName) {
         String checkedMBeanName = DSpaceKernelManager.checkName(mBeanName);
         synchronized (mBeanName) {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             try {
                 mbs.unregisterMBean(new ObjectName(checkedMBeanName));
-                return true;
             } catch (InstanceNotFoundException ie) {
                 //If this exception is thrown, the specified MBean is not currently registered
                 //So, we'll ignore the error and return true
-                return true;
             } catch (Exception e) {
                 //log this issue as a System Warning. Also log the underlying error message.
                 log.warn("Failed to unregister the MBean: " + checkedMBeanName, e);
-                return false;
             }
         }
     }

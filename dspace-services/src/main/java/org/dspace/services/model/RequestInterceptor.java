@@ -39,7 +39,7 @@ public interface RequestInterceptor extends OrderedService {
      * @param requestId the unique id of the request
      * @throws RequestInterruptionException if this interceptor wants to stop the request
      */
-    public void onStart(String requestId);
+    void onStart(String requestId);
 
     /**
      * Take actions after the request is handled for an operation.
@@ -60,7 +60,7 @@ public interface RequestInterceptor extends OrderedService {
      * @param failure   this is the exception associated with the failure, it is null if there is no associated
      *                  exception
      */
-    public void onEnd(String requestId, boolean succeeded, Exception failure);
+    void onEnd(String requestId, boolean succeeded, Exception failure);
 
     /**
      * Indicate that request processing should be halted.  This should
@@ -68,7 +68,7 @@ public interface RequestInterceptor extends OrderedService {
      * processing and cause any remaining interceptors to be skipped.
      * A message about the halt should be placed into the message field.
      */
-    public static class RequestInterruptionException extends RuntimeException {
+    class RequestInterruptionException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
         public RequestInterruptionException(String message, Throwable cause) {

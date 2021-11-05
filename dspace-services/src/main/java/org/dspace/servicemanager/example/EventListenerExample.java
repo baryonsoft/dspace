@@ -24,7 +24,7 @@ public final class EventListenerExample implements EventListener {
     /**
      * log4j category
      */
-    private static Logger log = LogManager.getLogger(EventListenerExample.class);
+    private static final Logger log = LogManager.getLogger(EventListenerExample.class);
 
     /**
      * @return null

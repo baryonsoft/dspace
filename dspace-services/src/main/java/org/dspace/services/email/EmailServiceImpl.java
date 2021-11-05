@@ -46,7 +46,7 @@ public class EmailServiceImpl
      *
      * @param cfg the configurationService object
      */
-    @Autowired(required = true)
+    @Autowired()
     public void setCfg(ConfigurationService cfg) {
         this.cfg = cfg;
     }

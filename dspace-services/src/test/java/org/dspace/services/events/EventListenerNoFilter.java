@@ -21,7 +21,7 @@ import org.dspace.services.model.EventListener;
  */
 public class EventListenerNoFilter implements EventListener {
 
-    public List<Event> received = new Vector<Event>();
+    public final List<Event> received = new Vector<>();
 
     public List<Event> getReceivedEvents() {
         return received;

@@ -15,7 +15,7 @@ class ServiceManagerUtils {
      * Compares objects by class name.
      */
     public static class ServiceComparator implements Comparator<Object>, Serializable {
-        public static final long serialVersionUID = 1l;
+        public static final long serialVersionUID = 1L;
 
         public int compare(Object o1, Object o2) {
             if (o1 != null && o2 != null) {

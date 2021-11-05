@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DSpaceKernelInit {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceKernelInit.class);
+    private static final Logger log = LoggerFactory.getLogger(DSpaceKernelInit.class);
 
     private static final Object staticLock = new Object();
 

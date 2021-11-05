@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 
@@ -56,8 +55,7 @@ public class EmailServiceImplTest
      * Test of getSession method, of class EmailService.
      */
     @Test
-    public void testGetSession()
-        throws MessagingException {
+    public void testGetSession() {
         System.out.println("getSession");
         Session session;
         EmailService instance = getService(EmailServiceImpl.class);
@@ -66,7 +64,7 @@ public class EmailServiceImplTest
         session = instance.getSession();
         assertNotNull(" getSession returned null", session);
         assertNull(" getSession returned authenticated session",
-                session.getProperties().getProperty("mail.smtp.auth"));
+            session.getProperties().getProperty("mail.smtp.auth"));
     }
 
     private static final String CFG_USERNAME = "mail.server.username";
@@ -89,7 +87,7 @@ public class EmailServiceImplTest
         cfg.setProperty(CFG_USERNAME, USERNAME);
         cfg.setProperty(CFG_PASSWORD, PASSWORD);
 
-        EmailServiceImpl instance = (EmailServiceImpl) getService(EmailServiceImpl.class);
+        EmailServiceImpl instance = getService(EmailServiceImpl.class);
         instance.reset();
         assertNotNull(" getSession returned null", instance);
         assertEquals(" authenticated session ", "true",
@@ -117,7 +115,7 @@ public class EmailServiceImplTest
         cfg.setProperty(CFG_USERNAME, USERNAME);
         cfg.setProperty(CFG_PASSWORD, PASSWORD);
 
-        EmailServiceImpl instance = (EmailServiceImpl) getService(EmailServiceImpl.class);
+        EmailServiceImpl instance = getService(EmailServiceImpl.class);
 
         PasswordAuthentication result = instance.getPasswordAuthentication();
         assertNotNull(" null returned", result);

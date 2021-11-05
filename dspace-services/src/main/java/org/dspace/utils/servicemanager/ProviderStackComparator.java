@@ -19,7 +19,7 @@ import java.util.Comparator;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class ProviderStackComparator implements Comparator<ProviderHolder<?>>, Serializable {
-    public static final long serialVersionUID = 1l;
+    public static final long serialVersionUID = 1L;
 
     public int compare(ProviderHolder<?> ph0, ProviderHolder<?> ph1) {
         /* a negative integer, zero, or a positive integer as the first argument

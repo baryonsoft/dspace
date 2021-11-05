@@ -29,7 +29,7 @@ import org.dspace.kernel.mixins.OrderedService;
  */
 public final class ProviderStack<T> {
 
-    protected final List<ProviderHolder<T>> providers;
+    final List<ProviderHolder<T>> providers;
 
     /**
      * Default empty constructor.
@@ -109,9 +109,8 @@ public final class ProviderStack<T> {
      * equal to 0 or this provider is not ordered.
      *
      * @param provider the provider to add to the stack
-     * @return the position in the stack that this provider was added
      */
-    public int addProvider(T provider) {
+    public void addProvider(T provider) {
         if (provider == null) {
             throw new IllegalArgumentException("provider to add cannot be null");
         }
@@ -131,7 +130,6 @@ public final class ProviderStack<T> {
             // re-sort the providers
             Collections.sort(this.providers, new ProviderStackComparator());
         }
-        return position;
     }
 
     /**
@@ -139,9 +137,8 @@ public final class ProviderStack<T> {
      * 0 and ending at size-1).
      *
      * @param position the position to remove the provider from
-     * @return true if the provider position was found and removed OR false if not found
      */
-    public boolean removeProvider(final int position) {
+    public void removeProvider(final int position) {
         boolean removed = false;
         try {
             this.providers.remove(position);
@@ -150,7 +147,6 @@ public final class ProviderStack<T> {
             removed = false;
         }
         refresh();
-        return removed;
     }
 
     /**
@@ -219,7 +215,7 @@ public final class ProviderStack<T> {
      */
     public Iterator<T> getIterator() {
         return new Iterator<T>() {
-            protected ListIterator<ProviderHolder<T>> it = null;
+            ListIterator<ProviderHolder<T>> it = null;
 
             public synchronized boolean hasNext() {
                 if (it == null) {
@@ -314,7 +310,7 @@ public final class ProviderStack<T> {
      *
      * @return list of valid providers
      */
-    protected List<T> refresh() {
+    List<T> refresh() {
         ArrayList<T> l = new ArrayList<T>();
         for (Iterator<ProviderHolder<T>> iterator = providers.iterator(); iterator.hasNext(); ) {
             ProviderHolder<T> holder = iterator.next();

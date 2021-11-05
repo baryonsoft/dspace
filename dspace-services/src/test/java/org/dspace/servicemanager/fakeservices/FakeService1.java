@@ -55,7 +55,7 @@ public class FakeService1 implements ConfigChangeListener, ServiceChangeListener
 
     private ConfigurationService configurationService;
 
-    @Autowired(required = true)
+    @Autowired()
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
