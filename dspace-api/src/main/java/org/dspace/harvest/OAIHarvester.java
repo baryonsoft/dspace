@@ -315,12 +315,14 @@ public class OAIHarvester {
      * since last
      * harvest, and ingest the returned items.
      *
+     * @param recentDays the number of days to look back for updates, -1 for all updates
+     *
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public void runHarvest() throws SQLException, IOException, AuthorizeException {
+    public void runHarvest(int recentDays) throws SQLException, IOException, AuthorizeException {
         Context.Mode originalMode = ourContext.getCurrentMode();
         ourContext.setMode(Context.Mode.BATCH_EDIT);
 
@@ -333,10 +335,9 @@ public class OAIHarvester {
             oaiSetId = null;
         }
 
-        Date lastHarvestDate = harvestRow.getHarvestDate();
-        String fromDate = null;
-        if (lastHarvestDate != null) {
-            fromDate = processDate(harvestRow.getHarvestDate());
+        String fromDate = harvestRow.getHarvestDate() == null ? null : processDate(harvestRow.getHarvestDate());
+        if (recentDays > 0) {
+            fromDate = processDate(new Date(System.currentTimeMillis() - ((long) recentDays * 24 * 60 * 60 * 1000)));
         }
 
         long totalListSize = 0;
@@ -353,9 +354,7 @@ public class OAIHarvester {
             String OREPrefix;
             try {
                 dateGranularity = oaiGetDateGranularity(oaiSource);
-                if (fromDate != null) {
-                    fromDate = fromDate.substring(0, dateGranularity.length());
-                }
+                fromDate = fromDate != null ? fromDate.substring(0, dateGranularity.length()) : null;
                 toDate = toDate.substring(0, dateGranularity.length());
 
                 descMDPrefix = oaiResolveNamespaceToPrefix(oaiSource, metadataNS.getURI());
@@ -520,12 +519,13 @@ public class OAIHarvester {
         // If we got to this point, it means the harvest was completely successful
         Date finishTime = new Date();
         long timeTaken = finishTime.getTime() - startTime.getTime();
-        harvestRow.setHarvestStartTime(startTime);
+        harvestRow.setLastHarvested(finishTime);
         harvestRow.setHarvestMessage("Harvest from " + oaiSource + " successful");
         harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
         log.info(
             "Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested "
-                + currentRecord + " items.");
+                + currentRecord + " items. Harvesting speed is " + (currentRecord / (timeTaken / 1000)) +
+                " items/second.");
         harvestedCollectionService.update(ourContext, harvestRow);
 
         ourContext.setMode(originalMode);
