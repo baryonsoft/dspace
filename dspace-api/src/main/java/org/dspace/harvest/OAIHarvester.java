@@ -338,7 +338,7 @@ public class OAIHarvester {
         }
 
         String fromDate = harvestRow.getHarvestDate() == null ? null : processDate(harvestRow.getHarvestDate());
-        if (recentDays > 0 && fromDate != null) {
+        if (recentDays > 0 && !fromDateNull) {
             fromDate = processDate(new Date(System.currentTimeMillis() - ((long) recentDays * 24 * 60 * 60 * 1000)));
         } else if (fromDateNull) {
             fromDate = null;
