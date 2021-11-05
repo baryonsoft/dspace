@@ -190,7 +190,6 @@
                                 <!--suppress UnresolvedMavenProperty -->
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
                             </systemPropertyVariables>
-                            <argLine>${dd.java.agent.arg}</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -253,7 +252,6 @@
                                 <!--suppress UnresolvedMavenProperty -->
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
                             </systemPropertyVariables>
-                            <argLine>${dd.java.agent.arg}</argLine>
                         </configuration>
                     </plugin>
                 </plugins>

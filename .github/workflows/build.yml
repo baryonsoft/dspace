@@ -35,14 +35,6 @@ jobs:
       fail-fast: false
 
     services:
-      datadog-agent:
-        image: datadog/agent:latest
-        ports:
-          - 8126:8126
-        env:
-          DD_API_KEY: ${{ secrets.DD_API_KEY }}
-          DD_INSIDE_CI: "true"
-          DD_HOSTNAME: "none"
       minio:
         image: bitnami/minio:latest
         ports:
@@ -80,7 +72,7 @@ jobs:
         env:
           TEST_FLAGS: ${{ matrix.mvnflags }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: DD_ENV=ci mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
+        run: mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
 
       # If previous step failed, save results of tests to downloadable artifact for this job
       # (This artifact is downloadable at the bottom of any job's summary page)
