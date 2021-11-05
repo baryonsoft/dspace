@@ -528,8 +528,8 @@ public class OAIHarvester {
         harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
         log.info(
             "Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested "
-                + currentRecord + " items. Harvesting speed is " + (currentRecord / (timeTaken / 1000)) +
-                " items/second.");
+                + currentRecord + " items. Harvesting speed is " + (currentRecord / (timeTaken / 1000 / 60)) +
+                " items/min.");
         harvestedCollectionService.update(ourContext, harvestRow);
 
         ourContext.setMode(originalMode);
