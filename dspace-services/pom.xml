@@ -74,6 +74,7 @@
                                 <!--suppress UnresolvedMavenProperty -->
                                 <dspace.dir>${agnostic.build.dir}/test-classes/</dspace.dir>
                             </systemPropertyVariables>
+                            <argLine>${dd.java.agent.arg}</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
