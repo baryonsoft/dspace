@@ -111,7 +111,6 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_APP }}:latest
 
       - name: Build Solr Image
-        id: docker_build
         uses: docker/build-push-action@v2
         with:
           file: solr.Dockerfile
