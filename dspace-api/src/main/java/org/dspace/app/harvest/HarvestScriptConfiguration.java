@@ -67,6 +67,8 @@ public class HarvestScriptConfiguration<T extends Harvest> extends ScriptConfigu
             "address of the OAI-PMH server");
         options.addOption("recent", "recent_days", true,
             "only harvest the records within the specified number of days in the recent past");
+        options.addOption("all", "all_records", false,
+            "if force to harvest all records, from the beginning");
         options.addOption("i", "oai_set_id", true,
             "id of the PMH set representing the harvested collection");
         options.addOption("m", "metadata_format", true,

@@ -105,44 +105,42 @@ public class ConsumerProfile {
         }
 
         consumer = Class.forName(className.trim())
-                .asSubclass(Consumer.class)
-                .getDeclaredConstructor().newInstance();
+            .asSubclass(Consumer.class)
+            .getDeclaredConstructor().newInstance();
 
         // Each "filter" is <objectTypes> + <eventTypes> : ...
         filters = new ArrayList<>();
-        String part[] = filterString.trim().split(":");
-        for (int j = 0; j < part.length; ++j) {
-            String fpart[] = part[j].split("\\+");
+        String[] part = filterString.trim().split(":");
+        for (String s : part) {
+            String[] fpart = s.split("\\+");
             if (fpart.length != 2) {
                 log.error("Bad Filter clause in consumer stanza in Configuration entry for "
-                              + CONSUMER_PREFIX
-                              + name
-                              + ".consumers: "
-                              + part[j]);
+                    + CONSUMER_PREFIX
+                    + name
+                    + ".consumers: "
+                    + s);
             } else {
-                int filter[] = new int[2];
-                filter[0] = 0;
-                filter[1] = 0;
-                String objectNames[] = fpart[0].split("\\|");
-                for (int k = 0; k < objectNames.length; ++k) {
-                    int ot = Event.parseObjectType(objectNames[k]);
+                int[] filter = new int[2];
+                String[] objectNames = fpart[0].split("\\|");
+                for (String objectName : objectNames) {
+                    int ot = Event.parseObjectType(objectName);
                     if (ot == 0) {
                         log.error("Bad ObjectType in Consumer Stanza in Configuration entry for "
-                                      + CONSUMER_PREFIX
-                                      + name
-                                      + ".consumers: " + objectNames[k]);
+                            + CONSUMER_PREFIX
+                            + name
+                            + ".consumers: " + objectName);
                     } else {
                         filter[Event.SUBJECT_MASK] |= ot;
                     }
                 }
-                String eventNames[] = fpart[1].split("\\|");
-                for (int k = 0; k < eventNames.length; ++k) {
-                    int et = Event.parseEventType(eventNames[k]);
+                String[] eventNames = fpart[1].split("\\|");
+                for (String eventName : eventNames) {
+                    int et = Event.parseEventType(eventName);
                     if (et == 0) {
                         log.error("Bad EventType in Consumer Stanza in Configuration entry for "
-                                      + CONSUMER_PREFIX
-                                      + name
-                                      + ".consumers: " + eventNames[k]);
+                            + CONSUMER_PREFIX
+                            + name
+                            + ".consumers: " + eventName);
                     } else {
                         filter[Event.EVENT_MASK] |= et;
                     }

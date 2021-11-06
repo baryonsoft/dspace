@@ -380,7 +380,8 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             handler.logInfo("Harvest started... ");
             int recentDays =
                 commandLine.hasOption("recent") ? Integer.parseInt(commandLine.getOptionValue("recent")) : -1;
-            harvester.runHarvest(recentDays);
+            boolean allRecords = commandLine.hasOption("all");
+            harvester.runHarvest(recentDays, allRecords);
             context.complete();
         } catch (SQLException | AuthorizeException | IOException e) {
             throw new IllegalStateException("Failed to run harvester", e);

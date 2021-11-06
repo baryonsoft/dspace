@@ -26,10 +26,12 @@ public class CommandRunner {
     /**
      * Default constructor
      */
-    private CommandRunner() { }
+    private CommandRunner() {
+    }
 
     /**
      * @param args the command line arguments given
+     *
      * @throws IOException           if IO error
      * @throws FileNotFoundException if file doesn't exist
      */
@@ -43,7 +45,7 @@ public class CommandRunner {
         // There is no sensible way to use the status returned by runManyCommands().
         // If called from the command line then we would want to return it
         // through System.exit().  But if called (normally) from ScriptLauncher,
-        // there is no way to return it and we don't want to interrupt
+        // there is no way to return it, and we don't want to interrupt
         // ScriptLauncher.
         //
         // "'tis a puzzlement." -- the King of Siam
@@ -53,11 +55,11 @@ public class CommandRunner {
      * Read a file of command lines and execute each in turn.
      *
      * @param script the file of command lines to be executed.
-     * @return status code
+     *
      * @throws IOException           if IO error
      * @throws FileNotFoundException if file doesn't exist
      */
-    static int runManyCommands(String script)
+    static void runManyCommands(String script)
         throws FileNotFoundException, IOException {
         Reader input;
         if ("-".equals(script)) {
@@ -82,13 +84,13 @@ public class CommandRunner {
         tokenizer.ordinaryChar('@');
         tokenizer.wordChars('@', '@');
 
-        int status = 0;
-        List<String> tokens = new ArrayList<String>();
+        int status;
+        List<String> tokens = new ArrayList<>();
         Document commandConfigs = ScriptLauncher.getConfig();
         while (StreamTokenizer.TT_EOF != tokenizer.nextToken()) {
             if (StreamTokenizer.TT_EOL == tokenizer.ttype) {
                 if (tokens.size() > 0) {
-                    status = ScriptLauncher.runOneCommand(commandConfigs, tokens.toArray(new String[tokens.size()]));
+                    status = ScriptLauncher.runOneCommand(commandConfigs, tokens.toArray(new String[0]));
                     if (status > 0) {
                         break;
                     }
@@ -99,6 +101,5 @@ public class CommandRunner {
             }
         }
 
-        return status;
     }
 }
