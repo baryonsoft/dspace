@@ -51,7 +51,7 @@ public final class SystemEventService implements EventService {
     private final CachingService cachingService;
     private EventRequestInterceptor requestInterceptor;
 
-    @Autowired(required = true)
+    @Autowired()
     public SystemEventService(RequestService requestService, CachingService cachingService) {
         if (requestService == null || cachingService == null) {
             throw new IllegalArgumentException("requestService, cachingService, and all inputs must not be null");
@@ -138,14 +138,14 @@ public final class SystemEventService implements EventService {
         // send event to all interested listeners
         for (EventListener listener : listenersMap.values()) {
             // filter the event if the listener has filter rules
-            if (listener != null && filterEvent(listener, event)) {
+            if (filterEvent(listener, event)) {
                 // passed filters so send the event to this listener
                 try {
                     listener.receiveEvent(event);
                 } catch (Exception e) {
                     log.warn("Listener (" + listener + ")[" + listener.getClass()
-                                                                      .getName() + "] failed to recieve event (" +
-                                 event + "): " + e
+                        .getName() + "] failed to recieve event (" +
+                        event + "): " + e
                         .getMessage() + ":" + e.getCause());
                 }
             }
@@ -181,7 +181,7 @@ public final class SystemEventService implements EventService {
      *
      * @return the number of events which were fired
      */
-    protected int fireQueuedEvents() {
+    int fireQueuedEvents() {
         int fired = 0;
         Cache queueCache = this.cachingService.getCache(QUEUE_CACHE_NAME, new CacheConfig(CacheScope.REQUEST));
 
@@ -203,7 +203,7 @@ public final class SystemEventService implements EventService {
      *
      * @return the number of events that were cleared
      */
-    protected int clearQueuedEvents() {
+    int clearQueuedEvents() {
         Cache queueCache = this.cachingService.getCache(QUEUE_CACHE_NAME, new CacheConfig(CacheScope.REQUEST));
         int cleared = queueCache.size();
         queueCache.clear();

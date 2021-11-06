@@ -43,6 +43,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility functions for DSpace.
@@ -69,15 +72,10 @@ public final class Utils {
     private static final long MS_IN_WEEK = 604800000L;
 
     private static final long MS_IN_YEAR = 31536000000L;
-
-    private static int counter = 0;
-
     private static final Random random = new Random();
-
     private static final VMID vmid = new VMID();
-
     // for parseISO8601Date
-    private static final SimpleDateFormat parseFmt[]  = {
+    private static final SimpleDateFormat[] parseFmt = {
         // first try at parsing, has milliseconds (note General time zone)
         new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSz"),
 
@@ -87,52 +85,34 @@ public final class Utils {
         // finally, try without any timezone (defaults to current TZ)
         new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS"),
 
-        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss")
-    };
+        new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss"),
 
+        new SimpleDateFormat("yyyy'-'MM'-'dd")
+    };
     // for formatISO8601Date
     // output canonical format (note RFC22 time zone, easier to hack)
     private static final SimpleDateFormat outFmtSecond
-            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
-
-    // output format with millsecond precision
-    private static final SimpleDateFormat outFmtMillisec
-            = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
-
+        = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
+    // output format with millisecond precision
+    private static final SimpleDateFormat outFmtMillisecond
+        = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
     private static final Calendar outCal = GregorianCalendar.getInstance();
+    private static int counter = 0;
 
     /**
      * Private constructor
      */
-    private Utils() { }
-
-    /**
-     * Return an MD5 checksum for data in hex format.
-     *
-     * @param data The data to checksum.
-     * @return MD5 checksum for the data in hex format.
-     */
-    public static String getMD5(String data) {
-        return getMD5(data.getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
-     * Return an MD5 checksum for data in hex format.
-     *
-     * @param data The data to checksum.
-     * @return MD5 checksum for the data in hex format.
-     */
-    public static String getMD5(byte[] data) {
-        return toHex(getMD5Bytes(data));
+    private Utils() {
     }
 
     /**
      * Return an MD5 checksum for data as a byte array.
      *
      * @param data The data to checksum.
+     *
      * @return MD5 checksum for the data as a byte array.
      */
-    public static byte[] getMD5Bytes(byte[] data) {
+    public static byte @Nullable [] getMD5Bytes(byte[] data) {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
 
@@ -149,6 +129,7 @@ public final class Utils {
      * Return a hex representation of the byte array
      *
      * @param data The data to transform.
+     *
      * @return A hex representation of the data.
      */
     public static String toHex(byte[] data) {
@@ -159,11 +140,11 @@ public final class Utils {
         StringBuilder result = new StringBuilder();
 
         // This is far from the most efficient way to do things...
-        for (int i = 0; i < data.length; i++) {
-            int low = (int) (data[i] & 0x0F);
-            int high = (int) (data[i] & 0xF0);
+        for (byte datum : data) {
+            int low = datum & 0x0F;
+            int high = datum & 0xF0;
 
-            result.append(Integer.toHexString(high).substring(0, 1));
+            result.append(Integer.toHexString(high).charAt(0));
             result.append(Integer.toHexString(low));
         }
 
@@ -200,12 +181,7 @@ public final class Utils {
 
         random.nextBytes(junk);
 
-        String input = new StringBuilder()
-                .append(vmid)
-                .append(new java.util.Date())
-                .append(Arrays.toString(junk))
-                .append(counter++)
-                .toString();
+        String input = String.valueOf(vmid) + new Date() + Arrays.toString(junk) + counter++;
 
         return getMD5Bytes(input.getBytes(StandardCharsets.UTF_8));
     }
@@ -220,9 +196,10 @@ public final class Utils {
      *
      * @param input  The InputStream to obtain data from.
      * @param output The OutputStream to copy data to.
+     *
      * @throws IOException if IO error
      */
-    public static void copy(final InputStream input, final OutputStream output)
+    public static void copy(final @NotNull InputStream input, final OutputStream output)
         throws IOException {
         final int BUFFER_SIZE = 1024 * 4;
         final byte[] buffer = new byte[BUFFER_SIZE];
@@ -252,6 +229,7 @@ public final class Utils {
      *
      * @param source      The InputStream to obtain data from.
      * @param destination The OutputStream to copy data to.
+     *
      * @throws IOException if IO error
      */
     public static void bufferedCopy(final InputStream source,
@@ -271,6 +249,7 @@ public final class Utils {
      * in metadata.
      *
      * @param value the metadata value to be scrubbed for display
+     *
      * @return the passed-in string, with html special characters replaced with
      * entities.
      */
@@ -283,18 +262,20 @@ public final class Utils {
      * minutes, hours, days, weeks, years)
      *
      * @param duration specified duration
+     *
      * @return number of milliseconds equivalent to duration.
+     *
      * @throws ParseException if the duration is of incorrect format
      */
-    public static long parseDuration(String duration) throws ParseException {
+    public static long parseDuration(@NotNull String duration) throws ParseException {
         Matcher m = DURATION_PATTERN.matcher(duration.trim());
         if (!m.matches()) {
             throw new ParseException("'" + duration
-                                         + "' is not a valid duration definition", 0);
+                + "' is not a valid duration definition", 0);
         }
 
         String units = m.group(2);
-        long multiplier = MS_IN_SECOND;
+        long multiplier;
 
         if ("s".equals(units)) {
             multiplier = MS_IN_SECOND;
@@ -310,8 +291,8 @@ public final class Utils {
             multiplier = MS_IN_YEAR;
         } else {
             throw new ParseException(units
-                                         + " is not a valid time unit (must be 'y', "
-                                         + "'w', 'd', 'h', 'm' or 's')", duration.indexOf(units));
+                + " is not a valid time unit (must be 'y', "
+                + "'w', 'd', 'h', 'm' or 's')", duration.indexOf(units));
         }
 
         long qint = Long.parseLong(m.group(1));
@@ -326,31 +307,30 @@ public final class Utils {
      * static DateFormat (more efficient than creating a new one each call).
      *
      * @param s the input string
+     *
      * @return Date object, or null if there is a problem translating.
      */
-    public static synchronized Date parseISO8601Date(String s) {
+    public static synchronized @Nullable Date parseISO8601Date(@NotNull String s) {
         // attempt to normalize the timezone to something we can parse;
         // SimpleDateFormat can't handle "Z"
         char tzSign = s.charAt(s.length() - 6);
         if (s.endsWith("Z")) {
             s = s.substring(0, s.length() - 1) + "GMT+00:00";
-        } else if (tzSign == '-' || tzSign == '+') {
+        } else if ((tzSign == '-' || tzSign == '+') && s.length() > 10) {
             // check for trailing timezone
             s = s.substring(0, s.length() - 6) + "GMT" + s.substring(s.length() - 6);
         }
 
         // try to parse without milliseconds
         ParseException lastError = null;
-        for (int i = 0; i < parseFmt.length; ++i) {
+        for (SimpleDateFormat simpleDateFormat : parseFmt) {
             try {
-                return parseFmt[i].parse(s);
+                return simpleDateFormat.parse(s);
             } catch (ParseException e) {
                 lastError = e;
             }
         }
-        if (lastError != null) {
-            log.error("Error parsing date:", lastError);
-        }
+        log.error("Error parsing date:", lastError);
         return null;
     }
 
@@ -361,22 +341,24 @@ public final class Utils {
      * static DateFormat (more efficient than creating a new one each call).
      *
      * @param d the input Date
+     *
      * @return String containing formatted date.
      */
-    public static synchronized String formatISO8601Date(Date d) {
+    public static synchronized @NotNull String formatISO8601Date(Date d) {
         String result;
         outCal.setTime(d);
         if (outCal.get(Calendar.MILLISECOND) == 0) {
             result = outFmtSecond.format(d);
         } else {
-            result = outFmtMillisec.format(d);
+            result = outFmtMillisecond.format(d);
         }
         int rl = result.length();
         return result.substring(0, rl - 2) + ":" + result.substring(rl - 2);
     }
 
-    public static <E> java.util.Collection<E> emptyIfNull(java.util.Collection<E> collection) {
-        return collection == null ? Collections.<E>emptyList() : collection;
+    @Contract(value = "!null -> param1", pure = true)
+    public static <E> java.util.@NotNull Collection<E> emptyIfNull(java.util.Collection<E> collection) {
+        return collection == null ? Collections.emptyList() : collection;
     }
 
     /**
@@ -389,9 +371,10 @@ public final class Utils {
      * qualifier = tokens[2]; //it can be empty string
      *
      * @param metadata (the field in the form dc.title or dc_title)
+     *
      * @return array of tokens
      */
-    public static String[] tokenize(String metadata) {
+    public static String[] tokenize(@NotNull String metadata) {
         String separator = metadata.contains("_") ? "_" : ".";
         StringTokenizer dcf = new StringTokenizer(metadata, separator);
 
@@ -402,9 +385,6 @@ public final class Utils {
             i++;
         }
         // Tokens contains:
-        // schema = tokens[0];
-        // element = tokens[1];
-        // qualifier = tokens[2];
         return tokens;
 
     }
@@ -412,13 +392,11 @@ public final class Utils {
     /**
      * Make the metadata field key using the separator.
      *
-     * @param schema
-     * @param element
-     * @param qualifier
      * @param separator (DSpace common separator are "_" or ".")
+     *
      * @return metadata field key
      */
-    public static String standardize(String schema, String element, String qualifier, String separator) {
+    public static @NotNull String standardize(String schema, String element, String qualifier, String separator) {
         if (StringUtils.isBlank(qualifier)) {
             return schema + separator + element;
         } else {
@@ -428,10 +406,12 @@ public final class Utils {
 
     /**
      * Retrieve the baseurl from a given URL string
+     *
      * @param urlString URL string
+     *
      * @return baseurl (without any context path) or null (if URL was invalid)
      */
-    public static String getBaseUrl(String urlString) {
+    public static @Nullable String getBaseUrl(String urlString) {
         try {
             URL url = new URL(urlString);
             String baseUrl = url.getProtocol() + "://" + url.getHost();
@@ -446,10 +426,12 @@ public final class Utils {
 
     /**
      * Retrieve the hostname from a given URI string
+     *
      * @param uriString URI string
+     *
      * @return hostname (without any www.) or null (if URI was invalid)
      */
-    public static String getHostName(String uriString) {
+    public static @Nullable String getHostName(String uriString) {
         try {
             URI uri = new URI(uriString);
             String hostname = uri.getHost();
@@ -457,7 +439,7 @@ public final class Utils {
             if (hostname != null) {
                 return hostname.startsWith("www.") ? hostname.substring(4) : hostname;
             }
-            return hostname;
+            return null;
         } catch (URISyntaxException e) {
             return null;
         }
@@ -467,10 +449,12 @@ public final class Utils {
      * Retrieve the IP address(es) of a given URI string.
      * <P>
      * At this time, DSpace only supports IPv4, so this method will only return IPv4 addresses.
+     *
      * @param uriString URI string
+     *
      * @return IP address(es) in a String array (or null if not found)
      */
-    public static String[] getIPAddresses(String uriString) {
+    public static String @Nullable [] getIPAddresses(String uriString) {
         String[] ipAddresses = null;
 
         // First, get the hostname
@@ -483,11 +467,11 @@ public final class Utils {
 
                 // Convert array of InetAddress objects to array of IP address Strings
                 ipAddresses = Arrays.stream(inetAddresses)
-                                    // Filter our array to ONLY include IPv4 addresses
-                                    .filter((address) -> address instanceof Inet4Address)
-                                    // Call getHostAddress() on each to get the IPv4 address as a string
-                                    .map((address) -> ((Inet4Address) address).getHostAddress())
-                                    .toArray(String[]::new);
+                    // Filter our array to ONLY include IPv4 addresses
+                    .filter((address) -> address instanceof Inet4Address)
+                    // Call getHostAddress() on each to get the IPv4 address as a string
+                    .map((address) -> ((Inet4Address) address).getHostAddress())
+                    .toArray(String[]::new);
             } catch (UnknownHostException ex) {
                 return null;
             }
@@ -503,7 +487,9 @@ public final class Utils {
      * <P>
      * For example, given a String like "My DSpace is installed at ${dspace.dir}", this
      * method will replace "${dspace.dir}" with the configured value of that property.
+     *
      * @param string source string
+     *
      * @return string with any placeholders replaced with configured values.
      */
     public static String interpolateConfigsInString(String string) {

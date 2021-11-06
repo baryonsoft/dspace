@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>baryonics-0.3.7-SNAPSHOT</version>
+        <version>baryonics-0.4.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -66,13 +66,13 @@
         <dependency>
             <groupId>javax.cache</groupId>
             <artifactId>cache-api</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>3.4.0</version>
+            <version>3.9.7</version>
         </dependency>
 
 

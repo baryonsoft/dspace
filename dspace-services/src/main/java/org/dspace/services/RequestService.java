@@ -92,7 +92,7 @@ public interface RequestService {
 
     /**
      * Allows developers to perform actions on the start and end of the request cycle,
-     * if you decide you do not need to use your interceptor anymore then simply destroy
+     * if you decide you do not need to use your interceptor any more than simply destroy
      * it (dereference it) and the service will stop calling it,
      * along those lines you should
      * not register an interceptor that you do not keep a reference to (like an inline class

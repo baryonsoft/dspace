@@ -38,14 +38,14 @@ public class SampleAnnotationBean {
 
     private ServiceExample serviceExample;
 
-    @Autowired(required = true)
+    @Autowired()
     public void setServiceExample(ServiceExample serviceExample) {
         this.serviceExample = serviceExample;
     }
 
     private ConcreteExample concreteExample;
 
-    @Autowired(required = true)
+    @Autowired()
     public void setConcreteExample(ConcreteExample concreteExample) {
         this.concreteExample = concreteExample;
     }

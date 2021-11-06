@@ -13,19 +13,20 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.ThreadContext;
 import org.dspace.services.ConfigurationService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.AbstractRequestLoggingFilter;
 
 /**
- * This class setup the basic attributes in Mapped Diagnostic Context useful for
+ * This class to set up the basic attributes in Mapped Diagnostic Context useful for
  * trouble-shooting of the DSpace Server Webapp and make sure to include a first
  * log entry for all the request nothing which is the referer.
- * 
+ *
  * This logging filter can be modified at runtime altering the value of the
  * logging.server.* configuration properties to include more details about the
  * incoming request (payload, headers, query string, client info)
- * 
- * The MDC attributes are as follow: - an unique randomly generated UUID is
+ *
+ * The MDC attributes are as follows: - a unique randomly generated UUID is
  * assigned to every request (requestID) - the correlation ID provided by
  * friendly client applications (such as our angular UI), if specified as
  * X-Correlation-ID (correlationID)
@@ -37,7 +38,7 @@ public class DSpaceAPIRequestLoggingFilter extends AbstractRequestLoggingFilter 
     private ConfigurationService configurationService;
 
     @Override
-    protected boolean shouldLog(HttpServletRequest request) {
+    protected boolean shouldLog(@NotNull HttpServletRequest request) {
         return true;
     }
 
@@ -67,7 +68,7 @@ public class DSpaceAPIRequestLoggingFilter extends AbstractRequestLoggingFilter 
     }
 
     @Override
-    protected void beforeRequest(HttpServletRequest request, String message) {
+    protected void beforeRequest(HttpServletRequest request, @NotNull String message) {
         ThreadContext.put("requestID", UUID.randomUUID().toString()); // Add the fishtag;
         String clientID = request.getHeader("x-correlation-id");
         if (StringUtils.isBlank(clientID)) {
@@ -85,7 +86,7 @@ public class DSpaceAPIRequestLoggingFilter extends AbstractRequestLoggingFilter 
     }
 
     @Override
-    protected void afterRequest(HttpServletRequest request, String message) {
+    protected void afterRequest(@NotNull HttpServletRequest request, @NotNull String message) {
         if (isAfterRequestLoggingEnabled()) {
             logger.info(message);
         }

@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -57,33 +58,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
 
-    @Column(name = "collection_id", insertable = false, updatable = false)
-    private Integer legacyId;
-
-    /**
-     * The logo bitstream
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "logo_bitstream_id")
-    private Bitstream logo;
-
-    /**
-     * The item template
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "template_item_id")
-    private Item template;
-
-    @OneToOne
-    @JoinColumn(name = "submitter")
-    /** The default group of administrators */
-    private Group submitters;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin")
-    /** The default group of administrators */
-    private Group admins;
-
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
         name = "community2collection",
@@ -91,7 +65,28 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         inverseJoinColumns = {@JoinColumn(name = "community_id")}
     )
     private final Set<Community> communities = new HashSet<>();
-
+    @Column(name = "collection_id", insertable = false, updatable = false)
+    private Integer legacyId;
+    /**
+     * The logo bitstream
+     */
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "logo_bitstream_id")
+    private Bitstream logo;
+    /**
+     * The item template
+     */
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "template_item_id")
+    private Item template;
+    @OneToOne
+    @JoinColumn(name = "submitter")
+    /** The default group of administrators */
+    private Group submitters;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin")
+    /** The default group of administrators */
+    private Group admins;
     @Transient
     private transient CollectionService collectionService;
 
@@ -109,7 +104,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Takes a pre-determined UUID to be passed to the object to allow for the
      * restoration of previously defined UUID's.
      *
-     * @param uuid Takes a uuid to be passed to the Pre-Defined UUID Generator
+     * @param uuid Takes an uuid to be passed to the Pre-Defined UUID Generator
      */
     protected Collection(UUID uuid) {
         this.predefinedUUID = uuid;
@@ -156,7 +151,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     /**
      * Set the default group of submitters
      *
-     * Package protected in order to preven unauthorized calls to this method
+     * Package protected in order to prevent unauthorized calls to this method
      *
      * @param submitters the group of submitters
      */
@@ -213,12 +208,8 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     @Nonnull
     public String getLicenseCollection() {
         String license = getCollectionService()
-                .getMetadataFirstValue(this, CollectionService.MD_LICENSE, Item.ANY);
-        if (null == license) {
-            return "";
-        } else {
-            return license;
-        }
+            .getMetadataFirstValue(this, CollectionService.MD_LICENSE, Item.ANY);
+        return Objects.requireNonNullElse(license, "");
     }
 
     /**
@@ -227,6 +218,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      *
      * @param context context
      * @param license the license, or <code>null</code>
+     *
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
@@ -240,6 +232,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * for a submission.
      *
      * @return the item template, or <code>null</code>
+     *
      * @throws SQLException if database error
      */
     public Item getTemplateItem() throws SQLException {
@@ -255,6 +248,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Get the communities this collection appears in
      *
      * @return array of <code>Community</code> objects
+     *
      * @throws SQLException if database error
      */
     public List<Community> getCommunities() throws SQLException {
@@ -281,6 +275,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * as this object, <code>false</code> otherwise
      *
      * @param other object to compare to
+     *
      * @return <code>true</code> if object passed in represents the same
      * collection as this object
      */
@@ -294,11 +289,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
             return false;
         }
         final Collection otherCollection = (Collection) other;
-        if (!this.getID().equals(otherCollection.getID())) {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(otherCollection.getID());
     }
 
     @Override
@@ -312,7 +303,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     /**
      * return type found in Constants
      *
-     * @return int Constants.COLLECTION
+     * @return int Constants. COLLECTION
      */
     @Override
     public int getType() {

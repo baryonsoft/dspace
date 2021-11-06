@@ -15,6 +15,13 @@ package org.dspace.services.model;
 public class CacheConfig {
 
     /**
+     * Defines the lifecycle of the cache.
+     *
+     * @see CacheScope
+     */
+    private final CacheScope cacheScope;
+
+    /**
      * Controls the scope of each created cache.
      */
     public enum CacheScope {
@@ -38,17 +45,8 @@ public class CacheConfig {
          * The cache will copy an entry over to other caches when it
          * changes or is created.
          */
-        CLUSTERREPLICATED;
+        CLUSTERREPLICATED
     }
-
-    ;
-
-    /**
-     * Defines the lifecycle of the cache.
-     *
-     * @see CacheScope
-     */
-    private CacheScope cacheScope;
 
     /**
      * @return the scope of the associated cache

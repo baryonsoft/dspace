@@ -345,7 +345,7 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Close the context object after all of the operations performed in the
+     * Close the context object after all the operations performed in the
      * context have completed successfully. Any transaction with the database is
      * committed.
      * <p>

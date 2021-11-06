@@ -113,9 +113,7 @@ class DtoMetadata {
             if (wildcard && ar[2].equals(Item.ANY)) {
                 return true;
             }
-            if (!this.qualifier.equals(ar[2])) {
-                return false;
-            }
+            return this.qualifier.equals(ar[2]);
         }
         return true;
     }

@@ -31,7 +31,7 @@ import org.dspace.services.RequestService;
  */
 public final class DSpace {
 
-    private DSpaceKernel kernel;
+    private final DSpaceKernel kernel;
 
     public DSpaceKernel getKernel() {
         return kernel;
@@ -47,15 +47,15 @@ public final class DSpace {
     }
 
     /**
-     * Construct a DSpace helper object which uses the a specific named
+     * Construct a DSpace helper object which uses the specific named
      * instance of the kernel.
      *
      * @param kernelName the name of the kernel to use (null to use the default kernel)
+     *
      * @throws IllegalStateException if the kernel is not already running or no kernel exists with this name
      */
     public DSpace(String kernelName) {
-        DSpaceKernel kernel = new DSpaceKernelManager().getKernel(kernelName);
-        this.kernel = kernel;
+        this.kernel = new DSpaceKernelManager().getKernel(kernelName);
     }
 
     public ServiceManager getServiceManager() {

@@ -30,36 +30,6 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class ProviderStackTest {
 
-    // some stuff for testing
-    public interface Provider {
-        public String getPrefix();
-    }
-
-    public class UnorderedProvider implements Provider {
-        protected String prefix;
-
-        public UnorderedProvider(String prefix) {
-            this.prefix = prefix;
-        }
-
-        public String getPrefix() {
-            return prefix;
-        }
-    }
-
-    public class OrderedProvider extends UnorderedProvider implements OrderedService {
-        protected int order = 0;
-
-        public OrderedProvider(String prefix, int order) {
-            super(prefix);
-            this.order = order;
-        }
-
-        public int getOrder() {
-            return order;
-        }
-    }
-
     /**
      * Test method for
      * {@link org.dspace.utils.servicemanager.ProviderStack#ProviderStack(org.dspace.kernel.ServiceManager, java.lang.Class)}.
@@ -107,7 +77,7 @@ public class ProviderStackTest {
             }
         };
         ProviderStack<Provider> providers = new ProviderStack<Provider>(sm, Provider.class);
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(0, providers.size());
         assertTrue(providers.getProviders().size() == 0);
@@ -127,7 +97,7 @@ public class ProviderStackTest {
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
         // check the order
@@ -154,7 +124,7 @@ public class ProviderStackTest {
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
         // check the order
@@ -219,7 +189,7 @@ public class ProviderStackTest {
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -250,7 +220,7 @@ public class ProviderStackTest {
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -281,7 +251,7 @@ public class ProviderStackTest {
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -319,7 +289,7 @@ public class ProviderStackTest {
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -348,7 +318,7 @@ public class ProviderStackTest {
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -368,12 +338,12 @@ public class ProviderStackTest {
             new OrderedProvider("bbb", 5),
             new OrderedProvider("aaa", 2)
         });
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
         providers.clear();
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(0, providers.size());
 
@@ -395,7 +365,7 @@ public class ProviderStackTest {
             p1
         });
 
-        assertNotNull(providers.hashCode());
+        providers.hashCode();
         assertNotNull(providers.toString());
         assertEquals(4, providers.size());
 
@@ -417,6 +387,36 @@ public class ProviderStackTest {
         p2 = null;
         providers.clear();
         providers = null;
+    }
+
+    // some stuff for testing
+    public interface Provider {
+        String getPrefix();
+    }
+
+    public class OrderedProvider extends UnorderedProvider implements OrderedService {
+        protected int order = 0;
+
+        public OrderedProvider(String prefix, int order) {
+            super(prefix);
+            this.order = order;
+        }
+
+        public int getOrder() {
+            return order;
+        }
+    }
+
+    public class UnorderedProvider implements Provider {
+        protected final String prefix;
+
+        public UnorderedProvider(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
     }
 
 }

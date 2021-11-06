@@ -48,7 +48,7 @@ jobs:
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
 
       # https://github.com/actions/setup-java
       - name: Install JDK 11
@@ -90,7 +90,7 @@ jobs:
 
   docker-build:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/baryonics'
+    if: github.ref == 'refs/heads/baryonics' || contains(github.event.head_commit.message, '/docker')
     needs: tests
     steps:
       - name: Set up QEMU
@@ -109,3 +109,12 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_APP }}:latest
+
+      - name: Build Solr Image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          file: solr.Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/solr:latest

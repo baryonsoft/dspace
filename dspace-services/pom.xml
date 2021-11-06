@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>baryonics-0.3.7-SNAPSHOT</version>
+        <version>baryonics-0.4.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -54,6 +54,7 @@
                                 <configuration>
                                     <source>
                                         project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/')
+                                        //noinspection GroovyAssignabilityCheck
                                         log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir'])
                                     </source>
                                 </configuration>

@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>baryonics-0.3.7-SNAPSHOT</version>
+        <version>baryonics-0.4.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -240,6 +240,7 @@
 
                     <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
+                        <!--suppress MavenModelInspection -->
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
@@ -533,13 +534,13 @@
         <dependency>
             <groupId>javax.cache</groupId>
             <artifactId>cache-api</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>3.4.0</version>
+            <version>3.9.7</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
@@ -590,7 +591,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-spring-boot-starter</artifactId>
-            <version>5.2.4</version>
+            <version>5.3.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>

@@ -8,11 +8,11 @@
 package org.dspace.services;
 
 /**
- * Interface whos implementations will be called when the kernel startup is completed.
+ * Interface whose implementations will be called when the kernel startup is completed.
  *
  * @author kevinvandevelde at atmire.com
  */
 public interface KernelStartupCallbackService {
 
-    public void executeCallback();
+    void executeCallback();
 }

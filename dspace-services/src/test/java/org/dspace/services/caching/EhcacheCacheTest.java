@@ -34,7 +34,7 @@ import org.junit.Test;
  */
 public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
 
-    static String cacheName = "org.dspace.aaronz.test.Cache";
+    static final String cacheName = "org.dspace.aaronz.test.Cache";
     static CacheManager cacheManager;
     static Cache cache = null;
 
@@ -136,7 +136,7 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
         cache.put("XXX", 123);
         Integer i = (Integer) cache.get("XXX");
         assertNotNull(i);
-        assertEquals(new Integer(123), i);
+        assertEquals(Integer.valueOf(123), i);
 
         Object o = cache.get("YYYYYYYY");
         assertNull(o);

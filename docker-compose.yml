@@ -17,8 +17,8 @@ services:
     networks:
       dspacenet:
     ports:
-    - published: 5432
-      target: 5432
+      - published: 5432
+        target: 5432
     stdin_open: true
     tty: true
     volumes:
@@ -26,37 +26,20 @@ services:
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    # Uses official Solr image at https://hub.docker.com/_/solr/
-    image: solr:8.8
+    image: astrowq/solr
+    build:
+      context: .
+      dockerfile: solr.Dockerfile
     networks:
       dspacenet:
     ports:
-    - published: 8983
-      target: 8983
-    stdin_open: true
-    tty: true
-    working_dir: /var/solr/data
+      - published: 8983
+        target: 8983
     environment:
+      SOLR_ENABLE_AUTHENTICATION: "no"
       SOLR_JAVA_MEM: "-Xms100m -Xmx600m"
     volumes:
-    # Mount our local Solr core configs so that they are available as Solr config sets on container
-    - ./dspace/solr/authority:/opt/solr/server/solr/configsets/authority
-    - ./dspace/solr/oai:/opt/solr/server/solr/configsets/oai
-    - ./dspace/solr/search:/opt/solr/server/solr/configsets/search
-    - ./dspace/solr/statistics:/opt/solr/server/solr/configsets/statistics
-    # Keep Solr data directory between reboots
-    - solr_data:/var/solr/data
-    # Initialize all DSpace Solr cores using the mounted local config sets (see above), then start Solr
-    entrypoint:
-      - /bin/bash
-      - '-c'
-      - |
-        init-var-solr
-        precreate-core authority /opt/solr/server/solr/configsets/authority
-        precreate-core oai /opt/solr/server/solr/configsets/oai
-        precreate-core search /opt/solr/server/solr/configsets/search
-        precreate-core statistics /opt/solr/server/solr/configsets/statistics
-        exec solr -f
+      - solr_data:/var/solr/data
 
   minio:
     image: minio/minio

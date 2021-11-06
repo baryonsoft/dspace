@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DSpaceEnvironmentConfiguration extends MapConfiguration {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceEnvironmentConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(DSpaceEnvironmentConfiguration.class);
 
     /**
      * Create a Configuration based on the environment variables.

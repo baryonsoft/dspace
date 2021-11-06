@@ -33,6 +33,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
@@ -46,10 +47,12 @@ import org.xml.sax.SAXException;
  */
 public class HarvestedCollectionServiceImpl implements HarvestedCollectionService {
 
+    @SuppressWarnings("HttpUrlsUsage")
     private static final Namespace ORE_NS = Namespace.getNamespace("http://www.openarchives.org/ore/terms/");
+    @SuppressWarnings("HttpUrlsUsage")
     private static final Namespace OAI_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
 
-    @Autowired(required = true)
+    @Autowired()
     protected HarvestedCollectionDAO harvestedCollectionDAO;
 
     protected HarvestedCollectionServiceImpl() {
@@ -72,22 +75,15 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
     @Override
     public boolean isHarvestable(Context context, Collection collection) throws SQLException {
         HarvestedCollection hc = find(context, collection);
-        if (hc != null && hc.getHarvestType() > 0 && hc.getOaiSource() != null && hc.getOaiSetId() != null &&
-            hc.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
-            return true;
-        }
-        return false;
+        return hc != null && hc.getHarvestType() > 0 && hc.getOaiSource() != null && hc.getOaiSetId() != null &&
+            hc.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR;
     }
 
     @Override
-    public boolean isHarvestable(HarvestedCollection harvestedCollection) throws SQLException {
-        if (harvestedCollection.getHarvestType() > 0 && harvestedCollection
-            .getOaiSource() != null && harvestedCollection.getOaiSetId() != null &&
-            harvestedCollection.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
-            return true;
-        }
-
-        return false;
+    public boolean isHarvestable(@NotNull HarvestedCollection harvestedCollection) {
+        return harvestedCollection.getHarvestType() > 0 && harvestedCollection
+            .getOaiSource() != null && harvestedCollection.getOaiSetId() != null;
+        // harvestedCollection.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR;
     }
 
     @Override
@@ -98,13 +94,9 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public boolean isReady(HarvestedCollection harvestedCollection) throws SQLException {
-        if (isHarvestable(harvestedCollection) && (harvestedCollection
+        return isHarvestable(harvestedCollection) && (harvestedCollection
             .getHarvestStatus() == HarvestedCollection.STATUS_READY || harvestedCollection
-            .getHarvestStatus() == HarvestedCollection.STATUS_OAI_ERROR)) {
-            return true;
-        }
-
-        return false;
+            .getHarvestStatus() == HarvestedCollection.STATUS_OAI_ERROR);
     }
 
     @Override
@@ -115,7 +107,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
     @Override
     public List<HarvestedCollection> findReady(Context context) throws SQLException {
         ConfigurationService configurationService
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
         int harvestInterval = configurationService.getIntProperty("oai.harvester.harvestFrequency");
         if (harvestInterval == 0) {
             harvestInterval = 720;
@@ -141,9 +133,9 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         int[] statuses = new int[] {HarvestedCollection.STATUS_READY, HarvestedCollection.STATUS_OAI_ERROR};
         return harvestedCollectionDAO
             .findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(context, startTime,
-                                                                               HarvestedCollection.TYPE_NONE, statuses,
-                                                                               HarvestedCollection.STATUS_BUSY,
-                                                                               expirationTime);
+                HarvestedCollection.TYPE_NONE, statuses,
+                HarvestedCollection.STATUS_BUSY,
+                expirationTime);
     }
 
     @Override
@@ -155,14 +147,14 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
     public HarvestedCollection findOldestHarvest(Context context) throws SQLException {
         return harvestedCollectionDAO
             .findByStatusAndMinimalTypeOrderByLastHarvestedAsc(context, HarvestedCollection.STATUS_READY,
-                                                               HarvestedCollection.TYPE_NONE, 1);
+                HarvestedCollection.TYPE_NONE, 1);
     }
 
     @Override
     public HarvestedCollection findNewestHarvest(Context context) throws SQLException {
         return harvestedCollectionDAO
             .findByStatusAndMinimalTypeOrderByLastHarvestedDesc(context, HarvestedCollection.STATUS_READY,
-                                                                HarvestedCollection.TYPE_NONE, 1);
+                HarvestedCollection.TYPE_NONE, 1);
     }
 
     @Override
@@ -188,11 +180,12 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
      * @param oaiSetId   OAI set identifier
      * @param metaPrefix OAI metadataPrefix
      * @param testORE    whether the method should also check the PMH provider for ORE support
+     *
      * @return list of errors encountered during verification. Empty list indicates a "success" condition.
      */
     @Override
     public List<String> verifyOAIharvester(String oaiSource,
-                                                  String oaiSetId, String metaPrefix, boolean testORE) {
+                                           String oaiSetId, String metaPrefix, boolean testORE) {
         List<String> errorSet = new ArrayList<>();
 
         // First, see if we can contact the target server at all.
@@ -233,7 +226,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         }
 
         // Now scan the sets and make sure the one supplied is in the list
-        boolean foundSet = false;
+        boolean foundSet;
         try {
             //If we do not want to harvest from one set, then skip this.
             if (!"all".equals(oaiSetId)) {
@@ -263,8 +256,6 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         } catch (IOException | ParserConfigurationException | TransformerException | DOMException | SAXException e) {
             errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached");
             return errorSet;
-        } catch (RuntimeException re) {
-            throw re;
         }
 
         return errorSet;

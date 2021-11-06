@@ -12,7 +12,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.google.common.base.Throwables;
 import org.apache.commons.collections.Buffer;
 import org.apache.commons.collections.BufferUtils;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
@@ -32,7 +30,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -46,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Notifies Google Analytics of Bitstream VIEW events. These events are stored in memory and then
- * asynchronously processed by a single seperate thread.
+ * asynchronously processed by a single separate thread.
  *
  * @author April Herron
  */
@@ -56,7 +55,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     // 20 is the event max set by the GA API
     private static final int GA_MAX_EVENTS = 20;
     private static final String ANALYTICS_BATCH_ENDPOINT = "https://www.google-analytics.com/batch";
-    private static final Logger log = Logger.getLogger(GoogleAsyncEventListener.class);
+    private static final Logger log = LogManager.getLogger(GoogleAsyncEventListener.class);
     private static String analyticsKey;
     private static CloseableHttpClient httpclient;
     private static Buffer buffer;
@@ -64,18 +63,18 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     private static Future future;
     private static boolean destroyed = false;
 
-    @Autowired(required = true)
+    @Autowired()
     ConfigurationService configurationService;
 
-    @Autowired(required = true)
+    @Autowired()
     ClientInfoService clientInfoService;
 
     @PostConstruct
     public void init() {
         analyticsKey = configurationService.getProperty("google.analytics.key");
         if (StringUtils.isNotEmpty(analyticsKey)) {
-            int analyticsBufferlimit = configurationService.getIntProperty("google.analytics.buffer.limit", 256);
-            buffer = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(analyticsBufferlimit));
+            int analyticsBufferLimit = configurationService.getIntProperty("google.analytics.buffer.limit", 256);
+            buffer = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(analyticsBufferLimit));
             httpclient = HttpClients.createDefault();
             executor = Executors.newSingleThreadExecutor();
             future = executor.submit(new GoogleAnalyticsTask());
@@ -90,10 +89,10 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                 log.debug("Usage event received " + event.getName());
                 try {
                     if (ue.getAction() == UsageEvent.Action.VIEW &&
-                            ue.getObject().getType() == Constants.BITSTREAM) {
+                        ue.getObject().getType() == Constants.BITSTREAM) {
 
                         // Client ID, should uniquely identify the user or device. If we have an X-CORRELATION-ID
-                        // header or a session ID for the user, then lets use it, othwerwise generate a UUID.
+                        // header or a session ID for the user, then lets use it, otherwise generate a UUID.
                         String cid;
                         if (ue.getRequest().getHeader("X-CORRELATION-ID") != null) {
                             cid = ue.getRequest().getHeader("X-CORRELATION-ID");
@@ -102,7 +101,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                         } else {
                             cid = UUID.randomUUID().toString();
                         }
-                        // Prefer the X-REFERRER header, otherwise falback to the referrer header
+                        // Prefer the X-REFERRER header, otherwise fallback to the referrer header
                         String referrer;
                         if (ue.getRequest().getHeader("X-REFERRER") != null) {
                             referrer = ue.getRequest().getHeader("X-REFERRER");
@@ -110,9 +109,9 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                             referrer = ue.getRequest().getHeader("referer");
                         }
                         buffer.add(new GoogleAnalyticsEvent(cid, clientInfoService.getClientIp(ue.getRequest()),
-                                ue.getRequest().getHeader("USER-AGENT"), referrer,
-                                ue.getRequest() .getRequestURI() + "?" + ue.getRequest().getQueryString(),
-                                getObjectName(ue), System.currentTimeMillis()));
+                            ue.getRequest().getHeader("USER-AGENT"), referrer,
+                            ue.getRequest().getRequestURI() + "?" + ue.getRequest().getQueryString(),
+                            getObjectName(ue), System.currentTimeMillis()));
                     }
                 } catch (Exception e) {
                     log.error("Failed to add event to buffer", e);
@@ -141,14 +140,14 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                 // For a bitstream download we really want to know the title of the owning item
                 // rather than the bitstream name.
                 return ContentServiceFactory.getInstance().getDSpaceObjectService(ue.getObject())
-                        .getParentObject(ue.getContext(), ue.getObject()).getName();
+                    .getParentObject(ue.getContext(), ue.getObject()).getName();
             } else {
                 return ue.getObject().getName();
             }
         } catch (SQLException e) {
             // This shouldn't merit interrupting the user's transaction so log the error and continue.
             log.error("Error in Google Analytics recording - can't determine ParentObjectName for bitstream " +
-                    ue.getObject().getID(), e);
+                ue.getObject().getID(), e);
         }
 
         return null;
@@ -172,7 +171,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                     boolean sleep = false;
                     StringBuilder request = null;
                     List<GoogleAnalyticsEvent> events = new ArrayList<>();
-                    Iterator iterator = buffer.iterator();
+                    var iterator = buffer.iterator();
                     for (int x = 0; x < GA_MAX_EVENTS && iterator.hasNext(); x++) {
                         GoogleAnalyticsEvent event = (GoogleAnalyticsEvent) iterator.next();
                         events.add(event);
@@ -223,7 +222,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
                     }
                 } catch (Throwable t) {
                     log.error("Unexpected error; aborting GA event recording", t);
-                    Throwables.propagate(t);
+                    throw new RuntimeException(t);
                 }
             }
             log.info("Stopping GA event recording");

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
@@ -25,26 +26,22 @@ import org.dspace.services.model.CacheConfig.CacheScope;
  */
 public final class MapCache implements Cache {
 
-    private Map<String, Object> cache;
+    private final Map<String, Object> cache;
 
     public Map<String, Object> getCache() {
         return cache;
     }
 
-    protected String name;
-    protected CacheConfig cacheConfig;
+    private final String name;
+    private final CacheConfig cacheConfig;
 
     public MapCache(String name, CacheConfig cacheConfig) {
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null");
         }
         this.name = name;
-        this.cache = new HashMap<String, Object>();
-        if (cacheConfig != null) {
-            this.cacheConfig = cacheConfig;
-        } else {
-            this.cacheConfig = new CacheConfig(CacheScope.REQUEST);
-        }
+        this.cache = new HashMap<>();
+        this.cacheConfig = Objects.requireNonNullElseGet(cacheConfig, () -> new CacheConfig(CacheScope.REQUEST));
     }
 
     /* (non-Javadoc)
@@ -78,7 +75,7 @@ public final class MapCache implements Cache {
      * @see org.dspace.services.model.Cache#getKeys()
      */
     public List<String> getKeys() {
-        return new ArrayList<String>(this.cache.keySet());
+        return new ArrayList<>(this.cache.keySet());
     }
 
     /* (non-Javadoc)
@@ -115,11 +112,11 @@ public final class MapCache implements Cache {
     /* (non-Javadoc)
      * @see org.dspace.services.model.Cache#remove(java.lang.String)
      */
-    public boolean remove(String key) {
+    public void remove(String key) {
         if (key == null) {
             throw new IllegalArgumentException("key cannot be null");
         }
-        return this.cache.remove(key) != null;
+        this.cache.remove(key);
     }
 
     /* (non-Javadoc)

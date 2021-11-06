@@ -28,20 +28,24 @@ public interface HarvestedCollectionService {
      *
      * @param context    The relevant DSpace Context.
      * @param collection target collection
+     *
      * @return a HarvestInstance object corresponding to this collection's settings, null if not found.
+     *
      * @throws SQLException if database error
      */
-    public HarvestedCollection find(Context context, Collection collection) throws SQLException;
+    HarvestedCollection find(Context context, Collection collection) throws SQLException;
 
     /**
      * Create a new harvest instance row for a specified collection.
      *
      * @param context    The relevant DSpace Context.
      * @param collection target collection
+     *
      * @return a new HarvestInstance object
+     *
      * @throws SQLException if database error
      */
-    public HarvestedCollection create(Context context, Collection collection) throws SQLException;
+    HarvestedCollection create(Context context, Collection collection) throws SQLException;
 
     /**
      * Returns whether the specified collection is harvestable, i.e. whether its harvesting
@@ -50,10 +54,12 @@ public interface HarvestedCollectionService {
      *
      * @param context    The relevant DSpace Context.
      * @param collection target collection
+     *
      * @return is collection harvestable?
+     *
      * @throws SQLException if database error
      */
-    public boolean isHarvestable(Context context, Collection collection) throws SQLException;
+    boolean isHarvestable(Context context, Collection collection) throws SQLException;
 
     /**
      * Returns whether this harvest instance is actually harvestable, i.e. whether its settings
@@ -61,91 +67,109 @@ public interface HarvestedCollectionService {
      * be in process of being harvested.
      *
      * @param harvestedCollection collection to be harvested
+     *
      * @return is collection harvestable?
+     *
      * @throws SQLException if database error
      */
-    public boolean isHarvestable(HarvestedCollection harvestedCollection) throws SQLException;
+    boolean isHarvestable(HarvestedCollection harvestedCollection) throws SQLException;
 
     /**
      * Returns whether the specified collection is ready for immediate harvest.
      *
      * @param context    The relevant DSpace Context.
      * @param collection collection to be harvested
+     *
      * @return is collection ready for immediate harvest?
+     *
      * @throws SQLException if database error
      */
-    public boolean isReady(Context context, Collection collection) throws SQLException;
+    boolean isReady(Context context, Collection collection) throws SQLException;
 
     /**
      * Returns whether the specified collection is ready for immediate harvest.
      *
      * @param harvestedCollection collection to be harvested
+     *
      * @return is collection ready for immediate harvest?
+     *
      * @throws SQLException if database error
      */
-    public boolean isReady(HarvestedCollection harvestedCollection) throws SQLException;
+    boolean isReady(HarvestedCollection harvestedCollection) throws SQLException;
 
     /**
      * Find all collections that are set up for harvesting
      *
      * @param context The relevant DSpace Context.
+     *
      * @return list of collection id's
+     *
      * @throws SQLException if database error
      */
-    public List<HarvestedCollection> findAll(Context context) throws SQLException;
+    List<HarvestedCollection> findAll(Context context) throws SQLException;
 
     /**
      * Find all collections that are ready for harvesting
      *
      * @param context The relevant DSpace Context.
+     *
      * @return list of collection id's
+     *
      * @throws SQLException if database error
      */
-    public List<HarvestedCollection> findReady(Context context) throws SQLException;
+    List<HarvestedCollection> findReady(Context context) throws SQLException;
 
     /**
      * Find all collections with the specified status flag.
      *
      * @param context The relevant DSpace Context.
      * @param status  see HarvestInstance.STATUS_...
+     *
      * @return all collections with the specified status flag
+     *
      * @throws SQLException if database error
      */
-    public List<HarvestedCollection> findByStatus(Context context, int status) throws SQLException;
+    List<HarvestedCollection> findByStatus(Context context, int status) throws SQLException;
 
     /**
      * Find the collection that was harvested the longest time ago.
      *
      * @param context The relevant DSpace Context.
+     *
      * @return collection that was harvested the longest time ago
+     *
      * @throws SQLException if database error
      */
-    public HarvestedCollection findOldestHarvest(Context context) throws SQLException;
+    HarvestedCollection findOldestHarvest(Context context) throws SQLException;
 
 
     /**
      * Find the collection that was harvested most recently.
      *
      * @param context The relevant DSpace Context.
+     *
      * @return collection that was harvested most recently
+     *
      * @throws SQLException if database error
      */
-    public HarvestedCollection findNewestHarvest(Context context) throws SQLException;
+    HarvestedCollection findNewestHarvest(Context context) throws SQLException;
 
-    public void delete(Context context, HarvestedCollection harvestedCollection) throws SQLException;
+    void delete(Context context, HarvestedCollection harvestedCollection) throws SQLException;
 
-    public void update(Context context, HarvestedCollection harvestedCollection) throws SQLException;
+    void update(Context context, HarvestedCollection harvestedCollection) throws SQLException;
 
-    public boolean exists(Context context) throws SQLException;
+    boolean exists(Context context) throws SQLException;
 
     /**
      * Test the given harvest settings
+     *
      * @param oaiSource  the address of the OAI-PMH provider
      * @param oaiSetId   OAI set identifier
      * @param metaPrefix OAI metadataPrefix
      * @param testORE    whether the method should also check the PMH provider for ORE support
+     *
      * @return list of errors encountered during verification. An empty list indicates a "success" condition.
      */
-    public List<String> verifyOAIharvester(String oaiSource,
-                                           String oaiSetId, String metaPrefix, boolean testORE);
+    List<String> verifyOAIharvester(String oaiSource,
+                                    String oaiSetId, String metaPrefix, boolean testORE);
 }
