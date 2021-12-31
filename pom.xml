@@ -1629,7 +1629,7 @@
             <dependency>
                 <groupId>com.oracle.database.jdbc</groupId>
                 <artifactId>ojdbc10</artifactId>
-                <version>19.12.0.0</version>
+                <version>19.13.0.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
