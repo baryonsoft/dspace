@@ -195,32 +195,6 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Update the DSpace database, ensuring that any necessary migrations are run prior to initializing
-     * Hibernate.
-     * <P>
-     * This is synchronized as it only needs to be run successfully *once* (for the first Context initialized).
-     *
-     * @return true/false, based on whether database was successfully updated
-     */
-    public static synchronized boolean updateDatabase() {
-        //If the database has not been updated yet, update it and remember that.
-        if (databaseUpdated.compareAndSet(false, true)) {
-
-            // Before initializing a Context object, we need to ensure the database
-            // is up-to-date. This ensures any outstanding Flyway migrations are run
-            // PRIOR to Hibernate initializing (occurs when DBConnection is loaded in calling init() method).
-            try {
-                DatabaseUtils.updateDatabase();
-            } catch (SQLException sqle) {
-                log.fatal("Cannot update or initialize database via Flyway!", sqle);
-                databaseUpdated.set(false);
-            }
-        }
-
-        return databaseUpdated.get();
-    }
-
-    /**
      * Get the database connection associated with the context
      *
      * @return the database connection
@@ -793,7 +767,6 @@ public class Context implements AutoCloseable {
      * small number of records.
      *
      * @param batchModeEnabled When true, batch processing mode will be enabled. If false, it will be disabled.
-     *
      */
     @Deprecated
     public void enableBatchMode(boolean batchModeEnabled) {

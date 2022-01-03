@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -30,20 +30,20 @@ import org.springframework.security.core.AuthenticationException;
  * This class will filter Shibboleth requests to see if the user has been authenticated via Shibboleth.
  * <P>
  * The overall Shibboleth login process is as follows:
- *   1. When Shibboleth plugin is enabled, client/UI receives Shibboleth's absolute URL in WWW-Authenticate header.
- *      See {@link org.dspace.authenticate.ShibAuthentication} loginPageURL() method.
- *   2. Client sends the user to that URL when they select Shibboleth authentication.
- *   3. User logs in using Shibboleth
- *   4. If successful, they are redirected by Shibboleth to the path where this Filter is "listening" (that path
- *      is passed to Shibboleth as a URL param in step 1)
- *   5. This filter then intercepts the request in order to check for a valid Shibboleth login (see
- *      ShibAuthentication.authenticate()) and stores that user info in a JWT. It also saves that JWT in a *temporary*
- *      authentication cookie.
- *   6. This filter then looks for a "redirectUrl" param (also a part of the original URL from step 1), and redirects
- *      the user to that location (after verifying it's a trusted URL). Usually this is a redirect back to the
- *      Client/UI page where the User started.
- *   7. At that point, the client reads the JWT from the Cookie, and sends it back in a request to /api/authn/login,
- *      which triggers the server-side to destroy the Cookie and move the JWT into a Header
+ * 1. When Shibboleth plugin is enabled, client/UI receives Shibboleth's absolute URL in WWW-Authenticate header.
+ * See {@link org.dspace.authenticate.ShibAuthentication} loginPageURL() method.
+ * 2. Client sends the user to that URL when they select Shibboleth authentication.
+ * 3. User logs in using Shibboleth
+ * 4. If successful, they are redirected by Shibboleth to the path where this Filter is "listening" (that path
+ * is passed to Shibboleth as a URL param in step 1)
+ * 5. This filter then intercepts the request in order to check for a valid Shibboleth login (see
+ * ShibAuthentication.authenticate()) and stores that user info in a JWT. It also saves that JWT in a *temporary*
+ * authentication cookie.
+ * 6. This filter then looks for a "redirectUrl" param (also a part of the original URL from step 1), and redirects
+ * the user to that location (after verifying it's a trusted URL). Usually this is a redirect back to the
+ * Client/UI page where the User started.
+ * 7. At that point, the client reads the JWT from the Cookie, and sends it back in a request to /api/authn/login,
+ * which triggers the server-side to destroy the Cookie and move the JWT into a Header
  * <P>
  * This Shibboleth Authentication process is tested in AuthenticationRestControllerIT.
  *
@@ -54,7 +54,8 @@ import org.springframework.security.core.AuthenticationException;
 public class ShibbolethLoginFilter extends StatelessLoginFilter {
     private static final Logger log = LogManager.getLogger(ShibbolethLoginFilter.class);
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ConfigurationService configurationService =
+        DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public ShibbolethLoginFilter(String url, AuthenticationManager authenticationManager,
                                  RestAuthenticationService restAuthenticationService) {
@@ -87,7 +88,7 @@ public class ShibbolethLoginFilter extends StatelessLoginFilter {
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
         log.debug("Shib authentication successful for EPerson {}. Sending back temporary auth cookie",
-                  dSpaceAuthentication.getName());
+            dSpaceAuthentication.getName());
         // OVERRIDE DEFAULT behavior of StatelessLoginFilter to return a temporary authentication cookie containing
         // the Auth Token (JWT). This Cookie is required because we *redirect* the user back to the client/UI after
         // a successful Shibboleth login. Headers cannot be sent via a redirect, so a Cookie must be sent to provide
@@ -103,9 +104,6 @@ public class ShibbolethLoginFilter extends StatelessLoginFilter {
     /**
      * After successful login, redirect to the DSpace URL specified by this Shibboleth request (in the "redirectUrl"
      * request parameter). If that 'redirectUrl' is not valid or trusted for this DSpace site, then return a 400 error.
-     * @param request
-     * @param response
-     * @throws IOException
      */
     private void redirectAfterSuccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Get redirect URL from request parameter
@@ -131,9 +129,9 @@ public class ShibbolethLoginFilter extends StatelessLoginFilter {
             response.sendRedirect(redirectUrl);
         } else {
             log.error("Invalid Shibboleth redirectURL=" + redirectUrl +
-                          ". URL doesn't match hostname of server or UI!");
+                ". URL doesn't match hostname of server or UI!");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Invalid redirectURL! Must match server or ui hostname.");
+                "Invalid redirectURL! Must match server or ui hostname.");
         }
     }
 }
