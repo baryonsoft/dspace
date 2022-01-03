@@ -104,7 +104,7 @@ public class Context implements AutoCloseable {
     /**
      * Context mode
      */
-    private Mode mode = Mode.READ_WRITE;
+    private Mode mode;
     private DBConnection dbConnection;
 
     protected Context(EventService eventService, DBConnection dbConnection) {
@@ -187,7 +187,11 @@ public class Context implements AutoCloseable {
 
         authStateChangeHistory = new ConcurrentLinkedDeque<>();
         authStateClassCallHistory = new ConcurrentLinkedDeque<>();
-        setMode(this.mode);
+
+        if (this.mode != null) {
+            setMode(this.mode);
+        }
+
     }
 
     /**
@@ -750,7 +754,7 @@ public class Context implements AutoCloseable {
      * @return The current mode
      */
     public Mode getCurrentMode() {
-        return mode;
+        return mode != null ? mode : Mode.READ_WRITE;
     }
 
     /**
@@ -763,7 +767,6 @@ public class Context implements AutoCloseable {
      * small number of records.
      *
      * @param batchModeEnabled When true, batch processing mode will be enabled. If false, it will be disabled.
-     *
      */
     @Deprecated
     public void enableBatchMode(boolean batchModeEnabled) {
