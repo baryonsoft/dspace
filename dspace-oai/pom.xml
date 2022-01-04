@@ -9,7 +9,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>baryonics-0.4.4</version>
+        <version>baryonics-0.4.5</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
