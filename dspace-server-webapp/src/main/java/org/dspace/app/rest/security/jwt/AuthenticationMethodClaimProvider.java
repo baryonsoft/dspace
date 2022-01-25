@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.security.jwt;
 
-import java.sql.SQLException;
 import java.text.ParseException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,8 +42,7 @@ public class AuthenticationMethodClaimProvider implements JWTClaimProvider {
         return authenticationService.getAuthenticationMethod(context, request);
     }
 
-    public void parseClaim(final Context context, final HttpServletRequest request, final JWTClaimsSet jwtClaimsSet)
-            throws SQLException {
+    public void parseClaim(final Context context, final HttpServletRequest request, final JWTClaimsSet jwtClaimsSet) {
         try {
             context.setAuthenticationMethod(jwtClaimsSet.getStringClaim(AUTHENTICATION_METHOD));
         } catch (ParseException e) {

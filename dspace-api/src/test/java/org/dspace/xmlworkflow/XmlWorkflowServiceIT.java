@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -44,15 +44,13 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
 
     protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
     protected IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
-                                                             .getServiceByName(IndexingService.class.getName(),
-                                                                 IndexingService.class);
+        .getServiceByName(IndexingService.class.getName(),
+            IndexingService.class);
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     /**
      * Test to verify that if a user submits an item into the workflow, then it gets rejected that the submitter gets
      * write access back on the item
-     *
-     * @throws Exception
      */
     @Test
     public void workflowUserRejectsItemTheySubmitted_ItemShouldBeEditable() throws Exception {
@@ -60,15 +58,15 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         EPerson submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.org").build();
         context.setCurrentUser(submitter);
         Community community = CommunityBuilder.createCommunity(context)
-                                              .withName("Parent Community")
-                                              .build();
+            .withName("Parent Community")
+            .build();
         Collection colWithWorkflow = CollectionBuilder.createCollection(context, community)
-                                                      .withName("Collection WITH workflow")
-                                                      .withWorkflowGroup(1, submitter)
-                                                      .build();
+            .withName("Collection WITH workflow")
+            .withWorkflowGroup(1, submitter)
+            .build();
         Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(colWithWorkflow);
         ClaimedTask taskToReject = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, submitter)
-                                                     .withTitle("Test workflow item to reject").build();
+            .withTitle("Test workflow item to reject").build();
         context.restoreAuthSystemState();
 
         // Submitter person is both original submitter as well as reviewer, should have edit access of claimed task

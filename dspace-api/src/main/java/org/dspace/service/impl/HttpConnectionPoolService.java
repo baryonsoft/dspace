@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -49,36 +49,28 @@ import org.dspace.services.ConfigurationService;
 @Named
 @Singleton
 public class HttpConnectionPoolService {
-    @Inject
-    ConfigurationService configurationService;
-
-    /** Configuration properties will begin with this string. */
-    private final String configPrefix;
-
     /** Maximum number of concurrent pooled connections. */
     private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 20;
-
     /** Maximum number of concurrent pooled connections per route. */
     private static final int DEFAULT_MAX_PER_ROUTE = 15;
-
-    /** Keep connections open at least this long, if the response did not
-     *  specify:  milliseconds
+    /**
+     * Keep connections open at least this long, if the response did not
+     * specify:  milliseconds
      */
     private static final int DEFAULT_KEEPALIVE = 5 * 1000;
-
     /** Pooled connection maximum lifetime:  seconds */
     private static final int DEFAULT_TTL = 10 * 60;
-
     /** Clean up stale connections this often:  milliseconds */
     private static final int CHECK_INTERVAL = 1000;
-
     /** Connection idle if unused for this long:  seconds */
     private static final int IDLE_INTERVAL = 30;
-
-    private PoolingHttpClientConnectionManager connManager;
-
+    /** Configuration properties will begin with this string. */
+    private final String configPrefix;
     private final ConnectionKeepAliveStrategy keepAliveStrategy
-            = new KeepAliveStrategy();
+        = new KeepAliveStrategy();
+    @Inject
+    ConfigurationService configurationService;
+    private PoolingHttpClientConnectionManager connManager;
 
     /**
      * Construct a pool for a given set of configuration properties.
@@ -92,14 +84,14 @@ public class HttpConnectionPoolService {
     @PostConstruct
     protected void init() {
         connManager = new PoolingHttpClientConnectionManager(
-                configurationService.getIntProperty(configPrefix + ".client.timeToLive", DEFAULT_TTL),
-                TimeUnit.SECONDS);
+            configurationService.getIntProperty(configPrefix + ".client.timeToLive", DEFAULT_TTL),
+            TimeUnit.SECONDS);
 
         connManager.setMaxTotal(configurationService.getIntProperty(
-                configPrefix + ".client.maxTotalConnections", DEFAULT_MAX_TOTAL_CONNECTIONS));
+            configPrefix + ".client.maxTotalConnections", DEFAULT_MAX_TOTAL_CONNECTIONS));
         connManager.setDefaultMaxPerRoute(
-                configurationService.getIntProperty(configPrefix + ".client.maxPerRoute",
-                        DEFAULT_MAX_PER_ROUTE));
+            configurationService.getIntProperty(configPrefix + ".client.maxPerRoute",
+                DEFAULT_MAX_PER_ROUTE));
 
         Thread connectionMonitor = new IdleConnectionMonitorThread(connManager);
         connectionMonitor.setDaemon(true);
@@ -113,9 +105,9 @@ public class HttpConnectionPoolService {
      */
     public CloseableHttpClient getClient() {
         CloseableHttpClient httpClient = HttpClientBuilder.create()
-                .setKeepAliveStrategy(keepAliveStrategy)
-                .setConnectionManager(connManager)
-                .build();
+            .setKeepAliveStrategy(keepAliveStrategy)
+            .setConnectionManager(connManager)
+            .build();
         return httpClient;
     }
 
@@ -126,12 +118,12 @@ public class HttpConnectionPoolService {
      * Swiped from https://www.baeldung.com/httpclient-connection-management
      */
     public class KeepAliveStrategy
-            implements ConnectionKeepAliveStrategy {
+        implements ConnectionKeepAliveStrategy {
         @Override
         public long getKeepAliveDuration(HttpResponse response,
-                HttpContext context) {
+                                         HttpContext context) {
             HeaderElementIterator it = new BasicHeaderElementIterator(
-                    response.headerIterator(HTTP.CONN_KEEP_ALIVE));
+                response.headerIterator(HTTP.CONN_KEEP_ALIVE));
             while (it.hasNext()) {
                 HeaderElement he = it.nextElement();
                 String name = he.getName();
@@ -143,7 +135,7 @@ public class HttpConnectionPoolService {
 
             // If server did not request keep-alive, use configured value.
             return configurationService.getIntProperty(configPrefix + ".client.keepAlive",
-                    DEFAULT_KEEPALIVE);
+                DEFAULT_KEEPALIVE);
         }
     }
 
@@ -153,7 +145,7 @@ public class HttpConnectionPoolService {
      * Swiped from https://www.baeldung.com/httpclient-connection-management
      */
     public class IdleConnectionMonitorThread
-            extends Thread {
+        extends Thread {
         private final HttpClientConnectionManager connMgr;
         private volatile boolean shutdown;
 

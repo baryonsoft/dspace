@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -42,9 +42,10 @@ public class CanvasDimensionCLI {
 
     private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
     private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
-                                                                                          .getConfigurationService();
+        .getConfigurationService();
 
-    private CanvasDimensionCLI() {}
+    private CanvasDimensionCLI() {
+    }
 
     public static void main(String[] argv) throws Exception {
 
@@ -66,7 +67,7 @@ public class CanvasDimensionCLI {
 
         Context context = new Context();
         IIIFCanvasDimensionService canvasProcessor = IIIFCanvasDimensionServiceFactory.getInstance()
-                                                                                      .getIiifCanvasDimensionService();
+            .getIiifCanvasDimensionService();
 
         CommandLineParser parser = new DefaultParser();
 
@@ -85,15 +86,15 @@ public class CanvasDimensionCLI {
             "display help");
 
         Option skipOption = Option.builder("s")
-                                  .longOpt("skip")
-                                  .hasArg()
-                                  .hasArgs()
-                                  .valueSeparator(',')
-                                  .desc(
-                                      "SKIP the bitstreams belonging to identifier\n" +
-                                          "Separate multiple identifiers with a comma (,)\n" +
-                                          "(e.g. -s \n 123456789/34,123456789/323)")
-                                  .build();
+            .longOpt("skip")
+            .hasArg()
+            .hasArgs()
+            .valueSeparator(',')
+            .desc(
+                "SKIP the bitstreams belonging to identifier\n" +
+                    "Separate multiple identifiers with a comma (,)\n" +
+                    "(e.g. -s \n 123456789/34,123456789/323)")
+            .build();
         options.addOption(skipOption);
 
         CommandLine line = null;
@@ -115,7 +116,7 @@ public class CanvasDimensionCLI {
                     "-i 1086306d-8a51-43c3-98b9-c3b00f49105f");
             System.out
                 .println("\nHandle example:    iiif-canvas-dimensions -e user@email.org " +
-                        "-i 123456789/12");
+                    "-i 123456789/12");
             System.exit(0);
         }
 
@@ -161,12 +162,12 @@ public class CanvasDimensionCLI {
             canvasProcessor.setSkipList(Arrays.asList(skipIds));
         }
 
-        DSpaceObject dso = null;
+        DSpaceObject dso;
         if (identifier.indexOf('/') != -1) {
             dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, identifier);
         } else {
             dso = UtilServiceFactory.getInstance().getDSpaceObjectUtils()
-                              .findDSpaceObject(context, UUID.fromString(identifier));
+                .findDSpaceObject(context, UUID.fromString(identifier));
         }
 
         if (dso == null) {

@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -44,6 +44,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionService {
 
+    // used to check for existing canvas dimension
+    private static final String IIIF_WIDTH_METADATA = "iiif.image.width";
     @Autowired()
     ItemService itemService;
     @Autowired()
@@ -54,15 +56,11 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
     DSpaceObjectService<Bitstream> dSpaceObjectService;
     @Autowired()
     IIIFApiQueryService iiifApiQuery;
-
     private boolean forceProcessing = false;
     private boolean isQuiet = false;
     private List<String> skipList = null;
     private int max2Process = Integer.MAX_VALUE;
     private int processed = 0;
-
-    // used to check for existing canvas dimension
-    private static final String IIIF_WIDTH_METADATA = "iiif.image.width";
 
     @Override
     public void setForceProcessing(boolean force) {
@@ -124,10 +122,6 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
 
     /**
      * Process all IIIF bundles for an item.
-     * @param context
-     * @param item
-     * @return
-     * @throws Exception
      */
     private boolean processItemBundles(Context context, Item item) throws Exception {
         List<Bundle> bundles = IIIFSharedUtils.getIIIFBundles(item);
@@ -152,10 +146,6 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
      * obtained from the IIIF image server. For other formats supported by ImageIO these values
      * are read from the actual DSpace bitstream content. If bitstream width metadata already exists,
      * the bitstream is processed when forceProcessing is true.
-     * @param context
-     * @param bitstream
-     * @return
-     * @throws Exception
      */
     private boolean processBitstream(Context context, Bitstream bitstream) throws SQLException, AuthorizeException,
         IOException {
@@ -164,8 +154,8 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
         boolean isImage = bitstream.getFormat(context).getMIMEType().contains("image/");
         if (isImage) {
             Optional<MetadataValue> op = bitstream.getMetadata().stream()
-                                                  .filter(m -> m.getMetadataField().toString('.')
-                                                                .contentEquals(IIIF_WIDTH_METADATA)).findFirst();
+                .filter(m -> m.getMetadataField().toString('.')
+                    .contentEquals(IIIF_WIDTH_METADATA)).findFirst();
             if (op.isEmpty() || forceProcessing) {
                 if (forceProcessing && !isQuiet) {
                     System.out.println("Force processing for bitstream: " + bitstream.getID());
@@ -202,10 +192,6 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
 
     /**
      * Sets bitstream metadata for "iiif.image.width" and "iiif.image.height".
-     * @param context
-     * @param bitstream
-     * @param dims
-     * @return
      */
     private boolean setBitstreamMetadata(Context context, Bitstream bitstream, int[] dims) throws SQLException {
         dSpaceObjectService.clearMetadata(context, bitstream, METADATA_IIIF_SCHEMA,
@@ -224,8 +210,6 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
 
     /**
      * Tests whether the identifier is in the skip list.
-     * @param identifier
-     * @return
      */
     private boolean inSkipList(String identifier) {
         if (skipList != null && skipList.contains(identifier)) {

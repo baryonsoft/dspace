@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -21,13 +21,15 @@ import javax.imageio.ImageIO;
  */
 public class ImageDimensionReader {
 
-    private ImageDimensionReader() {}
+    private ImageDimensionReader() {
+    }
 
     /**
      * Uses ImageIO to read height and width dimensions.
+     *
      * @param image inputstream for dspace image
+     *
      * @return image dimensions or null if the image format cannot be read.
-     * @throws Exception
      */
     public static int[] getImageDimensions(InputStream image) throws IOException {
         int[] dims = new int[2];

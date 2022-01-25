@@ -111,6 +111,11 @@ public class Context implements AutoCloseable {
      * Context mode
      */
     private Mode mode;
+
+    /**
+     * Cache that is only used the context is in READ_ONLY mode
+     */
+
     private DBConnection dbConnection;
 
     protected Context(EventService eventService, DBConnection dbConnection) {
@@ -126,7 +131,6 @@ public class Context implements AutoCloseable {
     public Context() {
         init();
     }
-
 
     /**
      * Construct a new context object with the given mode enabled. A database connection is opened.
@@ -885,5 +889,11 @@ public class Context implements AutoCloseable {
 
     public void setAuthenticationMethod(final String authenticationMethod) {
         this.authenticationMethod = authenticationMethod;
+    }
+
+    public enum Mode {
+        READ_ONLY,
+        READ_WRITE,
+        BATCH_EDIT
     }
 }

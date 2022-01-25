@@ -14,21 +14,6 @@ package org.dspace.statistics.content;
  */
 public class DatasetSearchGenerator extends DatasetTypeGenerator {
 
-    public static enum Mode {
-        SEARCH_OVERVIEW("search_overview"),
-        SEARCH_OVERVIEW_TOTAL("search_overview_total");
-
-        private final String text;
-
-        Mode(String text) {
-            this.text = text;
-        }
-
-        public String text() {
-            return text;
-        }
-    }
-
     private Mode mode;
     private boolean percentage = false;
     private boolean retrievePageViews;
@@ -41,12 +26,12 @@ public class DatasetSearchGenerator extends DatasetTypeGenerator {
         this.retrievePageViews = retrievePageViews;
     }
 
-    public void setPercentage(boolean percentage) {
-        this.percentage = percentage;
-    }
-
     public boolean isPercentage() {
         return percentage;
+    }
+
+    public void setPercentage(boolean percentage) {
+        this.percentage = percentage;
     }
 
     public Mode getMode() {
@@ -55,5 +40,20 @@ public class DatasetSearchGenerator extends DatasetTypeGenerator {
 
     public void setMode(Mode mode) {
         this.mode = mode;
+    }
+
+    public enum Mode {
+        SEARCH_OVERVIEW("search_overview"),
+        SEARCH_OVERVIEW_TOTAL("search_overview_total");
+
+        private final String text;
+
+        Mode(String text) {
+            this.text = text;
+        }
+
+        public String text() {
+            return text;
+        }
     }
 }
