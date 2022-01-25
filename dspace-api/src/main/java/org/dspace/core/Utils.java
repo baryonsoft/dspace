@@ -180,7 +180,6 @@ public final class Utils {
         byte[] junk = new byte[16];
 
         random.nextBytes(junk);
-
         String input = String.valueOf(vmid) + new Date() + Arrays.toString(junk) + counter++;
 
         return getMD5Bytes(input.getBytes(StandardCharsets.UTF_8));
