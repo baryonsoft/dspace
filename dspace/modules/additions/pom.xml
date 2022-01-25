@@ -1,3 +1,11 @@
+<!--
+  ~ The contents of this file are subject to the license and copyright
+  ~ detailed in the LICENSE and NOTICE files at the root of the source
+  ~ tree and available online at
+  ~
+  ~ http://www.dspace.org/license/
+  -->
+
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
@@ -18,13 +26,13 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>baryonics-0.4.5</version>
+      <version>baryonics-0.5.0</version>
       <relativePath>../pom.xml</relativePath>
    </parent>
 
    <properties>
-       <!-- This is the path to the root [dspace-src] directory. -->
-       <root.basedir>${basedir}/../../..</root.basedir>
+      <!-- This is the path to the root [dspace-src] directory. -->
+      <root.basedir>${basedir}/../../..</root.basedir>
    </properties>
 
    <build>
@@ -262,18 +270,18 @@
          <artifactId>dspace-api</artifactId>
       </dependency>
       <dependency>
-          <groupId>org.dspace</groupId>
-          <artifactId>dspace-api</artifactId>
-          <type>test-jar</type>
-          <scope>test</scope>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-api</artifactId>
+         <type>test-jar</type>
+         <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api-lang</artifactId>
       </dependency>
       <dependency>
-          <groupId>org.dspace</groupId>
-          <artifactId>dspace-services</artifactId>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-services</artifactId>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
@@ -291,29 +299,29 @@
             </exclusion>
          </exclusions>
       </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-icu</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-smartcn</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-stempel</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
-        </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-core</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers-icu</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers-smartcn</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers-stempel</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.xmlbeans</groupId>
+         <artifactId>xmlbeans</artifactId>
+      </dependency>
 
       <dependency>
          <groupId>junit</groupId>
