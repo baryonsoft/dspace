@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.iiif;
+package org.dspace.iiif.consumer;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;

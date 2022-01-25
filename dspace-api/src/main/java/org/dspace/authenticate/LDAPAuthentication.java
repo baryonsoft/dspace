@@ -82,6 +82,9 @@ public class LDAPAuthentication
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    private static final String LDAP_AUTHENTICATED = "ldap.authenticated";
+
+
     /**
      * Let a real auth method return true if it wants.
      */
@@ -251,6 +254,7 @@ public class LDAPAuthentication
 
             if (ldap.ldapAuthenticate(dn, password, context)) {
                 context.setCurrentUser(eperson);
+                request.setAttribute(LDAP_AUTHENTICATED, true);
 
                 // assign user to groups based on ldap dn
                 assignGroups(dn, ldap.ldapGroup, context);
@@ -301,6 +305,8 @@ public class LDAPAuthentication
                             context.dispatchEvents();
                             context.restoreAuthSystemState();
                             context.setCurrentUser(eperson);
+                            request.setAttribute(LDAP_AUTHENTICATED, true);
+
 
                             // assign user to groups based on ldap dn
                             assignGroups(dn, ldap.ldapGroup, context);
@@ -331,6 +337,8 @@ public class LDAPAuthentication
                                     ePersonService.update(context, eperson);
                                     context.dispatchEvents();
                                     context.setCurrentUser(eperson);
+                                    request.setAttribute(LDAP_AUTHENTICATED, true);
+
 
                                     // assign user to groups based on ldap dn
                                     assignGroups(dn, ldap.ldapGroup, context);
@@ -713,5 +721,96 @@ public class LDAPAuthentication
 
             return true;
         }
+    }
+
+    /*
+     * Returns the URL of an external login page which is not applicable for this authn method.
+     *
+     * Note: Prior to DSpace 7, this method return the page of login servlet.
+     *
+     * @param context
+     *  DSpace context, will be modified (ePerson set) upon success.
+     *
+     * @param request
+     *  The HTTP request that started this operation, or null if not applicable.
+     *
+     * @param response
+     *  The HTTP response from the servlet method.
+     *
+     * @return fully-qualified URL
+     */
+    @Override
+    public String loginPageURL(Context context,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return "ldap";
+    }
+
+    /*
+     * Add authenticated users to the group defined in dspace.cfg by
+     * the authentication-ldap.login.groupmap.* key.
+     */
+    private void assignGroups(String dn, String group, Context context) {
+        if (StringUtils.isNotBlank(dn)) {
+            System.out.println("dn:" + dn);
+            int i = 1;
+            String groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + i);
+
+            boolean cmp;
+
+            while (groupMap != null) {
+                String t[] = groupMap.split(":");
+                String ldapSearchString = t[0];
+                String dspaceGroupName = t[1];
+
+                if (group == null) {
+                    cmp = StringUtils.containsIgnoreCase(dn, ldapSearchString + ",");
+                } else {
+                    cmp = StringUtils.equalsIgnoreCase(group, ldapSearchString);
+                }
+
+                if (cmp) {
+                    // assign user to this group
+                    try {
+                        Group ldapGroup = groupService.findByName(context, dspaceGroupName);
+                        if (ldapGroup != null) {
+                            groupService.addMember(context, ldapGroup, context.getCurrentUser());
+                            groupService.update(context, ldapGroup);
+                        } else {
+                            // The group does not exist
+                            log.warn(LogHelper.getHeader(context,
+                                                          "ldap_assignGroupsBasedOnLdapDn",
+                                                          "Group defined in authentication-ldap.login.groupmap." + i
+                                                              + " does not exist :: " + dspaceGroupName));
+                        }
+                    } catch (AuthorizeException ae) {
+                        log.debug(LogHelper.getHeader(context,
+                                                       "assignGroupsBasedOnLdapDn could not authorize addition to " +
+                                                           "group",
+                                                       dspaceGroupName));
+                    } catch (SQLException e) {
+                        log.debug(LogHelper.getHeader(context, "assignGroupsBasedOnLdapDn could not find group",
+                                                       dspaceGroupName));
+                    }
+                }
+
+                groupMap = configurationService.getProperty("authentication-ldap.login.groupmap." + ++i);
+            }
+        }
+    }
+
+    @Override
+    public boolean isUsed(final Context context, final HttpServletRequest request) {
+        if (request != null &&
+                context.getCurrentUser() != null &&
+                request.getAttribute(LDAP_AUTHENTICATED) != null) {
+            return true;
+        }
+        return false;
     }
 }

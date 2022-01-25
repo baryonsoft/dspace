@@ -93,6 +93,12 @@ public class Context implements AutoCloseable {
      * Temporary store for the specialGroups when the current user is temporary switched
      */
     private List<UUID> specialGroupsPreviousState;
+
+    /**
+     * The currently used authentication method
+     */
+    private String authenticationMethod;
+
     /**
      * Content events
      */
@@ -873,10 +879,11 @@ public class Context implements AutoCloseable {
         currentUser = reloadEntity(currentUser);
     }
 
-    public enum Mode {
-        READ_ONLY,
-        READ_WRITE,
-        BATCH_EDIT
+    public String getAuthenticationMethod() {
+        return authenticationMethod;
     }
 
+    public void setAuthenticationMethod(final String authenticationMethod) {
+        this.authenticationMethod = authenticationMethod;
+    }
 }
