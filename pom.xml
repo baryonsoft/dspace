@@ -1172,7 +1172,7 @@
             <dependency>
                 <groupId>org.apache.james</groupId>
                 <artifactId>apache-mime4j-core</artifactId>
-                <version>0.8.6</version>
+                <version>0.8.7</version>
             </dependency>
 
             <!-- solr-core, solr-cell disagree with nimbus-jose-jwt -->
