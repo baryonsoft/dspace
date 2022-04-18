@@ -5,7 +5,7 @@ updates:
 - package-ecosystem: maven
   directory: '/'
   schedule:
-    interval: "weekly"
+    interval: "monthly"
     time: '00:00'
   open-pull-requests-limit: 100
   reviewers:
@@ -21,7 +21,7 @@ updates:
 - package-ecosystem: github-actions
   directory: '/'
   schedule:
-    interval: "weekly"
+    interval: "monthly"
     time: '00:00'
   open-pull-requests-limit: 10
   reviewers:
