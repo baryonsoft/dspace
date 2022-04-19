@@ -20,6 +20,7 @@ import org.junit.Test;
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class ProviderHolderTest {
 
     public class Thing {

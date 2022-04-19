@@ -28,6 +28,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class ProviderStackTest {
 
     /**
