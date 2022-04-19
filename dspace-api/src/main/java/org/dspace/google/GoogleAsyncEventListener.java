@@ -55,7 +55,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     // 20 is the event max set by the GA API
     private static final int GA_MAX_EVENTS = 20;
     private static final String ANALYTICS_BATCH_ENDPOINT = "https://www.google-analytics.com/batch";
-    private static final Logger log = LogManager.getLogger(GoogleAsyncEventListener.class);
+    private final static final Logger log = LogManager.getLogger();
     private static String analyticsKey;
     private static CloseableHttpClient httpclient;
     private static Buffer buffer;

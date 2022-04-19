@@ -42,6 +42,11 @@ nb-configuration.xml
 
 ##Ignore JRebel project configuration
 rebel.xml
+
+
+## Ignore jenv configuration
+.java-version
+
 local-dev/
 dspace-api/src/test/data/dspaceFolder/grobid-0.5.5
 dspace-api/src/test/data/dspaceFolder/0.5.5.zip

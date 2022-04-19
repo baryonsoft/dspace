@@ -32,15 +32,18 @@ public class IIIFSharedUtils {
     public static final String METADATA_IIIF_ENABLED = "dspace.iiif.enabled";
     // IIIF metadata definitions
     public static final String METADATA_IIIF_SCHEMA = "iiif";
-    public static final String METADATA_IIIF_IMAGE = "image";
-    public static final String METADATA_IIIF_HEIGHT = "height";
-    public static final String METADATA_IIIF_WIDTH = "width";
+    public static final String METADATA_IIIF_IMAGE_ELEMENT = "image";
+    public static final String METADATA_IIIF_TOC_ELEMENT = "toc";
+    public static final String METADATA_IIIF_LABEL_ELEMENT = "label";
+    public static final String METADATA_IIIF_HEIGHT_QUALIFIER = "height";
+    public static final String METADATA_IIIF_WIDTH_QUALIFIER = "width";
     // The DSpace bundle for other content related to item.
     protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
     // The IIIF image server url from configuration
     protected static final String IMAGE_SERVER_PATH = "iiif.image.server";
     protected static final ConfigurationService configurationService
         = DSpaceServicesFactory.getInstance().getConfigurationService();
+
 
     private IIIFSharedUtils() {
     }

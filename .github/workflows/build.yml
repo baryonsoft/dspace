@@ -17,9 +17,11 @@ jobs:
     strategy:
       # Create a matrix of two separate configurations for Unit vs Integration Tests
       # This will ensure those tasks are run in parallel
+      # Also specify version of Java to use (this can allow us to optionally run tests on multiple JDKs in future)
       matrix:
         include:
           - type: "Unit Tests"
+            java: 11
             mvnflags: "-DskipUnitTests=false -Dsurefire.rerunFailingTestsCount=2"
             resultsdir: "**/target/surefire-reports/**"
           # NOTE: ITs skip all code validation checks, as they are already done by Unit Test job.
@@ -29,6 +31,7 @@ jobs:
           #  - xml.skip          => Skip all XML/XSLT validation by xml-maven-plugin
           #  - failsafe.rerunFailingTestsCount => try again for flakey tests, and keep track of/report on number of retries
           - type: "Integration Tests"
+            java: 11
             mvnflags: "-DskipIntegrationTests=false -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true -Dfailsafe.rerunFailingTestsCount=2"
             resultsdir: "**/target/failsafe-reports/**"
       # Do NOT exit immediately if one matrix job fails
@@ -45,6 +48,7 @@ jobs:
           MINIO_SECRET_KEY: minio-key
           MINIO_DEFAULT_BUCKETS: 'bucket-test:public'
 
+    name: Run ${{ matrix.type }}
     # These are the actual CI steps to perform per job
     steps:
       # https://github.com/actions/checkout
@@ -52,10 +56,10 @@ jobs:
         uses: actions/checkout@v2
 
       # https://github.com/actions/setup-java
-      - name: Install JDK 11
+      - name: Install JDK ${{ matrix.java }}
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       # https://github.com/actions/cache
@@ -83,7 +87,6 @@ jobs:
         with:
           name: ${{ matrix.type }} results
           path: ${{ matrix.resultsdir }}
-          retention-days: 7
 
       # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io

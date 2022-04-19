@@ -73,7 +73,7 @@ public class UUIDLookupRestController implements InitializingBean {
         discoverableEndpointsService
             .register(this,
                     List.of(
-                            new Link(
+                            Link.of(
                                     UriTemplate.of("/api/" + CATEGORY + "/" + ACTION,
                                             new TemplateVariables(
                                                     new TemplateVariable(PARAM, VariableType.REQUEST_PARAM))),

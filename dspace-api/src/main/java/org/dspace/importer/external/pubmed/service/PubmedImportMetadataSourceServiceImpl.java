@@ -25,10 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.common.io.CharStreams;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMXMLBuilderFactory;
-import org.apache.axiom.om.OMXMLParserWrapper;
-import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -38,7 +34,13 @@ import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.FileSource;
 import org.dspace.importer.external.service.components.QuerySource;
-import org.jaxen.JaxenException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 
 /**
  * Implements a data source for querying PubMed Central
@@ -46,7 +48,7 @@ import org.jaxen.JaxenException;
  * @author Roeland Dillen (roeland at atmire dot com)
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
-public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
+public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
     implements QuerySource, FileSource {
 
     // it is protected so that subclass can mock it for testing
@@ -317,6 +319,28 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
+
+    private String getSingleElementValue(String src, String elementName) {
+        String value = null;
+
+        try {
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document document = saxBuilder.build(new StringReader(src));
+            Element root = document.getRootElement();
+
+            XPathExpression<Element> xpath =
+                XPathFactory.instance().compile("//" + elementName, Filters.element());
+
+            Element record = xpath.evaluateFirst(root);
+            if (record != null) {
+                value = record.getText();
+            }
+        } catch (JDOMException | IOException e) {
+            value = null;
+        }
+        return value;
+    }
+
     private class GetRecords implements Callable<Collection<ImportRecord>> {
 
         private final Query query;
@@ -372,13 +396,29 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             invocationBuilder = getRecordsTarget.request(MediaType.TEXT_PLAIN_TYPE);
             response = invocationBuilder.get();
 
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
+            List<Element> elements = splitToRecords(response.readEntity(String.class));
 
-            for (OMElement record : omElements) {
+            for (Element record : elements) {
                 records.add(transformSourceRecords(record));
             }
 
             return records;
+        }
+    }
+
+    private List<Element> splitToRecords(String recordsSrc) {
+        try {
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document document = saxBuilder.build(new StringReader(recordsSrc));
+            Element root = document.getRootElement();
+
+            XPathExpression<Element> xpath =
+                XPathFactory.instance().compile("//PubmedArticle", Filters.element());
+
+            List<Element> recordsList = xpath.evaluate(root);
+            return recordsList;
+        } catch (JDOMException | IOException e) {
+            return null;
         }
     }
 
@@ -407,13 +447,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             Response response = invocationBuilder.get();
 
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
+            List<Element> elements = splitToRecords(response.readEntity(String.class));
 
-            if (omElements.size() == 0) {
+            if (elements.isEmpty()) {
                 return null;
             }
 
-            return transformSourceRecords(omElements.get(0));
+            return transformSourceRecords(elements.get(0));
         }
     }
 
@@ -458,5 +498,38 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String xml = response.readEntity(String.class);
             return parseXMLString(xml);
         }
+    }
+
+
+    @Override
+    public List<ImportRecord> getRecords(InputStream inputStream) throws FileSourceException {
+        String xml = null;
+        try (Reader reader = new InputStreamReader(inputStream, "UTF-8")) {
+            xml = CharStreams.toString(reader);
+            return parseXMLString(xml);
+        } catch (IOException e) {
+            throw new FileSourceException ("Cannot read XML from InputStream", e);
+        }
+    }
+
+    @Override
+    public ImportRecord getRecord(InputStream inputStream) throws FileSourceException, FileMultipleOccurencesException {
+        List<ImportRecord> importRecord = getRecords(inputStream);
+        if (importRecord == null || importRecord.isEmpty()) {
+            throw new FileSourceException("Cannot find (valid) record in File");
+        } else if (importRecord.size() > 1) {
+            throw new FileMultipleOccurencesException("File contains more than one entry");
+        } else {
+            return importRecord.get(0);
+        }
+    }
+
+    private List<ImportRecord> parseXMLString(String xml) {
+        List<ImportRecord> records = new LinkedList<ImportRecord>();
+        List<Element> elements = splitToRecords(xml);
+        for (Element record : elements) {
+            records.add(transformSourceRecords(record));
+        }
+        return records;
     }
 }

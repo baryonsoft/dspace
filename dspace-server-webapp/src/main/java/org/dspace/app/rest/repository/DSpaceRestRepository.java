@@ -21,12 +21,15 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -44,19 +47,43 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID extends Serializable>
     extends AbstractDSpaceRestRepository
-    implements PagingAndSortingRepository<T, ID> {
+    implements PagingAndSortingRepository<T, ID>, BeanNameAware {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceRestRepository.class);
 
-    //Trick to make inner-calls to ourselves that are checked by Spring security
-    //See:
-    // https://stackoverflow.com/questions/13564627/spring-aop-not-working-for-method-call-inside-another-method
-    // https://docs.spring.io/spring/docs/4.3.18.RELEASE/spring-framework-reference/htmlsingle/#aop-understanding-aop-proxies
-    @Autowired
+    private String thisRepositoryBeanName;
     private DSpaceRestRepository<T, ID> thisRepository;
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
     private MetadataFieldService metadataFieldService;
+
+    /**
+     * From BeanNameAware. Allows us to capture the name of the bean, so we can load it into thisRepository.
+     * See getThisRepository() method.
+     * @param beanName name of ourselves
+     */
+    @Override
+    public void setBeanName(String beanName) {
+        this.thisRepositoryBeanName = beanName;
+    }
+
+    /**
+     * Get access to our current DSpaceRestRepository bean. This is a trick to make inner-calls to ourselves that are
+     * checked by Spring Security
+     * See:
+     * https://stackoverflow.com/questions/13564627/spring-aop-not-working-for-method-call-inside-another-method
+     * https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-understanding-aop-proxies
+     * @return current DSpaceRestRepository
+     */
+    private DSpaceRestRepository<T, ID> getThisRepository() {
+        if (thisRepository == null) {
+            thisRepository = (DSpaceRestRepository<T, ID>) applicationContext.getBean(thisRepositoryBeanName);
+        }
+        return thisRepository;
+    }
 
     @Override
     public <S extends T> S save(S entity) {
@@ -106,12 +133,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      */
     public Optional<T> findById(ID id) {
         Context context = obtainContext();
-        T object = null;
-        try {
-            object = thisRepository.findOne(context, id);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        final T object = getThisRepository().findOne(context, id);
         if (object == null) {
             return Optional.empty();
         } else {
@@ -173,7 +195,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public void deleteById(ID id) {
         Context context = obtainContext();
         try {
-            thisRepository.delete(context, id);
+            getThisRepository().delete(context, id);
             context.commit();
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
@@ -214,6 +236,14 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     @Override
     /**
+     * Deletes all instances of the type T with the given IDs.
+     */
+    public void deleteAllById(Iterable<? extends ID> ids) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    /**
      * Method to implement to support bulk delete of ALL entity instances
      */
     public void deleteAll() {
@@ -235,7 +265,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      */
     public Page<T> findAll(Pageable pageable) {
         Context context = obtainContext();
-        return thisRepository.findAll(context, pageable);
+        return getThisRepository().findAll(context, pageable);
     }
 
     /**
@@ -260,7 +290,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         Context context;
         try {
             context = obtainContext();
-            T entity = thisRepository.createAndReturn(context);
+            T entity = getThisRepository().createAndReturn(context);
             context.commit();
             return entity;
         } catch (AuthorizeException e) {
@@ -282,7 +312,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         Context context;
         try {
             context = obtainContext();
-            T entity = thisRepository.createAndReturn(context, uuid);
+            T entity = getThisRepository().createAndReturn(context, uuid);
             context.commit();
             return entity;
         } catch (AuthorizeException e) {
@@ -304,7 +334,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         Context context;
         try {
             context = obtainContext();
-            T entity = thisRepository.createAndReturn(context, list);
+            T entity = getThisRepository().createAndReturn(context, list);
             context.commit();
             return entity;
         } catch (AuthorizeException e) {
@@ -391,7 +421,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         throws UnprocessableEntityException, DSpaceBadRequestException {
         Context context = obtainContext();
         try {
-            thisRepository.patch(context, request, apiCategory, model, id, patch);
+            getThisRepository().patch(context, request, apiCategory, model, id, patch);
             context.commit();
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
@@ -474,7 +504,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public T put(HttpServletRequest request, String apiCategory, String model, ID uuid, JsonNode jsonNode) {
         Context context = obtainContext();
         try {
-            thisRepository.put(context, request, apiCategory, model, uuid, jsonNode);
+            getThisRepository().put(context, request, apiCategory, model, uuid, jsonNode);
             context.commit();
         } catch (SQLException e) {
             throw new RuntimeException("Unable to update DSpace object " + model + " with id=" + uuid, e);
@@ -500,7 +530,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
                  List<String> stringList) {
         Context context = obtainContext();
         try {
-            thisRepository.put(context, request, apiCategory, model, id, stringList);
+            getThisRepository().put(context, request, apiCategory, model, id, stringList);
             context.commit();
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
