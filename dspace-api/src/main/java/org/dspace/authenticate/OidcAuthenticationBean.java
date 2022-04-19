@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -14,7 +14,7 @@ import static org.apache.commons.lang.BooleanUtils.toBoolean;
 import static org.apache.commons.lang3.StringUtils.isAnyBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -106,7 +106,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
             return NO_SUCH_USER;
         }
 
-        String code = (String) request.getParameter("code");
+        String code = request.getParameter("code");
         if (StringUtils.isEmpty(code)) {
             LOGGER.warn("The incoming request has not code parameter");
             return NO_SUCH_USER;
@@ -180,12 +180,8 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
             return "";
         }
 
-        try {
-            return format(LOGIN_PAGE_URL_FORMAT, authorizeUrl, clientId, scopes, encode(redirectUri, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error(e.getMessage(), e);
-            return "";
-        }
+        return format(LOGIN_PAGE_URL_FORMAT, authorizeUrl, clientId, scopes,
+            encode(redirectUri, StandardCharsets.UTF_8));
 
     }
 
@@ -286,12 +282,9 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
     @Override
     public boolean isUsed(final Context context, final HttpServletRequest request) {
-        if (request != null &&
-                context.getCurrentUser() != null &&
-                request.getAttribute(OIDC_AUTHENTICATED) != null) {
-            return true;
-        }
-        return false;
+        return request != null &&
+            context.getCurrentUser() != null &&
+            request.getAttribute(OIDC_AUTHENTICATED) != null;
     }
 
 }

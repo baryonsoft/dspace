@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -30,7 +30,7 @@ public interface FeedbackService {
      * @throws IOException
      * @throws MessagingException
      */
-    public void sendEmail(Context context, HttpServletRequest request, String recipientEmail, String senderEmail,
-            String message, String page) throws IOException, MessagingException;
+    void sendEmail(Context context, HttpServletRequest request, String recipientEmail, String senderEmail,
+                   String message, String page) throws IOException, MessagingException;
 
 }

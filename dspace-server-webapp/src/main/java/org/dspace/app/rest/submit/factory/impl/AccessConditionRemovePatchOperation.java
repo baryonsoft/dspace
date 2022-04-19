@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -47,7 +47,7 @@ public class AccessConditionRemovePatchOperation extends RemovePatchOperation<Ac
         } else if (absolutePath.length == 2) {
             // to remove an access condition
             // contains "<:access-idx>"
-            Integer idxToDelete = null;
+            Integer idxToDelete;
             try {
                 idxToDelete = Integer.parseInt(absolutePath[1]);
             } catch (NumberFormatException e) {

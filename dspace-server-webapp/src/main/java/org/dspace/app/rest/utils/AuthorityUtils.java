@@ -65,13 +65,10 @@ public class AuthorityUtils {
     /**
      * TODO the authorityName MUST be a part of Choice model
      *
-     * @param choice
-     * @param authorityName
      * @param projection the name of the projection to use, or {@code null}.
-     * @return
      */
     public VocabularyEntryDetailsRest convertEntryDetails(Choice choice, String authorityName,
-           boolean isHierarchical, Projection projection) {
+                                                          boolean isHierarchical, Projection projection) {
         if (choice == null) {
             return null;
         }
@@ -86,16 +83,17 @@ public class AuthorityUtils {
      * This utility method is currently a workaround to enrich the REST object with
      * information from the parent vocabulary that is not referenced by the Choice
      * model
-     * 
+     *
      * @param choice         the dspace-api choice to expose as vocabulary entry
      * @param authorityName  the name of the vocabulary
      * @param storeAuthority <code>true</code> if the entry id should be exposed as
      *                       an authority for storing it in the metadatavalue
      * @param projection     the rest projection to apply
+     *
      * @return the vocabulary entry rest reppresentation of the provided choice
      */
     public VocabularyEntryRest convertEntry(Choice choice, String authorityName, boolean storeAuthority,
-            Projection projection) {
+                                            Projection projection) {
         if (choice == null) {
             return null;
         }
@@ -115,10 +113,7 @@ public class AuthorityUtils {
     /**
      * TODO the authorityName MUST be a part of ChoiceAuthority model
      *
-     * @param source
-     * @param authorityName
      * @param projection the projecton to use.
-     * @return
      */
     public VocabularyRest convertAuthority(ChoiceAuthority source, String authorityName, Projection projection) {
         VocabularyRest result = converter.toRest(source, projection);

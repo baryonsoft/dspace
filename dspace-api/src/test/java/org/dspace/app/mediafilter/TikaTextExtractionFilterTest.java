@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -30,7 +30,8 @@ import org.junit.Test;
  */
 public class TikaTextExtractionFilterTest extends AbstractUnitTest {
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ConfigurationService configurationService =
+        DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Test of getDestinationStream method using temp file for text extraction

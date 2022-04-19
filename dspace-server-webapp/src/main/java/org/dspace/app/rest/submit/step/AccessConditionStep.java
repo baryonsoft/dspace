@@ -1,4 +1,4 @@
-/**
+/*
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
@@ -66,7 +66,7 @@ public class AccessConditionStep extends AbstractProcessingStep {
     }
 
     private List<AccessConditionDTO> getAccessConditionList(Item item) {
-        List<AccessConditionDTO> accessConditions = new ArrayList<AccessConditionDTO>();
+        List<AccessConditionDTO> accessConditions = new ArrayList<>();
         for (ResourcePolicy rp : item.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
                 AccessConditionDTO accessConditionDTO = createAccessConditionFromResourcePolicy(rp);

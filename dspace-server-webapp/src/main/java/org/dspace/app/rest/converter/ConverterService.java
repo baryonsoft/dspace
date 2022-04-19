@@ -98,13 +98,15 @@ public class ConverterService {
      * </p>
      *
      * @param modelObject the model object, which may be a JPA entity any other class for which a converter exists.
-     * @param projection the projection to use.
-     * @param <M> the type of model object. A converter {@link Component} must exist that takes this as input.
-     * @param <R> the inferred return type.
+     * @param projection  the projection to use.
+     * @param <M>         the type of model object. A converter {@link Component} must exist that takes this as input.
+     * @param <R>         the inferred return type.
+     *
      * @return the converted object. If it's a {@link RestAddressableModel}, its
-     *         {@link RestAddressableModel#getProjection()} will be set to the given projection.
+     * {@link RestAddressableModel#getProjection()} will be set to the given projection.
+     *
      * @throws IllegalArgumentException if there is no compatible converter.
-     * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
+     * @throws ClassCastException       if the converter's return type is not compatible with the inferred return type.
      */
     public <M, R> R toRest(M modelObject, Projection projection) {
         M transformedModel = projection.transformModel(modelObject);
@@ -118,10 +120,10 @@ public class ConverterService {
             String preAuthorizeValue = getPreAuthorizeAnnotationForBaseObject(baseObjectRest);
             if (!webSecurityExpressionEvaluator
                 .evaluate(preAuthorizeValue, requestService.getCurrentRequest().getHttpServletRequest(),
-                          requestService.getCurrentRequest().getHttpServletResponse(),
-                          String.valueOf(baseObjectRest.getId()))) {
+                    requestService.getCurrentRequest().getHttpServletResponse(),
+                    String.valueOf(baseObjectRest.getId()))) {
                 log.debug("Access denied on " + restObject.getClass() + " with id: " +
-                              ((BaseObjectRest) restObject).getId());
+                    ((BaseObjectRest) restObject).getId());
                 return null;
             }
         }
@@ -193,13 +195,15 @@ public class ConverterService {
      * Converts a list of model objects to a page of rest objects using the given {@link Projection}.
      *
      * @param modelObjects the list of model objects.
-     * @param pageable the pageable.
-     * @param projection the projection to use.
-     * @param <M> the model object class.
-     * @param <R> the rest object class.
+     * @param pageable     the pageable.
+     * @param projection   the projection to use.
+     * @param <M>          the model object class.
+     * @param <R>          the rest object class.
+     *
      * @return the page.
+     *
      * @throws IllegalArgumentException if there is no compatible converter.
-     * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
+     * @throws ClassCastException       if the converter's return type is not compatible with the inferred return type.
      */
     public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, Projection projection) {
         List<R> transformedList = new LinkedList<>();
@@ -220,12 +224,14 @@ public class ConverterService {
      * This method differences in the sense that we define a total here instead of the size of the list because
      * this method will be called if the list is limited through a DB call already and thus we need to give the
      * total amount of records in the DB; not the size of the given list
+     *
      * @param modelObjects the list of model objects.
-     * @param pageable the pageable.
-     * @param total The total amount of objects
-     * @param projection the projection to use.
-     * @param <M> the model object class.
-     * @param <R> the rest object class.
+     * @param pageable     the pageable.
+     * @param total        The total amount of objects
+     * @param projection   the projection to use.
+     * @param <M>          the model object class.
+     * @param <R>          the rest object class.
+     *
      * @return the page.
      */
     public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, long total, Projection projection) {
@@ -247,9 +253,11 @@ public class ConverterService {
      * Gets the converter supporting the given class as input.
      *
      * @param sourceClass the desired converter's input type.
-     * @param <M> the converter's input type.
-     * @param <R> the converter's output type.
+     * @param <M>         the converter's input type.
+     * @param <R>         the converter's output type.
+     *
      * @return the converter.
+     *
      * @throws IllegalArgumentException if there is no such converter.
      */
     <M, R> DSpaceConverter<M, R> getConverter(Class<M> sourceClass) {
@@ -269,10 +277,12 @@ public class ConverterService {
      * </p>
      *
      * @param restObject the input rest object.
-     * @param <T> the return type, a subclass of {@link HALResource}.
+     * @param <T>        the return type, a subclass of {@link HALResource}.
+     *
      * @return the fully converted resource, with all automatic links and embeds applied.
+     *
      * @throws IllegalArgumentException if there is no compatible resource constructor.
-     * @throws ClassCastException if the resource type is not compatible with the inferred return type.
+     * @throws ClassCastException       if the resource type is not compatible with the inferred return type.
      */
     public <T extends HALResource> T toResource(RestModel restObject) {
         return toResource(restObject, new Link[] {});
@@ -291,8 +301,9 @@ public class ConverterService {
      * </p>
      *
      * @param restObject the input rest object.
-     * @param oldLinks  The old links fo the Resource Object
-     * @param <T> the return type, a subclass of {@link HALResource}.
+     * @param oldLinks   The old links fo the Resource Object
+     * @param <T>        the return type, a subclass of {@link HALResource}.
+     *
      * @return the fully converted resource, with all automatic links and embeds applied.
      */
     public <T extends HALResource> T toResource(RestModel restObject, Link... oldLinks) {
@@ -315,7 +326,9 @@ public class ConverterService {
      * Gets the projection with the given name, or the default (no-op) projection if null is given.
      *
      * @param projectionName the projection name, or {@code null}.
+     *
      * @return the projection with the given name, or {@link DefaultProjection} if {@code null} is given.
+     *
      * @throws IllegalArgumentException if a name is provided and such a projection cannot be found.
      */
     public Projection getProjection(@Nullable String projectionName) {
@@ -332,7 +345,8 @@ public class ConverterService {
      * </p>
      *
      * @param restObject the rest object to wrap.
-     * @param <T> the return type, a subclass of {@link HALResource}.
+     * @param <T>        the return type, a subclass of {@link HALResource}.
+     *
      * @return a new resource instance of the appropriate type.
      */
     private <T extends HALResource> T getResource(RestModel restObject) {
@@ -360,7 +374,9 @@ public class ConverterService {
      * Gets the projection with the given name or throws an {@link IllegalArgumentException}.
      *
      * @param projectionName the projection name.
+     *
      * @return the projection.
+     *
      * @throws IllegalArgumentException if not found.
      */
     private Projection requireProjection(String projectionName) {
@@ -374,7 +390,9 @@ public class ConverterService {
      * Gets the converter that supports the given source/input class or throws an {@link IllegalArgumentException}.
      *
      * @param sourceClass the source/input class.
+     *
      * @return the converter.
+     *
      * @throws IllegalArgumentException if not found.
      */
     private DSpaceConverter requireConverter(Class sourceClass) {
@@ -436,11 +454,11 @@ public class ConverterService {
                     resourceConstructors.put(restClass, compatibleConstructor);
                 } else {
                     log.warn("Skipping registration of resource class " + resourceClassName
-                                 + "; compatible constructor not found");
+                        + "; compatible constructor not found");
                 }
             } catch (ClassNotFoundException e) {
                 log.warn("Skipping registration of resource class " + resourceClassName
-                             + "; rest class not found: " + restClassName);
+                    + "; rest class not found: " + restClassName);
             }
         }
     }
