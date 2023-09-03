@@ -1,0 +1,34 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":disableDependencyDashboard"
+  ],
+  "reviewers": [
+    "astrowq"
+  ],
+  "schedule": [
+    "every weekend"
+  ],
+  "addLabels": [
+    "dependencies"
+  ],
+  "enabledManagers": [
+    "maven",
+    "github-actions",
+  ],
+  "ignoreDeps": [
+  ],
+  "packageRules": [
+  ],
+  "pin": {
+    "enabled": false
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
+  "automergeType": "branch",
+  "prConcurrentLimit": 5,
+  "rebaseWhen": "conflicted"
+}
