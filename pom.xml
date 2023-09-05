@@ -1710,7 +1710,7 @@
             <dependency>
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client-jackson2</artifactId>
-                <version>1.23.0</version>
+                <version>1.43.3</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>jackson-core</artifactId>
