@@ -18,6 +18,7 @@
     "github-actions",
   ],
   "ignoreDeps": [
+    "com.amazonaws:aws-java-sdk-s3"
   ],
   "packageRules": [
   ],
