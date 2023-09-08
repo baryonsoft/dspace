@@ -385,7 +385,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <!-- Used for code coverage reporting (see 'measure-test-coverage' profile) -->
                 <plugin>
