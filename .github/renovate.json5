@@ -21,6 +21,16 @@
     "com.amazonaws:aws-java-sdk-s3"
   ],
   "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "org.hibernate:*",
+        "org.eclipse.jetty:*",
+        "org.springframework.boot:*",
+        "org.springframework:*",
+        "org.springframework.security:*",
+      ],
+      "enabled": false
+    }
   ],
   "pin": {
     "enabled": false
@@ -31,5 +41,6 @@
   },
   "automergeType": "branch",
   "prConcurrentLimit": 5,
+  "prHourlyLimit": 5,
   "rebaseWhen": "conflicted"
 }
