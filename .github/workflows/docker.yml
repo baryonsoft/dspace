@@ -57,7 +57,7 @@ jobs:
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU emulation to build for multiple architectures
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       # https://github.com/docker/login-action
       - name: Login to DockerHub
@@ -114,7 +114,7 @@ jobs:
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU emulation to build for multiple architectures
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       # https://github.com/docker/login-action
       - name: Login to DockerHub
@@ -169,7 +169,7 @@ jobs:
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU emulation to build for multiple architectures
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       # https://github.com/docker/login-action
       - name: Login to DockerHub
@@ -227,7 +227,7 @@ jobs:
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU emulation to build for multiple architectures
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       # https://github.com/docker/login-action
       - name: Login to DockerHub
@@ -280,7 +280,7 @@ jobs:
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU emulation to build for multiple architectures
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       # https://github.com/docker/login-action
       - name: Login to DockerHub
@@ -333,7 +333,7 @@ jobs:
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU emulation to build for multiple architectures
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       # https://github.com/docker/login-action
       - name: Login to DockerHub
@@ -387,7 +387,7 @@ jobs:
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU emulation to build for multiple architectures
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       # https://github.com/docker/login-action
       - name: Login to DockerHub
