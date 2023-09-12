@@ -72,7 +72,7 @@ jobs:
       # Get Metadata for docker_build_deps step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-dependencies' image
         id: meta_build_deps
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: dspace/dspace-dependencies
           tags: ${{ env.IMAGE_TAGS }}
@@ -128,7 +128,7 @@ jobs:
       # Get Metadata for docker_build step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace' image
         id: meta_build
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: dspace/dspace
           tags: ${{ env.IMAGE_TAGS }}
@@ -183,7 +183,7 @@ jobs:
       # Get Metadata for docker_build_test step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-test' image
         id: meta_build_test
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: dspace/dspace
           tags: ${{ env.IMAGE_TAGS }}
@@ -241,7 +241,7 @@ jobs:
       # Get Metadata for docker_build_test step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-cli' image
         id: meta_build_cli
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: dspace/dspace-cli
           tags: ${{ env.IMAGE_TAGS }}
@@ -294,7 +294,7 @@ jobs:
       # Get Metadata for docker_build_solr step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-solr' image
         id: meta_build_solr
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: dspace/dspace-solr
           tags: ${{ env.IMAGE_TAGS }}
@@ -347,7 +347,7 @@ jobs:
       # Get Metadata for docker_build_postgres step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-postgres-pgcrypto' image
         id: meta_build_postgres
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: dspace/dspace-postgres-pgcrypto
           tags: ${{ env.IMAGE_TAGS }}
@@ -401,7 +401,7 @@ jobs:
       # Get Metadata for docker_build_postgres_loadsql step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-postgres-pgcrypto-loadsql' image
         id: meta_build_postgres_loadsql
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: dspace/dspace-postgres-pgcrypto
           tags: ${{ env.IMAGE_TAGS }}
