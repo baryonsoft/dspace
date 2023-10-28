@@ -228,7 +228,7 @@
                 <!-- Used to run Integration tests (when enabled by -DskipIntegrationTests=false) -->
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.1</version>
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
